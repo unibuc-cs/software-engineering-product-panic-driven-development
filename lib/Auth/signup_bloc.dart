@@ -12,7 +12,9 @@ part 'signup_event.dart';
 part 'signup_state.dart';
 
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
-  SignUpBloc() : super(SignUpInitial());
+  SignUpBloc() : super(SignUpInitial()) {
+    on<SignUpButtonPressed>(_onSignUpButtonPressed);
+  }
 
   String generateRandomString() {
     var r = Random();
@@ -57,19 +59,18 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   }
 
   @override
-  Stream<SignUpState> mapEventToState(SignUpEvent event) async* {
+  Future<void> _onSignUpButtonPressed( SignUpButtonPressed event, Emitter<SignUpState> emit) async {
     if (event is SignUpButtonPressed) {
-      yield SignUpLoading();
-
+      emit(SignUpLoading());
       try {
         await Future.delayed(const Duration(seconds: 1));
         List<Object> list = event.props;
         addUser(list[1].toString(), list[2].toString(), list[3].toString(),
             list[4].toString());
-        yield SignUpSuccess();
+        emit(SignUpSuccess());
         Navigator.pop(list[0] as BuildContext);
       } catch (error) {
-        yield SignUpFailure(error: error.toString());
+        emit(SignUpFailure(error: error.toString()));
       }
     }
   }

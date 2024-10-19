@@ -13,7 +13,9 @@ part 'login_event.dart';
 part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc() : super(LoginInitial());
+  LoginBloc() : super(LoginInitial()) {
+    on<LoginButtonPressed>(_onLoginButtonPressed);
+  }
 
   void checkUser(
     String _email,
@@ -49,20 +51,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   @override
-  Stream<LoginState> mapEventToState(LoginEvent event) async* {
+  Future<void> _onLoginButtonPressed(LoginButtonPressed event, Emitter<LoginState> emit) async {
     if (event is LoginButtonPressed) {
-      yield LoginLoading();
+      emit(LoginLoading());
       try {
         await Future.delayed(const Duration(seconds: 1));
         List<Object> list = event.props;
         checkUser(list[1].toString(), list[2].toString());
-        yield LoginSuccess();
+        emit(LoginSuccess());
         Navigator.pop(list[0] as BuildContext);
         Navigator.pop(list[0] as BuildContext);
         Navigator.of(list[0] as BuildContext)
             .push(MaterialPageRoute(builder: (context) => const GameLibrary()));
       } catch (error) {
-        yield LoginFailure(error: error.toString());
+        emit(LoginFailure(error: error.toString()));
       }
     }
   }
