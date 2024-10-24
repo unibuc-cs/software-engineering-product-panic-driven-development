@@ -1,3 +1,4 @@
+
 name: mediamaster
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
@@ -43,11 +44,13 @@ dependencies:
   hive_flutter: ^1.1.0
   pair: ^0.1.2
   hive_generator: ^2.0.1
-  flutter_bloc: ^7.3.3
+  flutter_bloc: ^8.1.6
   equatable: ^2.0.3
-  email_validator: ^2.0.1
+  email_validator: ^3.0.0
   test: ^1.24.9
   adaptive_theme: ^3.4.0
+
+  supabase_flutter: ^1.2.2
 
 dev_dependencies:
   flutter_test:
@@ -58,7 +61,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

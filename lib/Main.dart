@@ -9,9 +9,19 @@ import 'Auth/signup_bloc.dart';
 import 'Auth/login_screen.dart';
 import 'Auth/login_bloc.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'API/general/Constants.dart';
+
 void main() async {
   await initHiveAndAdapters();
   addSeedData();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: urlSupabase,
+    anonKey: anonKeySupabase,
+  );
 
   runApp(MyApp());
 }
@@ -47,6 +57,14 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
+  //function for testing database connection
+   Future<void> insertPublisher() async {
+    final response = await Supabase.instance.client.from('publisher').insert({
+      'name': 'Test Publisher',
+    }).execute();
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,9 +116,22 @@ class HomeState extends State<Home> {
               ),
               child: const Text('Log in'),
             ),
+              ElevatedButton(
+              onPressed: () {
+                insertPublisher();  // Call the insertPublisher function here
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    const Color.fromARGB(219, 10, 94, 87)),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+              ),
+              child: const Text('Insert Publisher'),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+

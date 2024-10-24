@@ -50,3 +50,6 @@ app.*.map.json
 
 *.lock
 lib/API/general/Constants.dart
+
+# For Visual Studio
+./vs
