@@ -50,8 +50,8 @@ dependencies:
   test: ^1.24.9
   adaptive_theme: ^3.4.0
 
-  supabase_flutter: ^1.2.2
-
+  supabase_flutter: ^2.8.0
+  flutter_dotenv: ^5.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -68,6 +68,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - .env
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -10,17 +10,17 @@ import 'Auth/login_screen.dart';
 import 'Auth/login_bloc.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'API/general/Constants.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
+   await dotenv.load(fileName: ".env");
+
   await initHiveAndAdapters();
   addSeedData();
 
-  WidgetsFlutterBinding.ensureInitialized();
-
   await Supabase.initialize(
-    url: urlSupabase,
-    anonKey: anonKeySupabase,
+    url: dotenv.env['URL_SUPABASE'] ?? 'default_value',
+    anonKey: dotenv.env['ANON_KEY_SUPABASE'] ?? 'default_value',
   );
 
   runApp(MyApp());
@@ -58,12 +58,19 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> {
   //function for testing database connection
-   Future<void> insertPublisher() async {
-    final response = await Supabase.instance.client.from('publisher').insert({
-      'name': 'Test Publisher',
-    }).execute();
-
+  Future<void> insertPublisher() async {
+  final response = await Supabase.instance.client
+      .from('publisher')
+      .insert({'name': 'Test Publisher'});
+  
+  if (response.error != null) {
+    // Handle error
+    print("Error inserting publisher: ${response.error.message}");
+  } else {
+    print("Publisher inserted successfully.");
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
