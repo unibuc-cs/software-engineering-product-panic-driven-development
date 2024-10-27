@@ -44,6 +44,8 @@ Future<void> main() async {
     print("[4] Goodreads (Books)");
     print("[5] TMDB (Movies)");
     print("[6] TMDB (TV Series)");
+    print("[7] Anilist (Anime)");
+    print("[8] Anilist (Manga)");
     print("[9] Change query (Current: $query)");
     print("[0] Exit");
     stdout.write("\nEnter your choice: ");
@@ -67,6 +69,12 @@ Future<void> main() async {
         break;
       case "6":
         ServiceBuilder.setTmdbSeries();
+        break;
+      case "7":
+        ServiceBuilder.setAnilistAnime();
+        break;
+      case "8":
+        ServiceBuilder.setAnilistManga();
         break;
       case "9":
         stdout.write("New query: ");
