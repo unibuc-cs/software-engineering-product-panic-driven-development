@@ -1,5 +1,10 @@
 # MediaMaster
 
+## Prerequisites
+- Get a Supabase URL and Key: https://supabase.com/docs
+- Get an IGDB ID and Secret: https://api-docs.igdb.com/#getting-started
+- Add them into .env.example and remove .example from the name
+
 ## Usage
 
 - Activate Run Pubspec Script

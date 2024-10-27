@@ -2,15 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../general/Service.dart';
-import '../general/Constants.dart';
 
-class IGDB implements Service {
+class IGDB extends Service {
   // Members
-  final _params = {
-    "client_id": clientIdIGDB,
-    "client_secret": clientSecretIGDB,
-    "grant_type": "client_credentials"
-  };
+  late final Map<String, String> _params;
   String _accessToken = "";
   List<String> _artwork = [];
   String _cover = "";
@@ -23,7 +18,13 @@ class IGDB implements Service {
   List<String> _websites = [];
 
   // Private constructor
-  IGDB._();
+  IGDB._() {
+    _params = {
+      "client_id": env['CLIENT_ID_IGDB'] ?? '',
+      "client_secret": env['CLIENT_SECRET_IGDB'] ?? '',
+      "grant_type": "client_credentials"
+    };
+  }
 
   // Singleton instance
   static final IGDB _instance = IGDB._();
@@ -71,7 +72,7 @@ class IGDB implements Service {
     try {
       final url = Uri.parse("https://api.igdb.com/v4/artworks");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body = "fields url; where id = ${_formatIds(game, 'artworks')};";
@@ -89,7 +90,7 @@ class IGDB implements Service {
     try {
       final url = Uri.parse("https://api.igdb.com/v4/covers");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body = "fields url; where id = ${game['cover']};";
@@ -111,7 +112,7 @@ class IGDB implements Service {
       }
       final url = Uri.parse("https://api.igdb.com/v4/collections");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body =
@@ -141,7 +142,7 @@ class IGDB implements Service {
 
       final url = Uri.parse("https://api.igdb.com/v4/companies");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body = "fields name; where id = $ids;";
@@ -177,7 +178,7 @@ class IGDB implements Service {
     try {
       final url = Uri.parse("https://api.igdb.com/v4/involved_companies");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body =
@@ -206,7 +207,7 @@ class IGDB implements Service {
       }
       final url = Uri.parse("https://api.igdb.com/v4/franchises");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body = "fields name; where id = ${_formatIds(game, 'franchise')};";
@@ -224,7 +225,7 @@ class IGDB implements Service {
     try {
       final url = Uri.parse("https://api.igdb.com/v4/genres");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body = "fields name; where id = ${_formatIds(game, 'genres')};";
@@ -243,7 +244,7 @@ class IGDB implements Service {
     try {
       final url = Uri.parse("https://api.igdb.com/v4/platforms");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body = "fields name; where id = ${_formatIds(game, 'platforms')};";
@@ -262,7 +263,7 @@ class IGDB implements Service {
     try {
       final url = Uri.parse("https://api.igdb.com/v4/websites");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body = "fields url; where game = ${game['id']};";
@@ -304,7 +305,7 @@ class IGDB implements Service {
 
       final url = Uri.parse("https://api.igdb.com/v4/games");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $accessToken",
       };
       final body =
@@ -328,7 +329,7 @@ class IGDB implements Service {
 
       final url = Uri.parse("https://api.igdb.com/v4/games");
       final headers = {
-        "Client-ID": clientIdIGDB,
+        "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
         "Authorization": "Bearer $_accessToken",
       };
       // version_parent = null -> no editions
@@ -380,7 +381,7 @@ class IGDB implements Service {
 
     final url = Uri.parse("https://api.igdb.com/v4/games");
     final headers = {
-      "Client-ID": clientIdIGDB,
+      "Client-ID": env['CLIENT_ID_IGDB'] ?? '',
       "Authorization": "Bearer $_accessToken",
     };
     final body = "fields similar_games; where id = ${gameId};";

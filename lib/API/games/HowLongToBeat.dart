@@ -4,7 +4,7 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import '../general/Service.dart';
 
-class HowLongToBeat implements Service {
+class HowLongToBeat extends Service {
   // Members
 
   // classes for HLTB game time elements
