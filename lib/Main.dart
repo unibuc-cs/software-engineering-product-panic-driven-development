@@ -71,7 +71,6 @@ class HomeState extends State<Home> {
   }
 }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,17 +122,7 @@ class HomeState extends State<Home> {
               ),
               child: const Text('Log in'),
             ),
-              ElevatedButton(
-              onPressed: () {
-                insertPublisher();  // Call the insertPublisher function here
-              },
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-              ),
-              child: const Text('Insert Publisher'),
-            ),
+              
           ],
         ),
       ),
