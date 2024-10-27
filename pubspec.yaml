@@ -114,4 +114,4 @@ scripts:
   restore: flutter clean && flutter pub get
   dev: flutter run -d windows
   run: flutter run -d windows --release
-  cli: cd lib/API && dart CLI_app.dart
+  cli: dart lib/API/CLI_app.dart
