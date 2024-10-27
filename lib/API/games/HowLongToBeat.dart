@@ -10,14 +10,14 @@ class HowLongToBeat extends Service {
   // classes for HLTB game time elements
   // example: <li class="GameStats_short__tSJ6I time_70"><h4>Co-Op</h4><h5>1448 Hours</h5></li>
   final _querySelectors = [
-    '.GameStats_short__tSJ6I',
-    '.GameStats_long__h3afN',
-    '.GameStats_full__jz7k7'
+    ".GameStats_short__tSJ6I",
+    ".GameStats_long__h3afN",
+    ".GameStats_full__jz7k7"
   ];
 
   // HLTB links to ignore
   // example: https://howlongtobeat.com/game/5203/reviews/latest/1
-  final _badLinks = ['forum', 'reviews', 'lists', 'completions'];
+  final _badLinks = ["forum", "reviews", "lists", "completions"];
 
   // Private constructor
   HowLongToBeat._();
@@ -40,14 +40,14 @@ class HowLongToBeat extends Service {
           // Split the text after the first digit, and include it in the second one
           // Single-Player68½ Hours - 274 Hours -> Singleplayer and 68½ - 274 Hours
           final text = timeElements[i].text;
-          final label = text.split(RegExp(r'\d'))[0].trim();
+          final label = text.split(RegExp(r"\d"))[0].trim();
           final time = text.substring(label.length).trim();
 
-          if (time.contains('-') || label.isEmpty || time.isEmpty) {
+          if (time.contains("-") || label.isEmpty || time.isEmpty) {
             continue;
           }
 
-          times[label] = time.replaceAll('½', '.5');
+          times[label] = time.replaceAll("½", ".5");
         }
       }
       return times;
@@ -71,15 +71,15 @@ class HowLongToBeat extends Service {
         var linkSet = <String>{};
 
         for (int i = 0; i < linkList.length; ++i) {
-          String link = linkList[i].attributes['href'].toString();
+          String link = linkList[i].attributes["href"].toString();
 
           // Remove google and bad howlongtobeat links
-          if (link.contains('www.google') || _badLinks.any((element) => link.contains(element))) {
+          if (link.contains("www.google") || _badLinks.any((element) => link.contains(element))) {
             continue;
           }
 
           // /url?q=https://howlongtobeat.com/game/[id]&[other_stuff] -> https://howlongtobeat.com/game/[id]
-          link = link.split('/url?q=').last.split('&').first;
+          link = link.split("/url?q=").last.split("&").first;
           linkSet.add(link);
         }
 
@@ -97,21 +97,23 @@ class HowLongToBeat extends Service {
   Future<List<Map<String, dynamic>>> _getGames(String gameName) async {
     try {
       final links = await _getLinks(gameName);
-
       var options = <Map<String, dynamic>>[];
-      for (int i = 0; i < links.length; ++i) {
-        var response = await http.get(Uri.parse(links[i]));
+
+      var fetches = links.map((link) async {
+        var response = await http.get(Uri.parse(link));
         if (response.statusCode == 200) {
           final document = parse(response.body);
-          final actualGameName = document.querySelector('.GameHeader_profile_header__q_PID')?.text;
+          final actualGameName = document.querySelector(".GameHeader_profile_header__q_PID")?.text;
           if (actualGameName != null) {
             options.add({
-              'name': actualGameName,
-              'link': links[i]
+              "name": actualGameName,
+              "link": link
             });
           }
         }
-      }
+      });
+
+      await Future.wait(fetches);
       return options;
     }
     catch (e) {
@@ -144,7 +146,7 @@ class HowLongToBeat extends Service {
 
   @override
   Future<Map<String, dynamic>> getInfo(Map<String, dynamic> game) async {
-    return instance._searchGame(game['link']);
+    return instance._searchGame(game["link"]);
   }
 
   @override

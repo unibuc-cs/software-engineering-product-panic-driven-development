@@ -7,7 +7,7 @@ import '../general/Service.dart';
 
 class PcGamingWiki extends Service {
   // Members
-  final _queries = ['windows', 'os_x', 'linux'];
+  final _queries = ["windows", "os_x", "linux"];
 
   // Private constructor
   PcGamingWiki._();
@@ -22,24 +22,24 @@ class PcGamingWiki extends Service {
   Future<List<Map<String, dynamic>>> _getGames(String gameName) async {
     try {
       // some games can't be found when the name contains -
-      gameName = gameName.replaceAll('-', ' ');
+      gameName = gameName.replaceAll("-", " ");
 
-      final url ='https://www.pcgamingwiki.com/w/api.php?action=query&format=json&list=search&srsearch=$gameName';
+      final url = "https://www.pcgamingwiki.com/w/api.php?action=query&format=json&list=search&srsearch=$gameName";
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final games = jsonDecode(response.body);
 
-        if (games.containsKey('query') && games['query'].containsKey('search')) {
+        if (games.containsKey("query") && games["query"].containsKey("search")) {
           var options = <Map<String, dynamic>>[];
 
-          for (var game in games['query']['search']) {
-            if (game['snippet'].contains('REDIRECT')) {
+          for (var game in games["query"]["search"]) {
+            if (game["snippet"].contains("REDIRECT")) {
               continue;
             }
 
             options.add({
-              'name': game['title'],
+              "name": game["title"],
             });
           }
           return options;
@@ -65,39 +65,38 @@ class PcGamingWiki extends Service {
       if (response.statusCode == 200) {
         final document = parse(response.body);
         Map<String, dynamic> gameInfo = {
-          'link': url,
+          "link": url,
         };
 
         for (var query in _queries) {
-          final sysReqsTable = document.querySelector('.pcgwikitable#table-sysreqs-$query');
+          final sysReqsTable = document.querySelector(".pcgwikitable#table-sysreqs-$query");
+          if (sysReqsTable == null) {
+            continue;
+          }
 
           Map<String, dynamic> sysReqs = {};
-          if (sysReqsTable != null) {
-            List<Element> rows = sysReqsTable.querySelectorAll('.template-infotable-body, .table-sysreqs-body-row');
+          List<Element> rows = sysReqsTable.querySelectorAll(".template-infotable-body, .table-sysreqs-body-row");
 
-            for (var row in rows) {
-              final fullCategory = row.querySelector('.table-sysreqs-body-parameter')?.text.trim() ?? '';
-              final category = fullCategory.contains('(') ? fullCategory.split('(')[1].split(')')[0] : fullCategory;
+          for (var row in rows) {
+            final fullCategory = row.querySelector(".table-sysreqs-body-parameter")?.text.trim() ?? "";
+            final category = fullCategory.contains("(") ? fullCategory.split("(")[1].split(")")[0] : fullCategory;
 
-              final minimumReq = row.querySelector('.table-sysreqs-body-minimum')?.text.trim() ?? '';
-              final recommendedReq = row.querySelector('.table-sysreqs-body-recommended')?.text.trim() ?? '';
+            final minimumReq = row.querySelector(".table-sysreqs-body-minimum")?.text.trim() ?? "";
+            final recommendedReq = row.querySelector(".table-sysreqs-body-recommended")?.text.trim() ?? "";
 
-              if (minimumReq.isNotEmpty || recommendedReq.isNotEmpty) {
-                sysReqs[category] = {
-                  'minimum': (minimumReq != '') ? minimumReq : null,
-                  'recommended': (recommendedReq != '') ? recommendedReq : null
-                };
-              }
+            if (minimumReq.isNotEmpty || recommendedReq.isNotEmpty) {
+              sysReqs[category] = {
+                "minimum": (minimumReq != "") ? minimumReq : null,
+                "recommended": (recommendedReq != "") ? recommendedReq : null
+              };
             }
+          }
+          if (sysReqs.isNotEmpty) {
             gameInfo[query] = sysReqs;
           }
         }
-        if (gameInfo.isNotEmpty) {
-          return gameInfo;
-        }
-        else {
-          return {};
-        }
+
+        return gameInfo.isNotEmpty ? gameInfo : {};
       }
       else {
         return {};
@@ -116,7 +115,7 @@ class PcGamingWiki extends Service {
 
   @override
   Future<Map<String, dynamic>> getInfo(Map<String, dynamic> game) async {
-    return instance._searchGame(game['name']);
+    return instance._searchGame(game["name"]);
   }
 
   @override
