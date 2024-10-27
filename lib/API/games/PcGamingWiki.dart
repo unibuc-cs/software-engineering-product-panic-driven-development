@@ -5,7 +5,7 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import '../general/Service.dart';
 
-class PcGamingWiki implements Service {
+class PcGamingWiki extends Service {
   // Members
   final _queries = ['windows', 'os_x', 'linux'];
 
