@@ -35,7 +35,14 @@ class PcGamingWiki extends Service {
 
           for (var game in games["query"]["search"]) {
             if (game["snippet"].contains("REDIRECT")) {
-              continue;
+              game['title'] = "";
+              final parts = game["snippet"].split("</span>");
+              for (var part in parts) {
+                if (part.contains(">")) {
+                  game["title"] += part.split(">")[1] + " ";
+                }
+              }
+              game["title"] += parts.last.substring(0, parts.last.length - 3).trim();
             }
 
             options.add({

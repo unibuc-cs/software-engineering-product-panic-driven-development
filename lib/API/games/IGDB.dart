@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:numerus/numerus.dart';
 import '../general/Service.dart';
 
 class IGDB extends Service {
@@ -348,6 +349,17 @@ class IGDB extends Service {
           if (games[i]["summary"] != null) {
             games[i]["summary"] =
                 utf8.decode(games[i]["summary"].runes.toList());
+          }
+        }
+
+        // Handle games with roman numerals
+        final regex = RegExp(r'(\d+)$');
+        final match = regex.firstMatch(gameName);
+        if (games.isEmpty && match != null) {
+          final numberString = match.group(1);
+          if (numberString != null) {
+            final roman = int.parse(numberString).toRomanNumeralString() ?? '';
+            return await _getGames(gameName.replaceFirst(numberString, roman));
           }
         }
         return List<Map<String, dynamic>>.from(games);
