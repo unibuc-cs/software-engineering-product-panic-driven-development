@@ -17,7 +17,12 @@ class HowLongToBeat extends Service {
 
   // HLTB links to ignore
   // example: https://howlongtobeat.com/game/5203/reviews/latest/1
-  final _badLinks = ["forum", "reviews", "lists", "completions"];
+  final _badLinks = [
+    "forum", 
+    "reviews", 
+    "lists", 
+    "completions"
+  ];
 
   // Private constructor
   HowLongToBeat._();
@@ -30,18 +35,22 @@ class HowLongToBeat extends Service {
 
   // Private methods
   Future<Map<String, dynamic>> _gameTimes(Document document) async {
+    // Might use later for labels
+    String format(String input) {
+      return input.toLowerCase().split(' ').join('_');
+    }
+
     try {
       var times = <String, dynamic>{};
 
       for (var selector in _querySelectors) {
         final timeElements = document.querySelectorAll(selector);
 
-        for (var i = 0; i < timeElements.length; ++i) {
+        for (var timeElement in timeElements) {
           // Split the text after the first digit, and include it in the second one
           // Single-Player68½ Hours - 274 Hours -> Singleplayer and 68½ - 274 Hours
-          final text = timeElements[i].text;
-          final label = text.split(RegExp(r"\d"))[0].trim();
-          final time = text.substring(label.length).trim();
+          final label = timeElement.text.split(RegExp(r"\d"))[0].trim();
+          final time = timeElement.text.substring(label.length).trim();
 
           if (time.contains("-") || label.isEmpty || time.isEmpty) {
             continue;
@@ -51,8 +60,7 @@ class HowLongToBeat extends Service {
         }
       }
       return times;
-    }
-    catch (e) {
+    } catch (e) {
       return {};
     }
   }
@@ -60,36 +68,32 @@ class HowLongToBeat extends Service {
   Future<List<String>> _getLinks(String gameName) async {
     try {
       final encodedGameName = Uri.encodeQueryComponent("how long to beat $gameName");
-      final url = Uri.parse("https://www.google.com/search?q=$encodedGameName");
-      final response = await http.get(url);
+      final response = await http.get(Uri.parse("https://www.google.com/search?q=$encodedGameName"));
 
-      if (response.statusCode == 200) {
-        final document = parse(response.body);
-        final linkList = document.querySelectorAll('a[href*="howlongtobeat.com/game/"]');
-
-        // Add the links to a set to remove duplicates
-        var linkSet = <String>{};
-
-        for (int i = 0; i < linkList.length; ++i) {
-          String link = linkList[i].attributes["href"].toString();
-
-          // Remove google and bad howlongtobeat links
-          if (link.contains("www.google") || _badLinks.any((element) => link.contains(element))) {
-            continue;
-          }
-
-          // /url?q=https://howlongtobeat.com/game/[id]&[other_stuff] -> https://howlongtobeat.com/game/[id]
-          link = link.split("/url?q=").last.split("&").first;
-          linkSet.add(link);
-        }
-
-        return linkSet.toList();
-      } 
-      else {
+      if (response.statusCode != 200) {
         return [];
       }
-    }
-    catch (e) {
+
+      final linkList = parse(response.body).querySelectorAll('a[href*="howlongtobeat.com/game/"]');
+
+      // Add the links to a set to remove duplicates
+      var linkSet = <String>{};
+
+      for (var item in linkList) {
+        String link = item.attributes["href"].toString();
+
+        // Remove google and bad howlongtobeat links
+        if (link.contains("www.google") || _badLinks.any((element) => link.contains(element))) {
+          continue;
+        }
+
+        // /url?q=https://howlongtobeat.com/game/[id]&[other_stuff] -> https://howlongtobeat.com/game/[id]
+        link = link.split("/url?q=").last.split("&").first;
+        linkSet.add(link);
+      }
+
+      return linkSet.toList();
+    } catch (e) {
       return [];
     }
   }
@@ -98,12 +102,10 @@ class HowLongToBeat extends Service {
     try {
       final links = await _getLinks(gameName);
       var options = <Map<String, dynamic>>[];
-
       var fetches = links.map((link) async {
         var response = await http.get(Uri.parse(link));
         if (response.statusCode == 200) {
-          final document = parse(response.body);
-          final actualGameName = document.querySelector(".GameHeader_profile_header__q_PID")?.text;
+          final actualGameName = parse(response.body).querySelector(".GameHeader_profile_header__q_PID")?.text;
           if (actualGameName != null) {
             options.add({
               "name": actualGameName,
@@ -115,8 +117,7 @@ class HowLongToBeat extends Service {
 
       await Future.wait(fetches);
       return options;
-    }
-    catch (e) {
+    } catch (e) {
       return [];
     }
   }
@@ -132,8 +133,7 @@ class HowLongToBeat extends Service {
       else {
         return {};
       }
-    }
-    catch (e) {
+    } catch (e) {
       return {};
     }
   }

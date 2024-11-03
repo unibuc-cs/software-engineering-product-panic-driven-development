@@ -1,10 +1,21 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import 'package:dart_console/dart_console.dart';
 import 'general/ServiceHandler.dart';
 import 'general/ServiceBuilder.dart';
 
 final console = Console();
+
+String encodeWithDateTime(Map<String, dynamic> data) {
+  return const JsonEncoder.withIndent('  ').convert(data.map((key, value) {
+    if (value is DateTime) {
+      return MapEntry(key, value.toString().substring(0, 10));
+    } else {
+      return MapEntry(key, value);
+    }
+  }));
+}
 
 int getUserInput(List<Map<String, dynamic>> options) {
   try {
@@ -93,7 +104,7 @@ Future<void> main() async {
       if (index != 0) {
         final answer = await ServiceHandler.getInfo(options[index - 1][ServiceHandler.getKey()].toString());
         print(options[index - 1]['name']);
-        print(answer);
+        print(encodeWithDateTime(answer));
       }
       stdout.write("\nPress Enter to continue...");
       stdin.readLineSync();

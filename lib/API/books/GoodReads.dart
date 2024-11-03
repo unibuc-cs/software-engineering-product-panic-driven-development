@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import '../general/Service.dart';
@@ -21,30 +22,54 @@ class GoodReads extends Service {
   // Accessor for the singleton instance
   static GoodReads get instance => _instance;
 
+  Future<List<Map<String, dynamic>>> _getBooksFromSeries(String seriesUrl) async {
+    try {
+      final response = await http.get(Uri.parse(seriesUrl));
+
+      if (response.statusCode != 200) {
+        return [];
+      }
+
+      final document = parse(response.body);
+      final books = await Future.wait(document.querySelectorAll('div.listWithDividers__item').map((element) async {
+        return {
+          "name": element.querySelector('span[itemprop="name"]')?.text.trim() ?? 'Unknown Title',
+          "index": element.querySelector('h3[class="gr-h3 gr-h3--noBottomMargin"]')?.text.split("Book")[1].trim()
+        };
+      }).toList());
+
+      // Remove books sets (for example, Book 1-7)
+      return books.where((book) => !(book["index"]?.contains("-") ?? false)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
   // Private methods
   Future<List<Map<String, dynamic>>> _getBooks(String bookName) async {
     try {
-      final url = "https://www.goodreads.com/search?q=$bookName";
-      final response = await http.get(Uri.parse(url), headers: _bookHeaders);
+      final response = await http.get(
+        Uri.parse("https://www.goodreads.com/search?q=$bookName"), 
+        headers: _bookHeaders
+      );
 
-      if (response.statusCode == 200) {
-        final document = parse(response.body);
-
-        var options = <Map<String, dynamic>>[];
-        for (var book in document.querySelectorAll("tr[itemtype='http://schema.org/Book']")) {
-          final titleElement = book.querySelector("a.bookTitle");
-
-          if (titleElement != null) {
-            options.add({
-              "name": titleElement.text.split("(")[0].trim(),
-              "link": "https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}",
-            });
-          }
-        }
-        return options;
-      } else {
+      if (response.statusCode != 200) {
         return [];
       }
+
+      return parse(response.body)
+             .querySelectorAll("tr[itemtype='http://schema.org/Book']")
+             .map((book) {
+                final titleElement = book.querySelector("a.bookTitle");
+                if (titleElement != null) {
+                  return {
+                    "name": titleElement.text.split("(")[0].trim(),
+                    "link": "https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}"
+                  };
+                }
+              })
+             .whereType<Map<String, dynamic>>()
+             .toList();
     } catch (e) {
       return [];
     }
@@ -54,34 +79,33 @@ class GoodReads extends Service {
     try {
       final response = await http.get(Uri.parse(bookLink), headers: _bookHeaders);
 
-      if (response.statusCode == 200) {
-        final document = parse(response.body);
-        final scriptTag = document.querySelector("script[type='application/ld+json']");
-        final jsonData = json.decode(scriptTag?.text ?? "{}");
-        final pagesFormat = document.querySelector("p[data-testid='pagesFormat']");
-        final titleSectionDiv = document.querySelector("div.BookPageTitleSection__title");
-        final h3Element = titleSectionDiv?.querySelector("h3");
-
-        return {
-          "name": document.querySelector("h1.Text__title1")?.text.trim(),
-          "author": document.querySelector("span.ContributorLink__name")?.text.trim(),
-          "link": bookLink,
-          "rating": document.querySelector("div.RatingStatistics__rating")?.text.trim(),
-          "pages": pagesFormat?.text.trim().split(" ")[0],
-          "release_date": document
-              .querySelector("p[data-testid='publicationInfo']")
-              ?.text
-              .trim()
-              .split("First published ")
-              .last,
-          "description": document.querySelector("span.Formatted")?.text.trim(),
-          "book_format": jsonData["bookFormat"],
-          "language": jsonData["inLanguage"],
-          "series": h3Element?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
-        };
-      } else {
+      if (response.statusCode != 200) {
         return {};
       }
+
+      final document = parse(response.body);
+      final jsonData = json.decode(document.querySelector("script[type='application/ld+json']")?.text ?? "{}");
+      final seriesElement = document.querySelector("div.BookPageTitleSection__title")?.querySelector("h3");
+
+      // Date example: July 21, 2007
+      final releaseDate = document.querySelector("p[data-testid='publicationInfo']")
+                                  ?.text.trim().split("First published ").last ?? "";
+      final parsedDate = DateFormat("MMMM d, y").parse(releaseDate);
+
+      return {
+        "name": document.querySelector("h1.Text__title1")?.text.trim(),
+        "author": document.querySelector("span.ContributorLink__name")?.text.trim(),
+        "link": bookLink,
+        "rating": document.querySelector("div.RatingStatistics__rating")?.text.trim(),
+        "release_date": DateFormat("yyyy-MM-dd").format(parsedDate),
+        "description": document.querySelector("span.Formatted")?.text.trim(),
+        "pages": jsonData["numberOfPages"],
+        "cover": jsonData["image"],
+        "book_format": jsonData["bookFormat"],
+        "language": jsonData["inLanguage"],
+        "series": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
+        "series_books": await instance._getBooksFromSeries(seriesElement?.querySelector("a")?.attributes['href'] ?? "")
+      };
     } catch (e) {
       return {};
     }

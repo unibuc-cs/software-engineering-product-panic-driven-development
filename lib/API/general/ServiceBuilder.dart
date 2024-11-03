@@ -1,19 +1,12 @@
 import 'ServiceHandler.dart';
-import '../books/AnilistManga.dart';
 import '../books/GoodReads.dart';
 import '../games/HowLongToBeat.dart';
 import '../games/IGDB.dart';
 import '../games/PcGamingWiki.dart';
-import '../movies/TmdbMovies.dart';
-import '../tv_series/AnilistAnime.dart';
-import '../tv_series/TmdbSeries.dart';
+import '../streaming/Anilist.dart';
+import '../streaming/Tmdb.dart';
 
 class ServiceBuilder {
-  static void setAnilistManga() {
-    ServiceHandler.setService(AnilistManga.instance);
-    ServiceHandler.setKey("id");
-  }
-
   static void setGoodReads() {
     ServiceHandler.setService(GoodReads.instance);
     ServiceHandler.setKey("link");
@@ -34,18 +27,27 @@ class ServiceBuilder {
     ServiceHandler.setKey("name");
   }
 
-  static void setTmdbMovies() {
-    ServiceHandler.setService(TmdbMovies.instance);
+  static void setAnilistManga() {
+    Anilist.instance.setManga();
+    ServiceHandler.setService(Anilist.instance);
     ServiceHandler.setKey("id");
   }
 
   static void setAnilistAnime() {
-    ServiceHandler.setService(AnilistAnime.instance);
+    Anilist.instance.setAnime();
+    ServiceHandler.setService(Anilist.instance);
+    ServiceHandler.setKey("id");
+  }
+
+  static void setTmdbMovies() {
+    Tmdb.instance.setMovies();
+    ServiceHandler.setService(Tmdb.instance);
     ServiceHandler.setKey("id");
   }
 
   static void setTmdbSeries() {
-    ServiceHandler.setService(TmdbSeries.instance);
+    Tmdb.instance.setSeries();
+    ServiceHandler.setService(Tmdb.instance);
     ServiceHandler.setKey("id");
   }
 }

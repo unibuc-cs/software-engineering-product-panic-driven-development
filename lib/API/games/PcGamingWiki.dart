@@ -27,41 +27,42 @@ class PcGamingWiki extends Service {
       final url = "https://www.pcgamingwiki.com/w/api.php?action=query&format=json&list=search&srsearch=$gameName";
       final response = await http.get(Uri.parse(url));
 
-      if (response.statusCode == 200) {
-        final games = jsonDecode(response.body);
-
-        if (games.containsKey("query") && games["query"].containsKey("search")) {
-          var options = <Map<String, dynamic>>[];
-
-          for (var game in games["query"]["search"]) {
-            if (game["snippet"].contains("REDIRECT")) {
-              game['title'] = "";
-              final parts = game["snippet"].split("</span>");
-              for (var part in parts) {
-                if (part.contains(">")) {
-                  game["title"] += part.split(">")[1] + " ";
-                }
-              }
-              game["title"] += parts.last.substring(0, parts.last.length - 3).trim();
-            }
-
-            if (!options.any((option) => option["name"].trim() == game["title"].trim())) {
-              options.add({
-                "name": game["title"].trim(),
-              });
-            }
-          }
-          return options;
-        }
-        else {
-          return [];
-        }
-      }
-      else {
+      if (response.statusCode != 200) {
         return [];
       }
-    }
-    catch (e) {
+
+      final games = jsonDecode(response.body);
+
+      if (!games.containsKey("query") || !games["query"].containsKey("search")) {
+        return [];
+      }
+
+      return (games["query"]["search"] as List)
+        .map((game) {
+          if (game["snippet"].contains("REDIRECT")) {
+            // Example: "#REDIRECT [[<span class='searchmatch'>Blasphemous</span> 2]]\n" -> Blasphemous 2
+            game['title'] = "";
+            final parts = game["snippet"].split("</span>");
+            for (var part in parts) {
+              if (part.contains(">")) {
+                game["title"] += part.split(">")[1] + " ";
+              }
+            }
+            game["title"] += parts.last.substring(0, parts.last.length - 3).trim();
+          }
+          return {
+            "name": game["title"].trim()
+          };
+        })
+        .fold<List<Map<String, dynamic>>>([], (uniqueOptions, option) {
+          // Prevent duplicates
+          if (!uniqueOptions.any((game) => game["name"] == option["name"])) {
+            uniqueOptions.add(option);
+          }
+          return uniqueOptions;
+        });
+    } catch (e) {
+      print(e);
       return [];
     }
   }
@@ -71,47 +72,45 @@ class PcGamingWiki extends Service {
       final url = "https://www.pcgamingwiki.com/wiki/${gameName.replaceAll(' ', '_')}";
       final response = await http.get(Uri.parse(url));
 
-      if (response.statusCode == 200) {
-        final document = parse(response.body);
-        Map<String, dynamic> gameInfo = {
-          "link": url,
-        };
-
-        for (var query in _queries) {
-          final sysReqsTable = document.querySelector(".pcgwikitable#table-sysreqs-$query");
-          if (sysReqsTable == null) {
-            continue;
-          }
-
-          Map<String, dynamic> sysReqs = {};
-          List<Element> rows = sysReqsTable.querySelectorAll(".template-infotable-body, .table-sysreqs-body-row");
-
-          for (var row in rows) {
-            final fullCategory = row.querySelector(".table-sysreqs-body-parameter")?.text.trim() ?? "";
-            final category = fullCategory.contains("(") ? fullCategory.split("(")[1].split(")")[0] : fullCategory;
-
-            final minimumReq = row.querySelector(".table-sysreqs-body-minimum")?.text.trim() ?? "";
-            final recommendedReq = row.querySelector(".table-sysreqs-body-recommended")?.text.trim() ?? "";
-
-            if (minimumReq.isNotEmpty || recommendedReq.isNotEmpty) {
-              sysReqs[category] = {
-                "minimum": (minimumReq != "") ? minimumReq : null,
-                "recommended": (recommendedReq != "") ? recommendedReq : null
-              };
-            }
-          }
-          if (sysReqs.isNotEmpty) {
-            gameInfo[query] = sysReqs;
-          }
-        }
-
-        return gameInfo.isNotEmpty ? gameInfo : {};
-      }
-      else {
+      if (response.statusCode != 200) {
         return {};
       }
-    }
-    catch (e) {
+
+      final document = parse(response.body);
+      Map<String, dynamic> gameInfo = {
+        "link": url,
+      };
+
+      for (var query in _queries) {
+        final sysReqsTable = document.querySelector(".pcgwikitable#table-sysreqs-$query");
+        if (sysReqsTable == null) {
+          continue;
+        }
+
+        Map<String, dynamic> sysReqs = {};
+        List<Element> rows = sysReqsTable.querySelectorAll(".template-infotable-body, .table-sysreqs-body-row");
+
+        for (var row in rows) {
+          final fullCategory = row.querySelector(".table-sysreqs-body-parameter")?.text.trim() ?? "";
+          final category = fullCategory.contains("(") ? fullCategory.split("(")[1].split(")")[0] : fullCategory;
+
+          final minimumReq = row.querySelector(".table-sysreqs-body-minimum")?.text.trim() ?? "";
+          final recommendedReq = row.querySelector(".table-sysreqs-body-recommended")?.text.trim() ?? "";
+
+          if (minimumReq.isNotEmpty || recommendedReq.isNotEmpty) {
+            sysReqs[category] = {
+              "minimum": (minimumReq != "") ? minimumReq : null,
+              "recommended": (recommendedReq != "") ? recommendedReq : null
+            };
+          }
+        }
+        if (sysReqs.isNotEmpty) {
+          gameInfo[query] = sysReqs;
+        }
+      }
+
+      return gameInfo.isNotEmpty ? gameInfo : {};
+    } catch (e) {
       return {};
     }
   }

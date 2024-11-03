@@ -140,11 +140,11 @@ class IGDB extends Service {
     try {
       await _getDevelopersAndPublishers(accessToken, game);
       var ids_array = [];
-      for (int i = 0; i < _developers.length; ++i) {
-        ids_array.add("${_developers[i]}");
+      for (var developer in _developers) {
+        ids_array.add(developer);
       }
-      for (int i = 0; i < _publishers.length; ++i) {
-        ids_array.add("${_publishers[i]}");
+      for (var publisher in _publishers) {
+        ids_array.add(publisher);
       }
       var ids = "(" + ids_array.join(", ") + ")";
 
@@ -291,8 +291,8 @@ class IGDB extends Service {
   Future<List<dynamic>> _getAdditionalGames(String accessToken, List<dynamic> games) async {
     try {
       List<dynamic> ids = [];
-      for (int i = 0; i < games.length; ++i) {
-        ids.add(games[i]["id"]);
+      for (var game in games) {
+        ids.add(game["id"]);
       }
 
       final response = await _makeRequest(
@@ -321,41 +321,41 @@ class IGDB extends Service {
         body: "fields id,first_release_date,name; search \"$gameName\"; where version_parent = null & parent_game = null;"
       );
 
-      if (response != null) {
-        var games = jsonDecode(response.body);
-        games = _filterGames(games)
-            .where((game) => _containsAllWords(game["name"], gameName))
-            .toList();
-        var additionalGames = await _getAdditionalGames(_accessToken, games);
-        additionalGames = _filterGames(additionalGames)
-            .where((game) => _containsAllWords(game["name"], gameName))
-            .toList();
-        games.addAll(additionalGames);
-        for (int i = 0; i < games.length; ++i) {
-          games[i]["name"] = utf8.decode(games[i]["name"].runes.toList());
-          if (games[i]["first_release_date"] != null) {
-            // Turn the Unix timestamp into a DateTime object
-            games[i]["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(games[i]["first_release_date"] * 1000);
-
-            // Add the year to the game name
-            games[i]["name"] += " (${games[i]['first_release_date'].year})";
-          }
-        }
-
-        // Handle games with roman numerals
-        final regex = RegExp(r'(\d+)$');
-        final match = regex.firstMatch(gameName);
-        if (games.isEmpty && match != null) {
-          final numberString = match.group(1);
-          if (numberString != null) {
-            final roman = int.parse(numberString).toRomanNumeralString() ?? '';
-            return await _getGames(gameName.replaceFirst(numberString, roman));
-          }
-        }
-        return List<Map<String, dynamic>>.from(games);
-      } else {
+      if (response == null) {
         return [];
       }
+
+      var games = jsonDecode(response.body);
+      games = _filterGames(games)
+          .where((game) => _containsAllWords(game["name"], gameName))
+          .toList();
+      var additionalGames = await _getAdditionalGames(_accessToken, games);
+      additionalGames = _filterGames(additionalGames)
+          .where((game) => _containsAllWords(game["name"], gameName))
+          .toList();
+      games.addAll(additionalGames);
+      for (int i = 0; i < games.length; ++i) {
+        games[i]["name"] = utf8.decode(games[i]["name"].runes.toList());
+        if (games[i]["first_release_date"] != null) {
+          // Turn the Unix timestamp into a DateTime object
+          games[i]["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(games[i]["first_release_date"] * 1000);
+
+          // Add the year to the game name
+          games[i]["name"] += " (${games[i]['first_release_date'].year})";
+        }
+      }
+
+      // Handle games with roman numerals
+      final regex = RegExp(r'(\d+)$');
+      final match = regex.firstMatch(gameName);
+      if (games.isEmpty && match != null) {
+        final numberString = match.group(1);
+        if (numberString != null) {
+          final roman = int.parse(numberString).toRomanNumeralString() ?? '';
+          return await _getGames(gameName.replaceFirst(numberString, roman));
+        }
+      }
+      return List<Map<String, dynamic>>.from(games);
     } catch (e) {
       return [];
     }
@@ -370,38 +370,42 @@ class IGDB extends Service {
         body: "fields similar_games; where id = ${gameId};"
       );
 
-    if (response != null) {
-      var games = jsonDecode(response.body)[0]["similar_games"];
-      if (games == null) {
-        return [];
-      }
-      List<dynamic> ids = [];
-      for (int i = 0; i < games.length; ++i) {
-        ids.add(games[i].toString());
-      }
+    if (response == null) {
+      return [];
+    }
 
-      final similarGamesResponse = await _makeRequest(
-        "games",
-        headers: _authHeaders(_accessToken),
-        body: "fields id,first_release_date,name; where id = (${ids.join(",")}) & version_parent = null & parent_game = null;"
-      );
+    var games = jsonDecode(response.body)[0]["similar_games"];
+    if (games == null) {
+      return [];
+    }
 
-      if (similarGamesResponse != null) {
-        games = jsonDecode(similarGamesResponse.body);
-        for (int i = 0; i < games.length; ++i) {
-          games[i]["name"] = utf8.decode(games[i]["name"].runes.toList());
-          if (games[i]["first_release_date"] != null) {
-            // Turn the Unix timestamp into a DateTime object
-            games[i]["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(games[i]["first_release_date"] * 1000);
+    List<dynamic> ids = [];
+    for (var game in games) {
+      ids.add(game.toString());
+    }
 
-            // Add the year to the game name
-            games[i]["name"] += " (${games[i]['first_release_date'].year})";
-          }
-        }
-        return List<Map<String, dynamic>>.from(games);
+    final similarGamesResponse = await _makeRequest(
+      "games",
+      headers: _authHeaders(_accessToken),
+      body: "fields id,first_release_date,name; where id = (${ids.join(",")}) & version_parent = null & parent_game = null;"
+    );
+
+    if (similarGamesResponse == null) {
+      return [];
+    }
+
+    games = jsonDecode(similarGamesResponse.body);
+    for (int i = 0; i < games.length; ++i) {
+      games[i]["name"] = utf8.decode(games[i]["name"].runes.toList());
+      if (games[i]["first_release_date"] != null) {
+        // Turn the Unix timestamp into a DateTime object
+        games[i]["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(games[i]["first_release_date"] * 1000);
+
+        // Add the year to the game name
+        games[i]["name"] += " (${games[i]['first_release_date'].year})";
       }
     }
-    return [];
+    return List<Map<String, dynamic>>.from(games);
   }
 
   Future<Map<String, dynamic>> _editGame(String gameId) async {
@@ -415,23 +419,24 @@ class IGDB extends Service {
         body: "fields id,aggregated_rating,artworks,collection,collections,cover,dlcs,first_release_date,franchise,genres,involved_companies,name,platforms,rating,remakes,remasters,summary,url,websites; where id = $gameId;"
       );
 
-      var game = <String, dynamic>{};
-      if (response != null) {
-          game = jsonDecode(response.body)[0];
-          game["name"] = utf8.decode(game["name"].runes.toList());
-          if (game["first_release_date"] != null) {
-            // Turn the Unix timestamp into a DateTime object
-            game["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(game["first_release_date"] * 1000);
+      if (response == null) {
+        return {};
+      }
 
-            // Add the year to the game name
-            game["name"] += " (${game['first_release_date'].year})";
+      var game = jsonDecode(response.body)[0];
+      game["name"] = utf8.decode(game["name"].runes.toList());
+      if (game["first_release_date"] != null) {
+        // Turn the Unix timestamp into a DateTime object
+        game["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(game["first_release_date"] * 1000);
 
-            // Format the date as a string, removing the time
-            game["first_release_date"] = DateTime.parse(game["first_release_date"].toString().substring(0, 10));
-          }
-          if (game["summary"] != null) {
-            game["summary"] = utf8.decode(game["summary"].runes.toList());
-          }
+        // Add the year to the game name
+        game["name"] += " (${game['first_release_date'].year})";
+
+        // Format the date as a string, removing the time
+        game["first_release_date"] = DateTime.parse(game["first_release_date"].toString().substring(0, 10));
+      }
+      if (game["summary"] != null) {
+        game["summary"] = utf8.decode(game["summary"].runes.toList());
       }
 
       if (game["aggregated_rating"] != null) {
@@ -489,7 +494,6 @@ class IGDB extends Service {
       reset();
       return game;
     } catch (e) {
-      print(e);
       return {};
     }
   }
