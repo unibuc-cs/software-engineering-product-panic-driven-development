@@ -45,9 +45,11 @@ class PcGamingWiki extends Service {
               game["title"] += parts.last.substring(0, parts.last.length - 3).trim();
             }
 
-            options.add({
-              "name": game["title"],
-            });
+            if (!options.any((option) => option["name"].trim() == game["title"].trim())) {
+              options.add({
+                "name": game["title"].trim(),
+              });
+            }
           }
           return options;
         }
@@ -121,8 +123,8 @@ class PcGamingWiki extends Service {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(Map<String, dynamic> game) async {
-    return instance._searchGame(game["name"]);
+  Future<Map<String, dynamic>> getInfo(String gameName) async {
+    return instance._searchGame(gameName);
   }
 
   @override

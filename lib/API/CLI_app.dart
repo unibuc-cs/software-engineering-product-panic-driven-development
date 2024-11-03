@@ -91,7 +91,7 @@ Future<void> main() async {
       final options = await ServiceHandler.getOptions(query);
       final index = getUserInput(options);
       if (index != 0) {
-        final answer = await ServiceHandler.getInfo(options[index - 1]);
+        final answer = await ServiceHandler.getInfo(options[index - 1][ServiceHandler.getKey()].toString());
         print(options[index - 1]['name']);
         print(answer);
       }

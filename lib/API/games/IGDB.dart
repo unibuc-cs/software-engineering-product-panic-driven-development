@@ -298,7 +298,7 @@ class IGDB extends Service {
       final response = await _makeRequest(
         "games",
         headers: _authHeaders(accessToken),
-        body: "fields id,aggregated_rating,artworks,collection,collections,cover,dlcs,first_release_date,franchise,genres,involved_companies,name,platforms,rating,remakes,remasters,similar_games,summary,url,websites; where parent_game = (${ids.join(", ")});"
+        body: "fields id,first_release_date,name; where parent_game = (${ids.join(", ")});"
       );
   
       if (response != null) {
@@ -318,7 +318,7 @@ class IGDB extends Service {
       final response = await _makeRequest(
         "games",
         headers: _authHeaders(_accessToken),
-        body: "fields id,aggregated_rating,artworks,collection,collections,cover,dlcs,first_release_date,franchise,genres,involved_companies,name,platforms,rating,remakes,remasters,summary,url,websites; search \"$gameName\"; where version_parent = null & parent_game = null;"
+        body: "fields id,first_release_date,name; search \"$gameName\"; where version_parent = null & parent_game = null;"
       );
 
       if (response != null) {
@@ -335,20 +335,10 @@ class IGDB extends Service {
           games[i]["name"] = utf8.decode(games[i]["name"].runes.toList());
           if (games[i]["first_release_date"] != null) {
             // Turn the Unix timestamp into a DateTime object
-            games[i]["first_release_date"] =
-                DateTime.fromMillisecondsSinceEpoch(
-                    games[i]["first_release_date"] * 1000);
+            games[i]["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(games[i]["first_release_date"] * 1000);
 
             // Add the year to the game name
             games[i]["name"] += " (${games[i]['first_release_date'].year})";
-
-            // Format the date as a string, removing the time
-            games[i]["first_release_date"] =
-                DateTime.parse(games[i]["first_release_date"].toString().substring(0, 10));
-          }
-          if (games[i]["summary"] != null) {
-            games[i]["summary"] =
-                utf8.decode(games[i]["summary"].runes.toList());
           }
         }
 
@@ -393,7 +383,7 @@ class IGDB extends Service {
       final similarGamesResponse = await _makeRequest(
         "games",
         headers: _authHeaders(_accessToken),
-        body: "fields id,aggregated_rating,artworks,collection,collections,cover,dlcs,first_release_date,franchise,genres,involved_companies,name,platforms,rating,remakes,remasters,summary,url,websites; where id = (${ids.join(",")}) & version_parent = null & parent_game = null;"
+        body: "fields id,first_release_date,name; where id = (${ids.join(",")}) & version_parent = null & parent_game = null;"
       );
 
       if (similarGamesResponse != null) {
@@ -402,20 +392,10 @@ class IGDB extends Service {
           games[i]["name"] = utf8.decode(games[i]["name"].runes.toList());
           if (games[i]["first_release_date"] != null) {
             // Turn the Unix timestamp into a DateTime object
-            games[i]["first_release_date"] =
-                DateTime.fromMillisecondsSinceEpoch(
-                    games[i]["first_release_date"] * 1000);
+            games[i]["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(games[i]["first_release_date"] * 1000);
 
             // Add the year to the game name
             games[i]["name"] += " (${games[i]['first_release_date'].year})";
-
-            // Format the date as a string, removing the time
-            games[i]["first_release_date"] =
-                games[i]["first_release_date"].toString().substring(0, 10);
-          }
-          if (games[i]["summary"] != null) {
-            games[i]["summary"] =
-                utf8.decode(games[i]["summary"].runes.toList());
           }
         }
         return List<Map<String, dynamic>>.from(games);
@@ -424,61 +404,94 @@ class IGDB extends Service {
     return [];
   }
 
-  Future<Map<String, dynamic>> _editGame(Map<String, dynamic> game) async {
-    if (game["aggregated_rating"] != null) {
-      game["critic_rating"] = (game["aggregated_rating"]).round();
-      game.remove("aggregated_rating");
-    } else {
-      game["critic_rating"] = 0;
-      game.remove("aggregated_rating");
-    }
-    if (game["artworks"] != null) {
-      await _getArtworks(_accessToken, game);
-      game["artworks"] = _artworks;
-    }
-    if (game["cover"] != null) {
-      await _getCover(_accessToken, game);
-      game["cover"] = _cover;
-    }
-    if (game["collections"] != null) {
-      await _getCollections(_accessToken, game);
-      game["collections"] = _collections;
-    }
-    if (game["franchises"] != null) {
-      await _getFranchises(_accessToken, game);
-      if (game["collections"] != null) {
-        game["collections"] += _franchises;
-      } else {
-        game["collections"] = _franchises;
+  Future<Map<String, dynamic>> _editGame(String gameId) async {
+    try
+    {
+      _accessToken = await _getAccessToken();
+
+      final response = await _makeRequest(
+        "games",
+        headers: _authHeaders(_accessToken),
+        body: "fields id,aggregated_rating,artworks,collection,collections,cover,dlcs,first_release_date,franchise,genres,involved_companies,name,platforms,rating,remakes,remasters,summary,url,websites; where id = $gameId;"
+      );
+
+      var game = <String, dynamic>{};
+      if (response != null) {
+          game = jsonDecode(response.body)[0];
+          game["name"] = utf8.decode(game["name"].runes.toList());
+          if (game["first_release_date"] != null) {
+            // Turn the Unix timestamp into a DateTime object
+            game["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(game["first_release_date"] * 1000);
+
+            // Add the year to the game name
+            game["name"] += " (${game['first_release_date'].year})";
+
+            // Format the date as a string, removing the time
+            game["first_release_date"] = DateTime.parse(game["first_release_date"].toString().substring(0, 10));
+          }
+          if (game["summary"] != null) {
+            game["summary"] = utf8.decode(game["summary"].runes.toList());
+          }
       }
+
+      if (game["aggregated_rating"] != null) {
+        game["critic_rating"] = (game["aggregated_rating"]).round();
+        game.remove("aggregated_rating");
+      } else {
+        game["critic_rating"] = 0;
+        game.remove("aggregated_rating");
+      }
+      if (game["artworks"] != null) {
+        await _getArtworks(_accessToken, game);
+        game["artworks"] = _artworks;
+      }
+      if (game["cover"] != null) {
+        await _getCover(_accessToken, game);
+        game["cover"] = _cover;
+      }
+      if (game["collections"] != null) {
+        await _getCollections(_accessToken, game);
+        game["collections"] = _collections;
+      }
+      if (game["franchises"] != null) {
+        await _getFranchises(_accessToken, game);
+        if (game["collections"] != null) {
+          game["collections"] += _franchises;
+        } else {
+          game["collections"] = _franchises;
+        }
+      }
+      if (game["genres"] != null) {
+        await _getGenres(_accessToken, game);
+        game["genres"] = _genres;
+      }
+      if (game["involved_companies"] != null) {
+        await _getCompanies(_accessToken, game);
+        game["developers"] = _developers;
+        game["publishers"] = _publishers;
+        game.remove("involved_companies");
+      }
+      if (game["platforms"] != null) {
+        await _getPlatforms(_accessToken, game);
+        game["platforms"] = _platforms;
+      }
+      if (game["rating"] != null) {
+        game["user_rating"] = (game["rating"]).round();
+        game.remove("rating");
+      } else {
+        game["user_rating"] = 0;
+        game.remove("rating");
+      }
+      if (game["websites"] != null) {
+        await _getWebsites(_accessToken, game);
+        game["websites"] = _websites;
+      }
+      reset();
+      return game;
+    } catch (e) {
+      print(e);
+      return {};
     }
-    if (game["genres"] != null) {
-      await _getGenres(_accessToken, game);
-      game["genres"] = _genres;
-    }
-    if (game["involved_companies"] != null) {
-      await _getCompanies(_accessToken, game);
-      game["developers"] = _developers;
-      game["publishers"] = _publishers;
-      game.remove("involved_companies");
-    }
-    if (game["platforms"] != null) {
-      await _getPlatforms(_accessToken, game);
-      game["platforms"] = _platforms;
-    }
-    if (game["rating"] != null) {
-      game["user_rating"] = (game["rating"]).round();
-      game.remove("rating");
-    } else {
-      game["user_rating"] = 0;
-      game.remove("rating");
-    }
-    if (game["websites"] != null) {
-      await _getWebsites(_accessToken, game);
-      game["websites"] = _websites;
-    }
-    reset();
-    return game;
   }
 
   // Public methods
@@ -488,8 +501,8 @@ class IGDB extends Service {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(Map<String, dynamic> game) async {
-    return instance._editGame(game);
+  Future<Map<String, dynamic>> getInfo(String gameId) async {
+    return instance._editGame(gameId);
   }
 
   @override

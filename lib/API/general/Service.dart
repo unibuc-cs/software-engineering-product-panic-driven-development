@@ -7,7 +7,7 @@ abstract class Service {
     throw UnimplementedError("getOptions method is not implemented");
   }
 
-  Future<Map<String, dynamic>> getInfo(Map<String, dynamic> item) async {
+  Future<Map<String, dynamic>> getInfo(String item) async {
     throw UnimplementedError("getInfo method is not implemented");
   }
 

@@ -33,15 +33,11 @@ class GoodReads extends Service {
         var options = <Map<String, dynamic>>[];
         for (var book in document.querySelectorAll("tr[itemtype='http://schema.org/Book']")) {
           final titleElement = book.querySelector("a.bookTitle");
-          final authorElement = book.querySelector("a.authorName");
-          final ratingText = book.querySelector("span.minirating")?.text.trim() ?? "avg rating —";
 
-          if (titleElement != null && authorElement != null) {
+          if (titleElement != null) {
             options.add({
-              "name": titleElement.text.trim(),
+              "name": titleElement.text.split("(")[0].trim(),
               "link": "https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}",
-              "author": authorElement.text.trim(),
-              "rating": ratingText.split("avg rating —")[0].trim(),
             });
           }
         }
@@ -54,34 +50,34 @@ class GoodReads extends Service {
     }
   }
 
-  Future<Map<String, dynamic>> _searchBook(Map<String, dynamic> book) async {
+  Future<Map<String, dynamic>> _searchBook(String bookLink) async {
     try {
-      final response =
-          await http.get(Uri.parse(book["link"]), headers: _bookHeaders);
+      final response = await http.get(Uri.parse(bookLink), headers: _bookHeaders);
 
       if (response.statusCode == 200) {
         final document = parse(response.body);
-        final scriptTag =
-            document.querySelector("script[type='application/ld+json']");
+        final scriptTag = document.querySelector("script[type='application/ld+json']");
         final jsonData = json.decode(scriptTag?.text ?? "{}");
-        final pagesFormat =
-            document.querySelector("p[data-testid='pagesFormat']");
+        final pagesFormat = document.querySelector("p[data-testid='pagesFormat']");
+        final titleSectionDiv = document.querySelector("div.BookPageTitleSection__title");
+        final h3Element = titleSectionDiv?.querySelector("h3");
 
         return {
-          "name": book["name"],
-          "author": book["author"],
-          "link": book["link"],
-          "rating": book["rating"],
-          "numPages": pagesFormat?.text.trim().split(" ")[0],
-          "publicationInfo": document
+          "name": document.querySelector("h1.Text__title1")?.text.trim(),
+          "author": document.querySelector("span.ContributorLink__name")?.text.trim(),
+          "link": bookLink,
+          "rating": document.querySelector("div.RatingStatistics__rating")?.text.trim(),
+          "pages": pagesFormat?.text.trim().split(" ")[0],
+          "release_date": document
               .querySelector("p[data-testid='publicationInfo']")
               ?.text
               .trim()
               .split("First published ")
               .last,
           "description": document.querySelector("span.Formatted")?.text.trim(),
-          "bookFormat": jsonData["bookFormat"],
-          "language": jsonData["inLanguage"]
+          "book_format": jsonData["bookFormat"],
+          "language": jsonData["inLanguage"],
+          "series": h3Element?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
         };
       } else {
         return {};
@@ -98,8 +94,8 @@ class GoodReads extends Service {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(Map<String, dynamic> book) async {
-    return instance._searchBook(book);
+  Future<Map<String, dynamic>> getInfo(String bookLink) async {
+    return instance._searchBook(bookLink);
   }
 
   @override

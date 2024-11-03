@@ -6,8 +6,8 @@ import '../general/Service.dart';
 class TmdbSeries extends Service {
   // Members
   late final _headers;
-  final _url = Uri.parse("https://api.themoviedb.org/3/search/tv");
-  final _genreUrl = Uri.parse("https://api.themoviedb.org/3/genre/tv/list");
+  final _searchUrl = Uri.parse("https://api.themoviedb.org/3/search/tv");
+  final _detailsUrl = "https://api.themoviedb.org/3/tv/";
 
   // Private constructor
   TmdbSeries._() {
@@ -24,9 +24,9 @@ class TmdbSeries extends Service {
   static TmdbSeries get instance => _instance;
 
   // Private methods
-  Future<Map<String, dynamic>> _getEpisodesPerSeason(int tvId) async {
+  Future<Map<String, dynamic>> _getEpisodesPerSeason(String seriesId) async {
     try {
-      final url = Uri.parse("https://api.themoviedb.org/3/tv/$tvId");
+      final url = Uri.parse("https://api.themoviedb.org/3/tv/$seriesId");
       final response = await http.get(url, headers: _headers);
       if (response.statusCode == 200) {
         final series = json.decode(response.body);
@@ -34,8 +34,7 @@ class TmdbSeries extends Service {
 
         for (var season in series["seasons"]) {
           if (season["season_number"] != 0) {
-            seasonsInfo[season["season_number"].toString()] =
-                season["episode_count"];
+            seasonsInfo[season["season_number"].toString()] = season["episode_count"];
           }
         }
         return seasonsInfo;
@@ -48,13 +47,13 @@ class TmdbSeries extends Service {
       return {};
     }
   }
-  
+
   Future<List<Map<String, dynamic>>> _getSeries(String seriesName) async {
     try {
       final params = {
         "query": Uri.encodeQueryComponent(seriesName)
       };
-      final response = await http.get(_url.replace(queryParameters: params), headers: _headers);
+      final response = await http.get(_searchUrl.replace(queryParameters: params), headers: _headers);
 
       if (response.statusCode == 200) {
         final series = json.decode(response.body);
@@ -64,26 +63,8 @@ class TmdbSeries extends Service {
           options.add({
             "id": tvSeries["id"],
             "name": tvSeries["name"],
-            "overview": tvSeries["overview"],
-            "first_air_date": tvSeries["first_air_date"],
-            "genre": tvSeries["genre_ids"]
           });
         }
-
-        final genreResponse = await http.get(_genreUrl, headers: _headers);
-        if (genreResponse.statusCode == 200) {
-          final genres = json.decode(genreResponse.body);
-
-          for (var tvSeries in options) {
-            for (var genre in genres["genres"]) {
-              if (tvSeries["genre"].contains(genre["id"])) {
-                tvSeries["genre"].remove(genre["id"]);
-                tvSeries["genre"].add(genre["name"]);
-              }
-            }
-          }
-        }
-
         return options;
       }
       else {
@@ -95,6 +76,41 @@ class TmdbSeries extends Service {
     }
   }
 
+  Future<Map<String, dynamic>> _getDetails(String seriesId) async {
+    try {
+      final params = {
+        "language": Uri.encodeQueryComponent("en-US")
+      };
+      final response = await http.get(Uri.parse(_detailsUrl + seriesId).replace(queryParameters: params), headers: _headers);
+
+      if (response.statusCode == 200) {
+        final details = json.decode(response.body);
+
+        // image url: https://image.tmdb.org/t/p/original
+        return {
+          "name": details["name"],
+          "description": details["overview"],
+          "language": details["original_language"],
+          "artwork": details["backdrop_path"],
+          "cover": details["poster_path"],
+          "producers": details["production_companies"].map((dynamic producer) {
+              return producer["name"];
+            }).toList(),
+          "status": details["status"],
+          "community_rating": details["vote_average"]
+        };
+      }
+      else {
+        print(response.reasonPhrase);
+        return {};
+      }
+    }
+    catch (e) {
+      print(e);
+      return {};
+    }
+  }
+
   // Public methods
   @override
   Future<List<Map<String, dynamic>>> getOptions(String seriesName) async {
@@ -102,8 +118,9 @@ class TmdbSeries extends Service {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(Map<String, dynamic> series) async {
-    final seasonsInfo = await instance._getEpisodesPerSeason(series["id"]);
+  Future<Map<String, dynamic>> getInfo(String seriesId) async {
+    final series = await instance._getDetails(seriesId);
+    final seasonsInfo = await instance._getEpisodesPerSeason(seriesId);
 
     if (!seasonsInfo.isEmpty) {
       series["seasons"] = seasonsInfo;

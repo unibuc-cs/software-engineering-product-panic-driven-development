@@ -6,8 +6,8 @@ import '../general/Service.dart';
 class TmdbMovies extends Service {
   // Members
   late final _headers;
-  final _url = Uri.parse("https://api.themoviedb.org/3/search/movie");
-  final _genreUrl = Uri.parse("https://api.themoviedb.org/3/genre/movie/list");
+  final _searchUrl = Uri.parse("https://api.themoviedb.org/3/search/movie");
+  final _detailsUrl = "https://api.themoviedb.org/3/movie/";
 
   // Private constructor
   TmdbMovies._() {
@@ -29,7 +29,7 @@ class TmdbMovies extends Service {
       final params = {
         "query": Uri.encodeQueryComponent(movieName)
       };
-      final response = await http.get(_url.replace(queryParameters: params), headers: _headers);
+      final response = await http.get(_searchUrl.replace(queryParameters: params), headers: _headers);
 
       if (response.statusCode == 200) {
         final movies = json.decode(response.body);
@@ -38,25 +38,8 @@ class TmdbMovies extends Service {
         for (var movie in movies["results"]) {
           options.add({
             "name": movie["title"],
-            "overview": movie["overview"],
-            "release_date": movie["release_date"],
-            "rating": movie["vote_average"],
-            "genre": movie["genre_ids"],
-            "original_language": movie["original_language"]
+            "id": movie["id"]
           });
-
-          final genreResponse = await http.get(_genreUrl, headers: _headers);
-
-          if (genreResponse.statusCode == 200) {
-            final genres = json.decode(genreResponse.body);
-
-            for (var genre in genres["genres"]) {
-              if (movie["genre_ids"].contains(genre["id"])) {
-                options.last["genre"].remove(genre["id"]);
-                options.last["genre"].add(genre["name"]);
-              }
-            }
-          }
         }
         return options;
       }
@@ -69,6 +52,44 @@ class TmdbMovies extends Service {
     }
   }
 
+  Future<Map<String, dynamic>> _getDetails(String movieId) async {
+    try {
+      final params = {
+        "language": Uri.encodeQueryComponent("en-US")
+      };
+      final response = await http.get(Uri.parse(_detailsUrl + movieId).replace(queryParameters: params), headers: _headers);
+
+      if (response.statusCode == 200) {
+        final details = json.decode(response.body);
+
+        // image url: https://image.tmdb.org/t/p/original
+        return {
+          "name": details["title"],
+          "description": details["overview"],
+          "collection": (details["belongs_to_collection"] as Map<String, dynamic>?)?["name"] ?? null,
+          "language": details["original_language"],
+          "artwork": details["backdrop_path"],
+          "cover": details["poster_path"],
+          "producers": details["production_companies"].map((dynamic producer) {
+              return producer["name"];
+            }).toList(),
+          "release_date": details["release_date"],
+          "duration": details["runtime"],
+          "status": details["status"],
+          "community_rating": details["vote_average"]
+        };
+      }
+      else {
+        print(response.reasonPhrase);
+        return {};
+      }
+    }
+    catch (e) {
+      print(e);
+      return {};
+    }
+  }
+
   // Public methods
   @override
   Future<List<Map<String, dynamic>>> getOptions(String movieName) async {
@@ -76,8 +97,8 @@ class TmdbMovies extends Service {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(Map<String, dynamic> movie) async {
-    return movie;
+  Future<Map<String, dynamic>> getInfo(String movieId) async {
+    return instance._getDetails(movieId);
   }
 
   @override

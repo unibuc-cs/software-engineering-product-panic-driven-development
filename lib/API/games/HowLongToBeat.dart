@@ -121,10 +121,10 @@ class HowLongToBeat extends Service {
     }
   }
 
-  Future<Map<String, dynamic>> _searchGame(String link) async {
+  Future<Map<String, dynamic>> _searchGame(String gameLink) async {
     try
     {
-      final response = await http.get(Uri.parse(link));
+      final response = await http.get(Uri.parse(gameLink));
 
       if (response.statusCode == 200) {
         return await _gameTimes(parse(response.body));
@@ -145,8 +145,8 @@ class HowLongToBeat extends Service {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(Map<String, dynamic> game) async {
-    return instance._searchGame(game["link"]);
+  Future<Map<String, dynamic>> getInfo(String gameLink) async {
+    return instance._searchGame(gameLink);
   }
 
   @override

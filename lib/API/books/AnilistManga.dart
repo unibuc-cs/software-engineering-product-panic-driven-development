@@ -69,7 +69,7 @@ class AnilistManga extends Service {
     }
   }
 
-  Future<Map<String, dynamic>> _getMangaInfo(int mangaId) async {
+  Future<Map<String, dynamic>> _getMangaInfo(String mangaId) async {
     final query = '''
       query {
         Media(id: $mangaId) {
@@ -129,8 +129,8 @@ class AnilistManga extends Service {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(Map<String, dynamic> manga) async {
-    return instance._getMangaInfo(manga["id"]);
+  Future<Map<String, dynamic>> getInfo(String mangaId) async {
+    return instance._getMangaInfo(mangaId);
   }
 
   @override
