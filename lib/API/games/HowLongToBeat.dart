@@ -98,7 +98,7 @@ class HowLongToBeat extends Service {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getGames(String gameName) async {
+  Future<List<Map<String, dynamic>>> _getGameOptions(String gameName) async {
     try {
       final links = await _getLinks(gameName);
       var options = <Map<String, dynamic>>[];
@@ -122,7 +122,7 @@ class HowLongToBeat extends Service {
     }
   }
 
-  Future<Map<String, dynamic>> _searchGame(String gameLink) async {
+  Future<Map<String, dynamic>> _getGameInfo(String gameLink) async {
     try
     {
       final response = await http.get(Uri.parse(gameLink));
@@ -141,16 +141,16 @@ class HowLongToBeat extends Service {
   // Public methods
   @override
   Future<List<Map<String, dynamic>>> getOptions(String gameName) async {
-    return instance._getGames(gameName);
+    return instance._getGameOptions(gameName);
   }
 
   @override
   Future<Map<String, dynamic>> getInfo(String gameLink) async {
-    return instance._searchGame(gameLink);
+    return instance._getGameInfo(gameLink);
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(int gameId) async {
+  Future<List<Map<String, dynamic>>> getRecommendations(int) async {
     return [];
   }
 }

@@ -311,7 +311,7 @@ class IGDB extends Service {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getGames(String gameName) async {
+  Future<List<Map<String, dynamic>>> _getGameOptions(String gameName) async {
     try {
       _accessToken = await _getAccessToken();
 
@@ -352,7 +352,7 @@ class IGDB extends Service {
         final numberString = match.group(1);
         if (numberString != null) {
           final roman = int.parse(numberString).toRomanNumeralString() ?? '';
-          return await _getGames(gameName.replaceFirst(numberString, roman));
+          return await _getGameOptions(gameName.replaceFirst(numberString, roman));
         }
       }
       return List<Map<String, dynamic>>.from(games);
@@ -408,7 +408,7 @@ class IGDB extends Service {
     return List<Map<String, dynamic>>.from(games);
   }
 
-  Future<Map<String, dynamic>> _editGame(String gameId) async {
+  Future<Map<String, dynamic>> _getGameInfo(String gameId) async {
     try
     {
       _accessToken = await _getAccessToken();
@@ -501,12 +501,12 @@ class IGDB extends Service {
   // Public methods
   @override
   Future<List<Map<String, dynamic>>> getOptions(String gameName) async {
-    return instance._getGames(gameName);
+    return instance._getGameOptions(gameName);
   }
 
   @override
   Future<Map<String, dynamic>> getInfo(String gameId) async {
-    return instance._editGame(gameId);
+    return instance._getGameInfo(gameId);
   }
 
   @override

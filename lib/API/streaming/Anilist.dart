@@ -8,10 +8,19 @@ class Anilist extends Service {
   final _headers = {
     "Content-Type": "application/json"
   };
+  final _replaceItems = {
+    "<br><br>": " ", 
+    "<br>": " "
+  };
+  final _removeItems = [
+    "<i>", 
+    "</i>", 
+    "\n", 
+    "\r"
+  ];
   final _url = Uri.parse("https://graphql.anilist.co/");
-  final badItems = [{"<br><br>": " ", "<br>": " "}, "<i>", "</i>", "\n", "\r"];
   String _mediaType = "";
-  
+
   // Private constructor
   Anilist._();
 
@@ -23,34 +32,16 @@ class Anilist extends Service {
 
   // Private methods
   String _removeBadItems(String input) {
-    for (var item in badItems) {
-      if (item is String) {
-        input = input.replaceAll(item, "");
-      } 
-      else if (item is Map<String, String>) {
-        item.forEach((key, value) {
-          input = input.replaceAll(key, value);
-        });
-      }
-    }
+    _removeItems.forEach((item) {
+      input = input.replaceAll(item, "");
+    });
+    _replaceItems.forEach((key, value) {
+      input = input.replaceAll(key, value);
+    });
     return input;
   }
 
-  Future<List<Map<String, dynamic>>> _getMediaOptions(String name) async {
-    final query = '''
-      query {
-        Page {
-          media(search: "$name", type: $_mediaType) {
-            id
-            title {
-              romaji
-              english
-            }
-          }
-        }
-      }
-    ''';
-
+  Future<Map<String, dynamic>> _getResponse(String query) async {
     try {
       final response = await http.post(
         _url,
@@ -59,31 +50,94 @@ class Anilist extends Service {
       );
 
       if (response.statusCode != 200) {
+        return {};
+      }
+
+      return json.decode(response.body)["data"];
+
+    } catch (e) {
+      return {};
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _getMediaOptions(String name) async {
+    try {
+      final query = '''
+        query {
+          Page {
+            media(search: "$name", type: $_mediaType) {
+              id
+              title {
+                romaji
+                english
+              }
+            }
+          }
+        }
+      ''';
+      final response = await _getResponse(query);
+
+      if (response.isEmpty) {
         return [];
       }
 
-      return (json.decode(response.body)["data"]["Page"]["media"] as List).map((media) {
-        // Prefer the English title, fallback to the Japanese one
+      return (response["Page"]["media"] as List).map((media) {
         return {
           "id": media["id"],
+          // Prefer the English title, fallback to the Japanese one
           "name": _removeBadItems(media["title"]["english"] ?? media["title"]["romaji"])
         };
       }).toList();
+
     } catch (e) {
       return [];
     }
   }
 
+  Future<Map<String, dynamic>> _getMediaById(String id, List<String> customFields) async {
+    try {
+      final query = '''
+        query {
+          Media(id: $id) {
+            id
+            title {
+              romaji
+              english
+            }
+            description
+            startDate {
+              year
+              month
+              day
+            }
+            genres
+            ${customFields.join("\n")}
+          }
+        }
+      ''';
+      final response = await _getResponse(query);
+
+      if (response.isEmpty) {
+        return {};
+      }
+
+      return response["Media"];
+
+    } catch (e) {
+      return {};
+    }
+  }
+
   Map<String, dynamic> _sharedInfo(Map<String, dynamic> media) {
     String formatTwoDigits(int value) {
-      return value.toString().padLeft(2, '0');
+      return value.toString().padLeft(2, "0");
     }
 
     return {
       "id": media["id"],
       "title": {
-        "romaji": media["title"]["romaji"],
-        "english": media["title"]["english"]
+        "romaji": _removeBadItems(media["title"]["romaji"]),
+        "english": _removeBadItems(media["title"]["english"])
       },
       "description": _removeBadItems(media["description"]),
       "release_date": DateTime.parse(
@@ -97,41 +151,20 @@ class Anilist extends Service {
 
   Future<Map<String, dynamic>> _getAnimeInfo(String animeId) async {
     try {
-      final query = '''
-        query {
-          Media(id: $animeId) {
-            id
-            title {
-              romaji
-              english
-              native
-            }
-            description
-            startDate {
-              year
-              month
-              day
-            }
-            genres
-            episodes
-          }
-        }
-      ''';
-      final response = await http.post(
-        _url,
-        headers: _headers,
-        body: json.encode({"query": query}),
-      );
+      final animeCustomFields = [
+        "episodes"
+      ];
+      final anime = await _getMediaById(animeId, animeCustomFields);
 
-      if (response.statusCode != 200) {
+      if (anime.isEmpty) {
         return {};
       }
 
-      final anime = json.decode(response.body)['data']['Media'];
       return {
         ..._sharedInfo(anime),
         "episodes": anime["episodes"]
       };
+
     } catch (e) {
       return {};
     }
@@ -139,41 +172,20 @@ class Anilist extends Service {
 
   Future<Map<String, dynamic>> _getMangaInfo(String mangaId) async {
     try {
-      final query = '''
-        query {
-          Media(id: $mangaId) {
-            id
-            title {
-              romaji
-              english
-              native
-            }
-            description
-            startDate {
-              year
-              month
-              day
-            }
-            genres
-            chapters
-          }
-        }
-      ''';
-      final response = await http.post(
-        _url,
-        headers: _headers,
-        body: json.encode({"query": query}),
-      );
+      final mangaCustomFields = [
+        "chapters"
+      ];
+      final manga = await _getMediaById(mangaId, mangaCustomFields);
 
-      if (response.statusCode != 200) {
+      if (manga.isEmpty) {
         return {};
       }
 
-      final manga = json.decode(response.body)['data']['Media'];
       return {
         ..._sharedInfo(manga),
         "chapters": manga["chapters"]
       };
+
     } catch (e) {
       return {};
     }
@@ -195,15 +207,16 @@ class Anilist extends Service {
 
   @override
   Future<Map<String, dynamic>> getInfo(String id) async {
-    if (_mediaType == 'ANIME') {
+    if (_mediaType == "ANIME") {
       return instance._getAnimeInfo(id);
-    } else {
+    } 
+    else {
       return instance._getMangaInfo(id);
     }
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(int id) async {
+  Future<List<Map<String, dynamic>>> getRecommendations(int) async {
     return [];
   }
 }

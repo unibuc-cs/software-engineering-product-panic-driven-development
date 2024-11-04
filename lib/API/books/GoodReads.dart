@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
@@ -7,11 +8,11 @@ import '../general/Service.dart';
 
 class GoodReads extends Service {
   // Members
-  late final _bookHeaders;
+  late final _headers;
 
   // Private constructor
   GoodReads._() {
-    _bookHeaders = {
+    _headers = {
       "User-Agent": env["USER_AGENTS_GOODREADS"] ?? ""
     };
   }
@@ -22,80 +23,99 @@ class GoodReads extends Service {
   // Accessor for the singleton instance
   static GoodReads get instance => _instance;
 
-  Future<List<Map<String, dynamic>>> _getBooksFromSeries(String seriesUrl) async {
-    try {
-      final response = await http.get(Uri.parse(seriesUrl));
-
-      if (response.statusCode != 200) {
-        return [];
-      }
-
-      final document = parse(response.body);
-      final books = await Future.wait(document.querySelectorAll('div.listWithDividers__item').map((element) async {
-        return {
-          "name": element.querySelector('span[itemprop="name"]')?.text.trim() ?? 'Unknown Title',
-          "index": element.querySelector('h3[class="gr-h3 gr-h3--noBottomMargin"]')?.text.split("Book")[1].trim()
-        };
-      }).toList());
-
-      // Remove books sets (for example, Book 1-7)
-      return books.where((book) => !(book["index"]?.contains("-") ?? false)).toList();
-    } catch (e) {
-      return [];
-    }
-  }
-
   // Private methods
-  Future<List<Map<String, dynamic>>> _getBooks(String bookName) async {
+  Future<Document> _getDocument(String url) async {
     try {
       final response = await http.get(
-        Uri.parse("https://www.goodreads.com/search?q=$bookName"), 
-        headers: _bookHeaders
+        Uri.parse(url),
+        headers: _headers,
       );
 
       if (response.statusCode != 200) {
+        return Document.html("");
+      }
+
+      return parse(response.body);
+
+    } catch (e) {
+      return Document.html("");
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _getBookOptions(String bookName) async {
+    try {
+      final document = await _getDocument("https://www.goodreads.com/search?q=$bookName");
+
+      if (document == Document.html("")) {
         return [];
       }
 
-      return parse(response.body)
-             .querySelectorAll("tr[itemtype='http://schema.org/Book']")
-             .map((book) {
-                final titleElement = book.querySelector("a.bookTitle");
-                if (titleElement != null) {
-                  return {
-                    "name": titleElement.text.split("(")[0].trim(),
-                    "link": "https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}"
-                  };
-                }
-              })
-             .whereType<Map<String, dynamic>>()
-             .toList();
+      return document
+         .querySelectorAll("tr[itemtype='http://schema.org/Book']")
+         .map((book) {
+            final titleElement = book.querySelector("a.bookTitle");
+            if (titleElement != null) {
+              return {
+                "name": titleElement.text.split("(")[0].trim(),
+                "link": "https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}"
+              };
+            }
+          })
+         .whereType<Map<String, dynamic>>()
+         .toList();
+
     } catch (e) {
       return [];
     }
   }
 
-  Future<Map<String, dynamic>> _searchBook(String bookLink) async {
+  Future<List<Map<String, dynamic>>> _getBooksFromSeries(String seriesUrl) async {
     try {
-      final response = await http.get(Uri.parse(bookLink), headers: _bookHeaders);
+      final document = await _getDocument(seriesUrl);
 
-      if (response.statusCode != 200) {
+      if (document == Document.html("")) {
+        return [];
+      }
+
+      return (
+        await Future.wait(
+          document
+          .querySelectorAll('div.listWithDividers__item')
+          .map((element) async {
+              return {
+                "name": element.querySelector('span[itemprop="name"]')?.text.trim() ?? 'Unknown Title',
+                "index": element.querySelector('h3[class="gr-h3 gr-h3--noBottomMargin"]')?.text.split("Book")[1].trim()
+              };
+            })
+        )
+      )
+      .where((book) => !(book["index"]?.contains("-") ?? false))
+      .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<Map<String, dynamic>> _getBookInfo(String bookUrl) async {
+    try {
+      final document = await _getDocument(bookUrl);
+
+      if (document == Document.html("")) {
         return {};
       }
 
-      final document = parse(response.body);
       final jsonData = json.decode(document.querySelector("script[type='application/ld+json']")?.text ?? "{}");
       final seriesElement = document.querySelector("div.BookPageTitleSection__title")?.querySelector("h3");
 
       // Date example: July 21, 2007
-      final releaseDate = document.querySelector("p[data-testid='publicationInfo']")
-                                  ?.text.trim().split("First published ").last ?? "";
+      final releaseDate = document.querySelector("p[data-testid='publicationInfo']")?.text
+                                  .trim().split("First published ").last ?? "";
       final parsedDate = DateFormat("MMMM d, y").parse(releaseDate);
 
       return {
         "name": document.querySelector("h1.Text__title1")?.text.trim(),
         "author": document.querySelector("span.ContributorLink__name")?.text.trim(),
-        "link": bookLink,
+        "link": bookUrl,
         "rating": document.querySelector("div.RatingStatistics__rating")?.text.trim(),
         "release_date": DateFormat("yyyy-MM-dd").format(parsedDate),
         "description": document.querySelector("span.Formatted")?.text.trim(),
@@ -114,16 +134,16 @@ class GoodReads extends Service {
   // Public methods
   @override
   Future<List<Map<String, dynamic>>> getOptions(String bookName) async {
-    return instance._getBooks(bookName);
+    return instance._getBookOptions(bookName);
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(String bookLink) async {
-    return instance._searchBook(bookLink);
+  Future<Map<String, dynamic>> getInfo(String bookUrl) async {
+    return instance._getBookInfo(bookUrl);
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(int bookId) async {
+  Future<List<Map<String, dynamic>>> getRecommendations(int) async {
     return [];
   }
 }

@@ -6,7 +6,7 @@ import '../general/Service.dart';
 class Tmdb extends Service {
   // Members
   late final _headers;
-  final _searchTemplate = "https://api.themoviedb.org/3/search/{media}";
+  final _searchUrlTemplate = "https://api.themoviedb.org/3/search/{media}";
   String _mediaType = "";
 
   // Private constructor
@@ -25,11 +25,28 @@ class Tmdb extends Service {
 
   // Private methods
   String _formatString(String template, Map<String, String> values) {
-    String formatted = template;
     values.forEach((key, value) {
-      formatted = formatted.replaceAll('{$key}', value);
+      template = template.replaceAll('{$key}', value);
     });
-    return formatted;
+    return template;
+  }
+
+  Future<Map<String, dynamic>> _getResponse(Map<String, dynamic> params, String url) async {
+    try {
+      final response = await http.get(
+        Uri.parse(url).replace(queryParameters: params),
+        headers: _headers,
+      );
+
+      if (response.statusCode != 200) {
+        return {};
+      }
+
+      return json.decode(response.body);
+
+    } catch (e) {
+      return {};
+    }
   }
 
   Future<List<Map<String, dynamic>>> _getMediaOptions(String name) async {
@@ -37,21 +54,21 @@ class Tmdb extends Service {
       final params = {
         "query": Uri.encodeQueryComponent(name)
       };
-      final searchUrl = _formatString(_searchTemplate, {'media': _mediaType});
-      final response = await http.get(Uri.parse(searchUrl).replace(queryParameters: params), headers: _headers);
+      final url = _formatString(_searchUrlTemplate, {'media': _mediaType});
+      final response = await _getResponse(params, url);
 
-      if (response.statusCode != 200) {
+      if (response.isEmpty) {
         return [];
       }
 
-      return (json.decode(response.body)["results"] as List).map((media) {
+      return (response["results"] as List).map((media) {
         return {
           "id": media["id"],
           "name": media[_mediaType == "movie" ? "title" : "name"]
         };
       }).toList();
-    }
-    catch (e) {
+
+    } catch (e) {
       return [];
     }
   }
@@ -61,16 +78,15 @@ class Tmdb extends Service {
       final params = {
         "language": Uri.encodeQueryComponent("en-US")
       };
-      final response = await http.get(Uri
-        .parse("https://api.themoviedb.org/3/$_mediaType/$id")
-        .replace(queryParameters: params), headers: _headers
-      );
+      final url = "https://api.themoviedb.org/3/$_mediaType/$id";
+      final response = await _getResponse(params, url);
 
-      if (response.statusCode != 200) {
+      if (response.isEmpty) {
         return {};
       }
 
-      return json.decode(response.body);
+      return response;
+
     } catch (e) {
       return {};
     }
@@ -149,13 +165,14 @@ class Tmdb extends Service {
   Future<Map<String, dynamic>> getInfo(String id) async {
     if (_mediaType == 'movie') {
       return instance._getMovieInfo(id);
-    } else {
+    } 
+    else {
       return instance._getSeriesInfo(id);
     }
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(int movieId) async {
+  Future<List<Map<String, dynamic>>> getRecommendations(int) async {
     return [];
   }
 }

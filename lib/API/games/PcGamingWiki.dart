@@ -19,7 +19,7 @@ class PcGamingWiki extends Service {
   static PcGamingWiki get instance => _instance;
 
   // Private methods
-  Future<List<Map<String, dynamic>>> _getGames(String gameName) async {
+  Future<List<Map<String, dynamic>>> _getGameOptions(String gameName) async {
     try {
       // some games can't be found when the name contains -
       gameName = gameName.replaceAll("-", " ");
@@ -37,8 +37,7 @@ class PcGamingWiki extends Service {
         return [];
       }
 
-      return (games["query"]["search"] as List)
-        .map((game) {
+      return (games["query"]["search"] as List).map((game) {
           if (game["snippet"].contains("REDIRECT")) {
             // Example: "#REDIRECT [[<span class='searchmatch'>Blasphemous</span> 2]]\n" -> Blasphemous 2
             game['title'] = "";
@@ -53,21 +52,21 @@ class PcGamingWiki extends Service {
           return {
             "name": game["title"].trim()
           };
-        })
-        .fold<List<Map<String, dynamic>>>([], (uniqueOptions, option) {
+        }).fold<List<Map<String, dynamic>>>([], (uniqueOptions, option) {
           // Prevent duplicates
           if (!uniqueOptions.any((game) => game["name"] == option["name"])) {
             uniqueOptions.add(option);
           }
           return uniqueOptions;
         });
+
     } catch (e) {
       print(e);
       return [];
     }
   }
 
-  Future<Map<String, dynamic>> _searchGame(String gameName) async {
+  Future<Map<String, dynamic>> _getGameInfo(String gameName) async {
     try {
       final url = "https://www.pcgamingwiki.com/wiki/${gameName.replaceAll(' ', '_')}";
       final response = await http.get(Uri.parse(url));
@@ -118,16 +117,16 @@ class PcGamingWiki extends Service {
   // Public methods
   @override
   Future<List<Map<String, dynamic>>> getOptions(String gameName) async {
-    return instance._getGames(gameName);
+    return instance._getGameOptions(gameName);
   }
 
   @override
   Future<Map<String, dynamic>> getInfo(String gameName) async {
-    return instance._searchGame(gameName);
+    return instance._getGameInfo(gameName);
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(int gameId) async {
+  Future<List<Map<String, dynamic>>> getRecommendations(int) async {
     return [];
   }
 }
