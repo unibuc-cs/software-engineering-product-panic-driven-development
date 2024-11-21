@@ -62,30 +62,31 @@ Future<void> main() async {
     stdout.write("\nEnter your choice: ");
     var choice = stdin.readLineSync() ?? "";
     console.clearScreen();
+    String serviceName = "";
     switch (choice) {
       case "1":
-        ServiceBuilder.setIgdb();
+        serviceName = "igdb";
         break;
       case "2":
-        ServiceBuilder.setPcGamingWiki();
+        serviceName = "pcgamingwiki";
         break;
       case "3":
-        ServiceBuilder.setHowLongToBeat();
+        serviceName = "howlongtobeat";
         break;
       case "4":
-        ServiceBuilder.setGoodReads();
+        serviceName = "goodreads";
         break;
       case "5":
-        ServiceBuilder.setTmdbMovies();
+        serviceName = "tmdbmovies";
         break;
       case "6":
-        ServiceBuilder.setTmdbSeries();
+        serviceName = "tmdbseries";
         break;
       case "7":
-        ServiceBuilder.setAnilistAnime();
+        serviceName = "anilistanime";
         break;
       case "8":
-        ServiceBuilder.setAnilistManga();
+        serviceName = "anilistmanga";
         break;
       case "9":
         stdout.write("New query: ");
@@ -98,11 +99,13 @@ Future<void> main() async {
         print("Invalid choice.");
         break;
     }
-    if (running && choice != "9") {
-      final options = await ServiceHandler.getOptions(query);
+
+    final service = ServiceBuilder.getService(serviceName);
+    if (running && choice != "9" && service != null) {
+      final options = await ServiceHandler.getOptions(service, query);
       final index = getUserInput(options);
       if (index != 0) {
-        final answer = await ServiceHandler.getInfo(options[index - 1][ServiceHandler.getKey()].toString());
+        final answer = await ServiceHandler.getInfo(service, options[index - 1][service.getKey()].toString());
         print(options[index - 1]['name']);
         print(encodeWithDateTime(answer));
       }

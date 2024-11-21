@@ -9,26 +9,20 @@ class Anilist extends Service {
     "Content-Type": "application/json"
   };
   final _replaceItems = {
-    "<br><br>": " ", 
+    "<br><br>": " ",
     "<br>": " "
   };
   final _removeItems = [
-    "<i>", 
-    "</i>", 
-    "\n", 
+    "<i>",
+    "</i>",
+    "\n",
     "\r"
   ];
   final _url = Uri.parse("https://graphql.anilist.co/");
   String _mediaType = "";
 
-  // Private constructor
-  Anilist._();
-
-  // Singleton instance
-  static final Anilist _instance = Anilist._();
-
-  // Accessor for the singleton instance
-  static Anilist get instance => _instance;
+  // Public constructor
+  Anilist({required String mediaType}) : _mediaType = mediaType;
 
   // Private methods
   String _removeBadItems(String input) {
@@ -192,26 +186,18 @@ class Anilist extends Service {
   }
 
   // Public methods
-  void setAnime() {
-    _mediaType = "ANIME";
-  }
-
-  void setManga() {
-    _mediaType = "MANGA";
-  }
-
   @override
   Future<List<Map<String, dynamic>>> getOptions(String name) async {
-    return instance._getMediaOptions(name);
+    return _getMediaOptions(name);
   }
 
   @override
   Future<Map<String, dynamic>> getInfo(String id) async {
     if (_mediaType == "ANIME") {
-      return instance._getAnimeInfo(id);
-    } 
+      return _getAnimeInfo(id);
+    }
     else {
-      return instance._getMangaInfo(id);
+      return _getMangaInfo(id);
     }
   }
 

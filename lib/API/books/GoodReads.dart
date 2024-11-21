@@ -61,6 +61,7 @@ class GoodReads extends Service {
               };
             }
           })
+         // Remove the nulls that appear when the if from above is false
          .whereType<Map<String, dynamic>>()
          .toList();
 
@@ -145,5 +146,10 @@ class GoodReads extends Service {
   @override
   Future<List<Map<String, dynamic>>> getRecommendations(int) async {
     return [];
+  }
+
+  @override
+  String getKey() {
+    return "link";
   }
 }

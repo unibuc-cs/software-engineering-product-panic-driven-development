@@ -7,7 +7,11 @@ import '../general/Service.dart';
 
 class PcGamingWiki extends Service {
   // Members
-  final _queries = ["windows", "os_x", "linux"];
+  final _queries = [
+    "windows",
+    "os_x",
+    "linux"
+  ];
 
   // Private constructor
   PcGamingWiki._();
@@ -128,5 +132,10 @@ class PcGamingWiki extends Service {
   @override
   Future<List<Map<String, dynamic>>> getRecommendations(int) async {
     return [];
+  }
+
+  @override
+  String getKey() {
+    return "name";
   }
 }

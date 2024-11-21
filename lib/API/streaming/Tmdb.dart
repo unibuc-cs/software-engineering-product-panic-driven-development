@@ -6,31 +6,17 @@ import '../general/Service.dart';
 class Tmdb extends Service {
   // Members
   late final _headers;
-  final _searchUrlTemplate = "https://api.themoviedb.org/3/search/{media}";
   String _mediaType = "";
 
-  // Private constructor
-  Tmdb._() {
-    _headers = {
+  // Public constructor
+  Tmdb({required String mediaType}) : _mediaType = mediaType {
+     _headers = {
       "accept": "application/json",
       "Authorization": "Bearer ${env['ACCESS_TOKEN_TMDB']}"
     };
   }
 
-  // Singleton instance
-  static final Tmdb _instance = Tmdb._();
-
-  // Accessor for the singleton instance
-  static Tmdb get instance => _instance;
-
   // Private methods
-  String _formatString(String template, Map<String, String> values) {
-    values.forEach((key, value) {
-      template = template.replaceAll('{$key}', value);
-    });
-    return template;
-  }
-
   Future<Map<String, dynamic>> _getResponse(Map<String, dynamic> params, String url) async {
     try {
       final response = await http.get(
@@ -54,7 +40,7 @@ class Tmdb extends Service {
       final params = {
         "query": Uri.encodeQueryComponent(name)
       };
-      final url = _formatString(_searchUrlTemplate, {'media': _mediaType});
+      final url = "https://api.themoviedb.org/3/search/$_mediaType";
       final response = await _getResponse(params, url);
 
       if (response.isEmpty) {
@@ -122,9 +108,8 @@ class Tmdb extends Service {
         "release_date": movie["release_date"],
         "duration": movie["runtime"]
       };
-    }
-    catch (e) {
-      print(e);
+
+    } catch (e) {
       return {};
     }
   }
@@ -140,34 +125,24 @@ class Tmdb extends Service {
       return {
         ..._sharedInfo(series),
       };
-    }
-    catch (e) {
-      print(e);
+
+    } catch (e) {
       return {};
     }
   }
 
-  // Public methods
-  void setMovies() {
-    _mediaType = "movie";
-  }
-
-  void setSeries() {
-    _mediaType = "tv";
-  }
-
   @override
   Future<List<Map<String, dynamic>>> getOptions(String name) async {
-    return instance._getMediaOptions(name);
+    return _getMediaOptions(name);
   }
 
   @override
   Future<Map<String, dynamic>> getInfo(String id) async {
     if (_mediaType == 'movie') {
-      return instance._getMovieInfo(id);
-    } 
+      return _getMovieInfo(id);
+    }
     else {
-      return instance._getSeriesInfo(id);
+      return _getSeriesInfo(id);
     }
   }
 

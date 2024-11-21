@@ -18,9 +18,9 @@ class HowLongToBeat extends Service {
   // HLTB links to ignore
   // example: https://howlongtobeat.com/game/5203/reviews/latest/1
   final _badLinks = [
-    "forum", 
-    "reviews", 
-    "lists", 
+    "forum",
+    "reviews",
+    "lists",
     "completions"
   ];
 
@@ -35,11 +35,6 @@ class HowLongToBeat extends Service {
 
   // Private methods
   Future<Map<String, dynamic>> _gameTimes(Document document) async {
-    // Might use later for labels
-    String format(String input) {
-      return input.toLowerCase().split(' ').join('_');
-    }
-
     try {
       var times = <String, dynamic>{};
 
@@ -129,7 +124,7 @@ class HowLongToBeat extends Service {
 
       if (response.statusCode == 200) {
         return await _gameTimes(parse(response.body));
-      } 
+      }
       else {
         return {};
       }
@@ -152,5 +147,10 @@ class HowLongToBeat extends Service {
   @override
   Future<List<Map<String, dynamic>>> getRecommendations(int) async {
     return [];
+  }
+
+  @override
+  String getKey() {
+    return "link";
   }
 }
