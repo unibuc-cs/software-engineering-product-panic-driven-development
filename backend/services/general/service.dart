@@ -1,7 +1,7 @@
-import 'package:dotenv/dotenv.dart';
+import '../../helpers/config.dart';
 
 abstract class Service {
-  final env = DotEnv()..load();
+  final config = Config();
 
   Future<List<Map<String, dynamic>>> getOptions(String query) async {
     throw UnimplementedError("getOptions method is not implemented");

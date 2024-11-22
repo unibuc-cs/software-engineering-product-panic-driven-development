@@ -2,8 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:dart_console/dart_console.dart';
-import 'general/ServiceHandler.dart';
-import 'general/ServiceBuilder.dart';
+import 'services/general/servicemanager.dart';
 
 final console = Console();
 
@@ -62,7 +61,7 @@ Future<void> main() async {
     stdout.write("\nEnter your choice: ");
     var choice = stdin.readLineSync() ?? "";
     console.clearScreen();
-    String serviceName = "";
+    String serviceName = "igdb";
     switch (choice) {
       case "1":
         serviceName = "igdb";
@@ -100,13 +99,14 @@ Future<void> main() async {
         break;
     }
 
-    final service = ServiceBuilder.getService(serviceName);
-    if (running && choice != "9" && service != null) {
-      final options = await ServiceHandler.getOptions(service, query);
+    final manager = ServiceManager(serviceName);
+    if (running && choice != "9") {
+      final options = await manager.getOptions(query);
       final index = getUserInput(options);
       if (index != 0) {
-        final answer = await ServiceHandler.getInfo(service, options[index - 1][service.getKey()].toString());
-        print(options[index - 1]['name']);
+        final choice = options[index - 1];
+        final answer = await manager.getInfo(choice[manager.getService()?.getKey() ?? ""].toString());
+        print(choice['name']);
         print(encodeWithDateTime(answer));
       }
       stdout.write("\nPress Enter to continue...");

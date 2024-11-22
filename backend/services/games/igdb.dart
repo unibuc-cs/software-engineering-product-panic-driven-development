@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import '../general/service.dart';
 import 'package:numerus/numerus.dart';
-import '../general/Service.dart';
+import 'package:http/http.dart' as http;
 
 class IGDB extends Service {
   // Members
@@ -21,8 +21,8 @@ class IGDB extends Service {
   // Private constructor
   IGDB._() {
     _params = {
-      "client_id": env["CLIENT_ID_IGDB"] ?? "",
-      "client_secret": env["CLIENT_SECRET_IGDB"] ?? "",
+      "client_id": config.igdb_id,
+      "client_secret": config.igdb_secret,
       "grant_type": "client_credentials"
     };
   }
@@ -48,7 +48,7 @@ class IGDB extends Service {
 
   Map<String, String> _authHeaders(String accessToken) {
     return {
-      "Client-ID": env["CLIENT_ID_IGDB"] ?? "",
+      "Client-ID": config.igdb_id ?? "",
       "Authorization": "Bearer $accessToken",
     };
   }
@@ -300,7 +300,7 @@ class IGDB extends Service {
         headers: _authHeaders(accessToken),
         body: "fields id,first_release_date,name; where parent_game = (${ids.join(", ")});"
       );
-  
+
       if (response != null) {
         return _filterGames(jsonDecode(response.body));
       } else {

@@ -49,5 +49,4 @@ app.*.map.json
 *ios
 *android
 
-*.lock
 .env

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
+import '../general/service.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
-import '../general/Service.dart';
 
 class GoodReads extends Service {
   // Members
@@ -13,7 +13,7 @@ class GoodReads extends Service {
   // Private constructor
   GoodReads._() {
     _headers = {
-      "User-Agent": env["USER_AGENTS_GOODREADS"] ?? ""
+      "User-Agent": config.goodreads_agents
     };
   }
 

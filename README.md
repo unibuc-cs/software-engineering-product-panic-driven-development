@@ -1,10 +1,7 @@
 # MediaMaster
 
-## Prerequisites
-- Get a Supabase URL and Key: https://supabase.com/docs
-- Get an IGDB ID and Secret: https://api-docs.igdb.com/#getting-started
-- Get a TMDB Access Token: https://developer.themoviedb.org/reference/intro/getting-started
-- Add them into .env.example and remove .example from the name
+## Backend server
+- https://mediamaster.fly.dev/
 
 ## Usage
 
@@ -35,11 +32,10 @@ flutter run -d windows
 ```bash
 rps run
 ```
-or 
+or
 ```bash
 flutter run -d windows --release
 ```
-
 
 ## Testing
 

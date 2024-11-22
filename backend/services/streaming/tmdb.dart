@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import '../general/service.dart';
 import 'package:http/http.dart' as http;
-import '../general/Service.dart';
 
 class Tmdb extends Service {
   // Members
@@ -12,7 +12,7 @@ class Tmdb extends Service {
   Tmdb({required String mediaType}) : _mediaType = mediaType {
      _headers = {
       "accept": "application/json",
-      "Authorization": "Bearer ${env['ACCESS_TOKEN_TMDB']}"
+      "Authorization": "Bearer ${config.tmdb_token}"
     };
   }
 

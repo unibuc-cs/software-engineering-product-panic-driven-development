@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import '../general/service.dart';
 import 'package:http/http.dart' as http;
-import '../general/Service.dart';
 
 class Anilist extends Service {
   // Members
