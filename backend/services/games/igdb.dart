@@ -361,7 +361,7 @@ class IGDB extends Service {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getSimilarGames(int gameId) async {
+  Future<List<Map<String, dynamic>>> _getSimilarGames(String gameId) async {
     _accessToken = await _getAccessToken();
 
     final response = await _makeRequest(
@@ -510,7 +510,7 @@ class IGDB extends Service {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(int gameId) async {
+  Future<List<Map<String, dynamic>>> getRecommendations(String gameId) async {
     return instance._getSimilarGames(gameId);
   }
 }

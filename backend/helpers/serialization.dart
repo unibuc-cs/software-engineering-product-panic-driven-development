@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:shelf/shelf.dart';
 
-Response jsonResponse(Map<String, dynamic> data) {
+Response mapToJson(Map<String, dynamic> data) {
   final jsonData = jsonEncode(data);
   return Response.ok(jsonData, headers: {'Content-Type': 'application/json'});
 }
@@ -18,4 +18,13 @@ Map<String, dynamic> serialize(Map<String, dynamic> data) {
     }
     return MapEntry(key, value);
   });
+}
+
+Response listToJson(List<Map<String, dynamic>> dataList) {
+  final jsonData = jsonEncode(dataList);
+  return Response.ok(jsonData, headers: {'Content-Type': 'application/json'});
+}
+
+List<Map<String, dynamic>> serializeList(List<Map<String, dynamic>> dataList) {
+  return dataList.map((data) => serialize(data)).toList();
 }

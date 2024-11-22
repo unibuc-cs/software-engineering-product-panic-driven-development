@@ -34,7 +34,7 @@ class ServiceManager {
     return await service.getInfo(item) ?? {};
   }
 
-  Future<List<Map<String, dynamic>>> getRecommendations(int id) async {
-    return await service.getRecommendations(id) ?? [];
+  Future<List<Map<String, dynamic>>> getRecommendations(String item) async {
+    return await service.getRecommendations(item) ?? [];
   }
 }

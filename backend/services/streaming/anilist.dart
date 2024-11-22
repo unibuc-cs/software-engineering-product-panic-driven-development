@@ -202,7 +202,7 @@ class Anilist extends Service {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(int) async {
+  Future<List<Map<String, dynamic>>> getRecommendations(String) async {
     return [];
   }
 }
