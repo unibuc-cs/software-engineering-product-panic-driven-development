@@ -34,6 +34,21 @@ class HowLongToBeat extends Service {
   static HowLongToBeat get instance => _instance;
 
   // Private methods
+  Future<Document> _getDocument(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode != 200) {
+        return Document.html("");
+      }
+
+      return parse(response.body);
+
+    } catch (e) {
+      return Document.html("");
+    }
+  }
+
   Future<Map<String, dynamic>> _gameTimes(Document document) async {
     try {
       var times = <String, dynamic>{};
@@ -63,13 +78,14 @@ class HowLongToBeat extends Service {
   Future<List<String>> _getLinks(String gameName) async {
     try {
       final encodedGameName = Uri.encodeQueryComponent("how long to beat $gameName");
-      final response = await http.get(Uri.parse("https://www.google.com/search?q=$encodedGameName"));
 
-      if (response.statusCode != 200) {
+      final document = await _getDocument("https://www.google.com/search?q=$encodedGameName");
+
+      if (document == Document.html("")) {
         return [];
       }
 
-      final linkList = parse(response.body).querySelectorAll('a[href*="howlongtobeat.com/game/"]');
+      final linkList = document.querySelectorAll('a[href*="howlongtobeat.com/game/"]');
 
       // Add the links to a set to remove duplicates
       var linkSet = <String>{};
@@ -96,11 +112,11 @@ class HowLongToBeat extends Service {
   Future<List<Map<String, dynamic>>> _getGameOptions(String gameName) async {
     try {
       final links = await _getLinks(gameName);
-      var options = <Map<String, dynamic>>[];
-      var fetches = links.map((link) async {
-        var response = await http.get(Uri.parse(link));
-        if (response.statusCode == 200) {
-          final actualGameName = parse(response.body).querySelector(".GameHeader_profile_header__q_PID")?.text;
+      final options = <Map<String, dynamic>>[];
+      final fetches = links.map((link) async {
+        final document = await _getDocument(link);
+        if (document != Document.html("")) {
+          final actualGameName = document.querySelector(".GameHeader_profile_header__q_PID")?.text;
           if (actualGameName != null) {
             options.add({
               "name": actualGameName,
@@ -120,14 +136,14 @@ class HowLongToBeat extends Service {
   Future<Map<String, dynamic>> _getGameInfo(String gameLink) async {
     try
     {
-      final response = await http.get(Uri.parse(gameLink));
+      final document = await _getDocument(gameLink);
 
-      if (response.statusCode == 200) {
-        return await _gameTimes(parse(response.body));
-      }
-      else {
+      if (document == Document.html("")) {
         return {};
       }
+
+      return await _gameTimes(document);
+
     } catch (e) {
       return {};
     }
