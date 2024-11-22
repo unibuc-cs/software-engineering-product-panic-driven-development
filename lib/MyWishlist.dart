@@ -923,7 +923,7 @@ class MyWishlistState extends State<MyWishlist> {
         description:
             selectedGame['summary'] ?? "There is no summary for this game.",
         releaseDate: selectedGame['first_release_date'] != null
-            ? selectedGame['first_release_date'] as DateTime
+            ? DateTime.parse(selectedGame['first_release_date'])
             : DateTime(1800),
         criticScore: selectedGame['critic_rating'] != 0
             ? selectedGame['critic_rating']

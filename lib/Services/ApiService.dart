@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 Future<dynamic> _fetchEndpoint(String endpoint) async {
-  final baseUrl = 'http://localhost:8080/api';
+  final baseUrl = const bool.fromEnvironment('LOCAL', defaultValue: false)
+    ? 'http://localhost:8080/api'
+    : 'https://mediamaster.fly.dev/api';
   final response = await http.get(Uri.parse('$baseUrl/$endpoint'));
 
   if (response.statusCode == 200) {

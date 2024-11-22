@@ -119,6 +119,7 @@ scripts:
   restore: flutter clean && flutter pub get
   dev: flutter run -d windows
   run: flutter run -d windows --release
-  server: dart backend/main.dart
+  test: flutter run --dart-define=LOCAL=true -d windows
   cli: dart backend/cli.dart
+  server: dart backend/main.dart
   deploy: fly deploy
