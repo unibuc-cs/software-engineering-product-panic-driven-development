@@ -1,5 +1,7 @@
 # MediaMaster
 
+We describe our app in more detail on the Wiki: https://github.com/unibuc-cs/software-engineering-product-panic-driven-development/wiki
+
 ## Backend server
 - https://mediamaster.fly.dev/
 
