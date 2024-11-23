@@ -1,0 +1,47 @@
+# Use the official Dart image with the required SDK version
+FROM dart:3.5.4 AS base
+
+# Install dependencies for Flutter
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    xz-utils \
+    git \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and install the Flutter SDK
+RUN curl -LO https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.4-stable.tar.xz \
+    && tar xf flutter_linux_3.24.4-stable.tar.xz -C /usr/local/ \
+    && rm flutter_linux_3.24.4-stable.tar.xz
+
+# Set the Flutter path
+ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
+
+# Add git safe directory configuration
+RUN git config --global --add safe.directory /usr/local/flutter
+
+# Create a non-root user
+RUN useradd -m flutteruser
+
+# Switch to the non-root user
+USER flutteruser
+
+# Set the working directory for the backend
+WORKDIR /home/flutteruser/app
+
+# Copy the backend code
+COPY backend/ /home/flutteruser/app/
+
+# Copy the root pubspec.yaml from the root
+COPY pubspec.yaml /home/flutteruser/app/
+
+# Disable cli animations
+RUN flutter config --no-cli-animations
+
+# Install dependencies
+RUN flutter pub get
+
+# Run the backend server
+EXPOSE 8080
+CMD ["dart", "main.dart"]

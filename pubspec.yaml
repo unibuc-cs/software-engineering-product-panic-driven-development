@@ -47,10 +47,14 @@ dependencies:
   flutter_bloc: ^8.1.6
   equatable: ^2.0.3
   email_validator: ^3.0.0
-  test: ^1.24.9
   adaptive_theme: ^3.4.0
+  numerus: ^2.3.0
   dotenv: ^4.2.0
+  intl: ^0.19.0
   supabase_flutter: ^2.8.0
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  shelf_static: ^1.1.3
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +66,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  test: ^1.24.9
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -114,4 +119,7 @@ scripts:
   restore: flutter clean && flutter pub get
   dev: flutter run -d windows
   run: flutter run -d windows --release
-  cli: cd lib/API && dart CLI_app.dart
+  test: flutter run --dart-define=LOCAL=true -d windows
+  cli: dart backend/cli.dart
+  server: dart backend/main.dart
+  deploy: fly deploy

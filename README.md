@@ -1,11 +1,9 @@
 # MediaMaster
 
-We describe our app in more detail on the Wiki: https://github.com/unibuc-cs/software-engineering-product-panic-driven-development/wiki . 
+We describe our app in more detail on the Wiki: https://github.com/unibuc-cs/software-engineering-product-panic-driven-development/wiki
 
-## Prerequisites
-- Get a Supabase URL and Key: https://supabase.com/docs
-- Get an IGDB ID and Secret: https://api-docs.igdb.com/#getting-started
-- Add them into .env.example and remove .example from the name
+## Backend server
+- https://mediamaster.fly.dev/
 
 ## Usage
 
@@ -36,7 +34,24 @@ flutter run -d windows
 ```bash
 rps run
 ```
-or 
+or
 ```bash
 flutter run -d windows --release
+```
+
+## Testing
+
+- Test the services with the CLI app
+```bash
+rps cli
+```
+
+- Test all services with unit tests
+```bash
+rps test_all
+```
+
+- Test individual services with unit tests (replace {service} with igdb, hltb or pcgw)
+```bash
+rps test_{service}
 ```

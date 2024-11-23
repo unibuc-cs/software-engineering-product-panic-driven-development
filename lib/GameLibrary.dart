@@ -5,8 +5,6 @@ import 'package:mediamaster/Models/note.dart';
 import 'package:pair/pair.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
-import 'API/general/ServiceHandler.dart';
-import 'API/general/ServiceBuilder.dart';
 
 import 'Models/game.dart';
 import 'Models/genre.dart';
@@ -23,9 +21,11 @@ import 'Models/media_platform.dart';
 import 'Models/media_creator.dart';
 import 'Models/wishlist.dart';
 
+import 'Services/ApiService.dart';
+
+import 'Main.dart';
 import 'UserSystem.dart';
 import 'MyWishlist.dart';
-import 'Main.dart';
 
 class GameLibrary extends StatefulWidget {
   const GameLibrary({super.key});
@@ -434,9 +434,7 @@ class GameLibraryState extends State<GameLibrary> {
                           onPressed: () async {
                             String query = searchController.text;
                             if (query.isNotEmpty) {
-                              ServiceBuilder.setIgdb();
-                              searchResults =
-                                  await ServiceHandler.getOptions(query);
+                              searchResults = await getOptionsIGDB(query);
                               setState(() {
                                 noSearch = searchResults
                                     .isEmpty; // Update noSearch flag
@@ -829,7 +827,7 @@ class GameLibraryState extends State<GameLibrary> {
       return;
     }
 
-    var selectedGame = await ServiceHandler.getInfo(result);
+    var selectedGame = await getInfoIGDB(result);
     String name = selectedGame['name'];
 
     if (name[name.length - 1] == ')' && name.length >= 7) {
@@ -839,12 +837,11 @@ class GameLibraryState extends State<GameLibrary> {
     Game? nullableGame = gameAlreadyInDB(name);
 
     // Get information from PCGamingWiki
-    ServiceBuilder.setPcGamingWiki();
-    var optionsPCGW = await ServiceHandler.getOptions(name);
+    var optionsPCGW = await getOptionsPCGW(name);
     Map<String, dynamic> resultPCGW = {};
     if (optionsPCGW.isNotEmpty) {
       // This is kind of a hack but we will do it legit in the future
-      resultPCGW = await ServiceHandler.getInfo(optionsPCGW[0]);
+      resultPCGW = await getInfoPCGW(optionsPCGW[0]);
     }
     Map<String, dynamic> answersPCGW = {};
     if (resultPCGW.containsKey('windows')) {
@@ -886,12 +883,11 @@ class GameLibraryState extends State<GameLibrary> {
     }
 
     // Get information from HLTB
-    ServiceBuilder.setHowLongToBeat();
-    var optionsHLTB = await ServiceHandler.getOptions(selectedGame['name']);
+    var optionsHLTB = await getOptionsHLTB(selectedGame['name']);
     Map<String, dynamic> resultHLTB = {};
     if (optionsHLTB.isNotEmpty) {
       // This is kind of a hack but we will do it legit in the future
-      resultHLTB = await ServiceHandler.getInfo(optionsHLTB[0]);
+      resultHLTB = await getInfoHLTB(optionsHLTB[0]);
     }
     Map<String, dynamic> answersHLTB = {};
     if (resultHLTB.containsKey('Main Story')) {
@@ -929,7 +925,7 @@ class GameLibraryState extends State<GameLibrary> {
         description:
             selectedGame['summary'] ?? "There is no summary for this game.",
         releaseDate: selectedGame['first_release_date'] != null
-            ? selectedGame['first_release_date'] as DateTime 
+            ? DateTime.parse(selectedGame['first_release_date'])
             : DateTime(1800),
         criticScore: selectedGame['critic_rating'] != 0
             ? selectedGame['critic_rating']
@@ -1530,8 +1526,7 @@ class GameLibraryState extends State<GameLibrary> {
       setState(() {});
     }
 
-    ServiceBuilder.setIgdb();
-    var similarGames = await ServiceHandler.getRecommendations(game.IGDBId);
+    var similarGames = await getRecsIGDB(game.IGDBId.toString());
     List<Widget> recommendations = [];
 
     if (similarGames.isEmpty) {

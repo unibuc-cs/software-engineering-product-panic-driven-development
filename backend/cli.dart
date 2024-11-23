@@ -1,10 +1,20 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import 'package:dart_console/dart_console.dart';
-import 'general/ServiceHandler.dart';
-import 'general/ServiceBuilder.dart';
+import 'services/general/servicemanager.dart';
 
 final console = Console();
+
+String encodeWithDateTime(Map<String, dynamic> data) {
+  return const JsonEncoder.withIndent('  ').convert(data.map((key, value) {
+    if (value is DateTime) {
+      return MapEntry(key, value.toString().substring(0, 10));
+    } else {
+      return MapEntry(key, value);
+    }
+  }));
+}
 
 int getUserInput(List<Map<String, dynamic>> options) {
   try {
@@ -41,38 +51,63 @@ Future<void> main() async {
     print("[1] IGDB (Games)");
     print("[2] PcGamingWiki (Game System Requirements)");
     print("[3] HowLongToBeat (Game Times)");
+    print("[4] Goodreads (Books)");
+    print("[5] TMDB (Movies)");
+    print("[6] TMDB (TV Series)");
+    print("[7] Anilist (Anime)");
+    print("[8] Anilist (Manga)");
     print("[9] Change query (Current: $query)");
     print("[0] Exit");
     stdout.write("\nEnter your choice: ");
-    var choice = stdin.readLineSync() ?? '';
+    var choice = stdin.readLineSync() ?? "";
     console.clearScreen();
+    String serviceName = "igdb";
     switch (choice) {
-      case '1':
-        ServiceBuilder.setIgdb();
+      case "1":
+        serviceName = "igdb";
         break;
-      case '2':
-        ServiceBuilder.setPcGamingWiki();
+      case "2":
+        serviceName = "pcgamingwiki";
         break;
-      case '3':
-        ServiceBuilder.setHowLongToBeat();
+      case "3":
+        serviceName = "howlongtobeat";
         break;
-      case '9':
+      case "4":
+        serviceName = "goodreads";
+        break;
+      case "5":
+        serviceName = "tmdbmovies";
+        break;
+      case "6":
+        serviceName = "tmdbseries";
+        break;
+      case "7":
+        serviceName = "anilistanime";
+        break;
+      case "8":
+        serviceName = "anilistmanga";
+        break;
+      case "9":
         stdout.write("New query: ");
-        query = stdin.readLineSync() ?? '';
+        query = stdin.readLineSync() ?? "";
         break;
-      case '0':
+      case "0":
         running = false;
         break;
       default:
         print("Invalid choice.");
         break;
     }
-    if (running && choice != '9') {
-      final options = await ServiceHandler.getOptions(query);
+
+    final manager = ServiceManager(serviceName);
+    if (running && choice != "9") {
+      final options = await manager.getOptions(query);
       final index = getUserInput(options);
       if (index != 0) {
-        final answer = await ServiceHandler.getInfo(options[index - 1]);
-        print(answer);
+        final choice = options[index - 1];
+        final answer = await manager.getInfo(choice[manager.getService()?.getKey() ?? ""].toString());
+        print(choice['name']);
+        print(encodeWithDateTime(answer));
       }
       stdout.write("\nPress Enter to continue...");
       stdin.readLineSync();
