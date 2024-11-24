@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import '../general/service.dart';
+import '../provider.dart';
 import 'package:http/http.dart' as http;
 
-class Tmdb extends Service {
+class Tmdb extends Provider {
   // Members
   late final _headers;
   String _mediaType = "";

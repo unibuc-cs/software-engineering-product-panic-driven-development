@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import '../general/service.dart';
+import '../provider.dart';
 import 'package:numerus/numerus.dart';
 import 'package:http/http.dart' as http;
 
-class IGDB extends Service {
+class IGDB extends Provider {
   // Members
   late final Map<String, String> _params;
   String _accessToken = "";

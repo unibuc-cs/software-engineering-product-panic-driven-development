@@ -34,4 +34,16 @@ class Config {
   String get tmdb_token {
     return getEnv('ACCESS_TOKEN_TMDB') ?? '';
   }
+
+  String get supabase_url {
+    return getEnv('URL_SUPABASE') ?? '';
+  }
+
+  String get supabase_key {
+    return getEnv('ANON_KEY_SUPABASE') ?? '';
+  }
+
+  int get port {
+    return int.parse(getEnv('PORT') ?? '8080');
+  }
 }

@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'manager.dart';
 import 'package:dart_console/dart_console.dart';
-import 'services/general/servicemanager.dart';
 
 final console = Console();
 
@@ -61,31 +61,31 @@ Future<void> main() async {
     stdout.write("\nEnter your choice: ");
     var choice = stdin.readLineSync() ?? "";
     console.clearScreen();
-    String serviceName = "igdb";
+    String providerName = "igdb";
     switch (choice) {
       case "1":
-        serviceName = "igdb";
+        providerName = "igdb";
         break;
       case "2":
-        serviceName = "pcgamingwiki";
+        providerName = "pcgamingwiki";
         break;
       case "3":
-        serviceName = "howlongtobeat";
+        providerName = "howlongtobeat";
         break;
       case "4":
-        serviceName = "goodreads";
+        providerName = "goodreads";
         break;
       case "5":
-        serviceName = "tmdbmovies";
+        providerName = "tmdbmovies";
         break;
       case "6":
-        serviceName = "tmdbseries";
+        providerName = "tmdbseries";
         break;
       case "7":
-        serviceName = "anilistanime";
+        providerName = "anilistanime";
         break;
       case "8":
-        serviceName = "anilistmanga";
+        providerName = "anilistmanga";
         break;
       case "9":
         stdout.write("New query: ");
@@ -99,13 +99,14 @@ Future<void> main() async {
         break;
     }
 
-    final manager = ServiceManager(serviceName);
+    final providerManager = Manager(providerName);
     if (running && choice != "9") {
-      final options = await manager.getOptions(query);
+      final options = await providerManager.getOptions(query);
       final index = getUserInput(options);
       if (index != 0) {
         final choice = options[index - 1];
-        final answer = await manager.getInfo(choice[manager.getService()?.getKey() ?? ""].toString());
+        final id = choice[providerManager.getProvider()?.getKey() ?? ""].toString();
+        final answer = await providerManager.getInfo(id);
         print(choice['name']);
         print(encodeWithDateTime(answer));
       }
