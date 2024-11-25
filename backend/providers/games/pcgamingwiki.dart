@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import '../provider.dart';
 import 'package:html/dom.dart';
-import '../general/service.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 
-class PcGamingWiki extends Service {
+class PcGamingWiki extends Provider {
   // Members
   final _queries = [
     "windows",

@@ -112,14 +112,17 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
 scripts:
-  test_igdb: dart test/services/IGDB_test.dart
-  test_hltb: dart test/services/HowLongToBeat_test.dart
-  test_pcgw: dart test/services/PcGamingWiki_test.dart
-  test_all: flutter test test/services
   restore: flutter clean && flutter pub get
   dev: flutter run -d windows
   run: flutter run -d windows --release
-  test: flutter run --dart-define=LOCAL=true -d windows
-  cli: dart backend/cli.dart
+  local: flutter run --dart-define=LOCAL=true -d windows
+  cli: dart backend/providers/cli.dart
   server: dart backend/main.dart
   deploy: fly deploy
+  test_igdb: dart test/backend/providers/IGDB_test.dart
+  test_hltb: dart test/backend/providers/HLTB_test.dart
+  test_pcgw: dart test/backend/providers/PCGW_test.dart
+  test_goodreads: dart test/backend/providers/GoodReads_test.dart
+  test_tmdb: dart test/backend/providers/TMDB_test.dart
+  test_anilist: dart test/backend/providers/Anilist_test.dart
+  test: flutter test

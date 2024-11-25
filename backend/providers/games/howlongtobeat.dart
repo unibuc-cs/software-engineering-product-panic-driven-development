@@ -1,10 +1,10 @@
 import 'dart:async';
+import '../provider.dart';
 import 'package:html/dom.dart';
-import '../general/service.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 
-class HowLongToBeat extends Service {
+class HowLongToBeat extends Provider {
   // Members
 
   // classes for HLTB game time elements

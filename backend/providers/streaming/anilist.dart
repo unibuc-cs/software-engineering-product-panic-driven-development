@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import '../general/service.dart';
+import '../provider.dart';
 import 'package:http/http.dart' as http;
 
-class Anilist extends Service {
+class Anilist extends Provider {
   // Members
   final _headers = {
     "Content-Type": "application/json"

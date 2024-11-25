@@ -1,6 +1,6 @@
-import '../../helpers/config.dart';
+import '../helpers/config.dart';
 
-abstract class Service {
+abstract class Provider {
   final config = Config();
 
   Future<List<Map<String, dynamic>>> getOptions(String query) async {

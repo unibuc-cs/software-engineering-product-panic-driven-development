@@ -1,9 +1,10 @@
 import 'dart:io';
+import 'helpers/config.dart';
+import 'providers/manager.dart';
 import 'helpers/middleware.dart';
 import 'package:shelf/shelf.dart';
 import 'helpers/serialization.dart';
 import 'package:shelf/shelf_io.dart';
-import 'services/general/servicemanager.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 void main() async {
@@ -29,7 +30,7 @@ void main() async {
       ..write('/pcgamingwiki\n')
       ..write('/howlongtobeat\n')
       ..write('/goodreads\n')
-      ..write('/tmdbmovies\n')
+      ..write('/tmdbmovie\n')
       ..write('/tmdbseries\n')
       ..write('/anilistanime\n')
       ..write('/anilistmanga');
@@ -37,18 +38,18 @@ void main() async {
     return Response.ok(sb.toString());
   });
 
-  router.get('/api/<service>', (Request request) {
+  router.get('/api/<provider>', (Request request) {
     final sb = StringBuffer()
       ..write('Available methods\n\n')
       ..write('/options?name=<query>\n')
-      ..write('/info?<key>=<value>');
+      ..write('/info?id=<query>');
 
     return Response.ok(sb.toString());
   });
 
-  router.get('/api/<service>/<method>', (Request request, String service, String method) async {
+  router.get('/api/<provider>/<method>', (Request request, String provider, String method) async {
     final Map<String, String> queryParams = request.url.queryParameters;
-    final manager = ServiceManager(service);
+    final providerManager = Manager(provider);
     final parameter = method == 'options'
       ? queryParams['name']
       : queryParams['id'];
@@ -58,15 +59,15 @@ void main() async {
     }
 
     if (method == 'options') {
-      final options = await manager.getOptions(parameter);
+      final options = await providerManager.getOptions(parameter);
       return listToJson(serializeList(options));
     }
     if (method == 'info') {
-      final info = await manager.getInfo(parameter);
-      return mapToJson(serialize(info));
+      final info = await providerManager.getInfo(parameter);
+      return mapToJson(serializeMap(info));
     }
     if (method == 'recommendations') {
-      final recommendations = await manager.getRecommendations(parameter);
+      final recommendations = await providerManager.getRecommendations(parameter);
       return listToJson(serializeList(recommendations));
     }
 
@@ -78,6 +79,6 @@ void main() async {
     .addMiddleware(unknownEndpoint())
     .addHandler(router);
 
-  final server = await serve(handler, InternetAddress.anyIPv4, 8080);
+  final server = await serve(handler, InternetAddress.anyIPv4, Config().port);
   print('Server listening on port ${server.port}');
 }

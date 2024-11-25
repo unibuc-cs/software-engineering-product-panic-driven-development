@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import '../provider.dart';
 import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
-import '../general/service.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 
-class GoodReads extends Service {
+class GoodReads extends Provider {
   // Members
   late final _headers;
 
