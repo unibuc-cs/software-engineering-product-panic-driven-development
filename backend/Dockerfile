@@ -1,14 +1,27 @@
 # Use the official Dart image with the required SDK version
 FROM dart:3.5.4 AS base
 
-# Install dependencies for Flutter
+# Install dependencies for Flutter and Puppeteer (including Chromium and Node.js)
 RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     xz-utils \
     git \
     sudo \
+    libxss1 \
+    libappindicator3-1 \
+    libasound2 \
+    libnss3 \
+    libgtk-3-0 \
+    libx11-xcb1 \
+    libgdk-pixbuf2.0-0 \
+    libgbm1 \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js (which includes npm)
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
 
 # Download and install the Flutter SDK
 RUN curl -LO https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.4-stable.tar.xz \
@@ -41,6 +54,9 @@ RUN flutter config --no-cli-animations
 
 # Install dependencies
 RUN flutter pub get
+
+# Install Puppeteer dependencies for Chromium
+RUN npm install puppeteer --save
 
 # Run the backend server
 EXPOSE 8080

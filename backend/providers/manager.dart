@@ -7,6 +7,23 @@ import 'streaming/anilist.dart';
 import 'games/pcgamingwiki.dart';
 import 'games/howlongtobeat.dart';
 
+class Dummy extends Provider {
+  @override
+  Future<List<Map<String, dynamic>>> getOptions(String query) async {
+    return [{"error": "No provider found"}];
+  }
+
+  @override
+  Future<Map<String, dynamic>> getInfo(String item) async {
+    return {"error": "No provider found"};
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getRecommendations(String item) async {
+    return [{"error": "No provider found"}];
+  }
+}
+
 class Manager {
   late Provider provider;
 
@@ -27,7 +44,7 @@ class Manager {
       provider = IGDB();
     }
     else {
-      provider = _providers[name.toLowerCase()] ?? (throw ArgumentError("Service '$name' not found."));
+      provider = _providers[name.toLowerCase()] ?? Dummy();
     }
   }
 

@@ -105,6 +105,15 @@ class Anilist extends Provider {
               day
             }
             genres
+            coverImage {
+              large
+            }
+            meanScore
+            averageScore
+            status
+            externalLinks {
+              url
+            }
             ${customFields.join("\n")}
           }
         }
@@ -129,24 +138,27 @@ class Anilist extends Provider {
 
     return {
       "id": media["id"],
-      "title": {
-        "romaji": _removeBadItems(media["title"]["romaji"]),
-        "english": _removeBadItems(media["title"]["english"])
-      },
-      "description": _removeBadItems(media["description"]),
+      "name": _removeBadItems(media["title"]["english"] ?? media["title"]["romaji"]),
+      "description": _removeBadItems(media["description"] ?? ""),
       "release_date": DateTime.parse(
         '${media["startDate"]["year"]}-'
-        '${formatTwoDigits(media["startDate"]["month"])}-'
-        '${formatTwoDigits(media["startDate"]["day"])}'
+        '${formatTwoDigits(media["startDate"]["month"] ?? 1)}-'
+        '${formatTwoDigits(media["startDate"]["day"] ?? 1)}'
       ),
-      "genres": media["genres"]
+      "genres": media["genres"],
+      "cover_image": media["coverImage"]["large"],
+      "user_rating": media["meanScore"],
+      "critic_rating": media["averageScore"],
+      "status": media["status"],
+      "links": media["externalLinks"].map((link) => link["url"]).toList()
     };
   }
 
   Future<Map<String, dynamic>> _getAnimeInfo(String animeId) async {
     try {
       final animeCustomFields = [
-        "episodes"
+        "episodes",
+        "duration"
       ];
       final anime = await _getMediaById(animeId, animeCustomFields);
 
@@ -159,7 +171,8 @@ class Anilist extends Provider {
 
       return {
         ..._sharedInfo(anime),
-        "episodes": anime["episodes"]
+        "episodes": anime["episodes"],
+        "duration": anime["duration"]
       };
     }
     catch (e) {
@@ -170,7 +183,8 @@ class Anilist extends Provider {
   Future<Map<String, dynamic>> _getMangaInfo(String mangaId) async {
     try {
       final mangaCustomFields = [
-        "chapters"
+        "chapters",
+        "volumes"
       ];
       final manga = await _getMediaById(mangaId, mangaCustomFields);
 
@@ -183,11 +197,59 @@ class Anilist extends Provider {
 
       return {
         ..._sharedInfo(manga),
-        "chapters": manga["chapters"]
+        "chapters": manga["chapters"],
+        "volumes": manga["volumes"]
       };
     }
     catch (e) {
       return {"error": e.toString()};
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _getMediaRecommendations(String id) async {
+    try {
+      final query = '''
+        query {
+          Media(id: $id) {
+            recommendations {
+              edges {
+                node {
+                  mediaRecommendation {
+                    id
+                    title {
+                      romaji
+                      english
+                    }
+                    type
+                  }
+                }
+              }
+            }
+          }
+        }
+      ''';
+
+      final response = await _getResponse(query);
+
+      if (response.isEmpty) {
+        return [{"error": "No recommendations found"}];
+      }
+
+      final recommendations = response["Media"]["recommendations"]["edges"];
+      if (recommendations == null || recommendations.isEmpty) {
+        return [{"error": "No recommendations found"}];
+      }
+
+      return (recommendations as List).map((edge) {
+        final recommendation = edge["node"]["mediaRecommendation"];
+        return {
+          "id": recommendation["id"],
+          "name": _removeBadItems(recommendation["title"]["english"] ?? recommendation["title"]["romaji"])
+        };
+      }).toList();
+    }
+    catch (e) {
+      return [{"error": e.toString()}];
     }
   }
 
@@ -208,7 +270,7 @@ class Anilist extends Provider {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(String) async {
-    return [];
+  Future<List<Map<String, dynamic>>> getRecommendations(String id) async {
+    return _getMediaRecommendations(id);
   }
 }

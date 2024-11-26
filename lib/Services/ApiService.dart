@@ -44,8 +44,8 @@ Future<List<Map<String, dynamic>>> getOptionsIGDB(String query) async =>
 Future<Map<String, dynamic>> getInfoIGDB(Map<String, dynamic> game) async =>
   await _fetchInfo("igdb", game["id"].toString());
 
-Future<List<Map<String, dynamic>>> getRecsIGDB (String id) async =>
-  await _fetchRecommendations("igdb", id);
+Future<List<Map<String, dynamic>>> getRecsIGDB (Map<String, dynamic> game) async =>
+  await _fetchRecommendations("igdb", game["id"].toString());
 
 // PCGW, key is name
 Future<List<Map<String, dynamic>>> getOptionsPCGW(String query) async =>
@@ -72,8 +72,8 @@ Future<List<Map<String, dynamic>>> getOptionsBook(String query) async =>
 Future<Map<String, dynamic>> getInfoBook(Map<String, dynamic> book) async =>
   await _fetchInfo("goodreads", book["link"]);
 
-Future<List<Map<String, dynamic>>> getRecsBook(String id) async =>
-  await _fetchRecommendations("goodreads", id);
+Future<List<Map<String, dynamic>>> getRecsBook(Map<String, dynamic> book) async =>
+  await _fetchRecommendations("goodreads", book["link"]);
 
 // TMDB Movies, key is id
 Future<List<Map<String, dynamic>>> getOptionsMovie(String query) async =>
@@ -82,8 +82,8 @@ Future<List<Map<String, dynamic>>> getOptionsMovie(String query) async =>
 Future<Map<String, dynamic>> getInfoMovie(Map<String, dynamic> movie) async =>
   await _fetchInfo("tmdbmovie", movie["id"].toString());
 
-Future<List<Map<String, dynamic>>> getRecsMovie(String id) async =>
-  await _fetchRecommendations("tmdbmovie", id);
+Future<List<Map<String, dynamic>>> getRecsMovie(Map<String, dynamic> movie) async =>
+  await _fetchRecommendations("tmdbmovie", movie["id"].toString());
 
 // TMDB Series, key is id
 Future<List<Map<String, dynamic>>> getOptionsSeries(String query) async =>
@@ -92,8 +92,8 @@ Future<List<Map<String, dynamic>>> getOptionsSeries(String query) async =>
 Future<Map<String, dynamic>> getInfoSeries(Map<String, dynamic> series) async =>
   await _fetchInfo("tmdbseries", series["id"].toString());
 
-Future<List<Map<String, dynamic>>> getRecsSeries(String id) async =>
-  await _fetchRecommendations("tmdbseries", id);
+Future<List<Map<String, dynamic>>> getRecsSeries(Map<String, dynamic> series) async =>
+  await _fetchRecommendations("tmdbseries", series["id"].toString());
 
 // Anilist Anime, key is id
 Future<List<Map<String, dynamic>>> getOptionsAnime(String query) async =>
@@ -102,8 +102,8 @@ Future<List<Map<String, dynamic>>> getOptionsAnime(String query) async =>
 Future<Map<String, dynamic>> getInfoAnime(Map<String, dynamic> anime) async =>
   await _fetchInfo("anilistanime", anime["id"].toString());
 
-Future<List<Map<String, dynamic>>> getRecsAnime(String id) async =>
-  await _fetchRecommendations("anilistanime", id);
+Future<List<Map<String, dynamic>>> getRecsAnime(Map<String, dynamic> anime) async =>
+  await _fetchRecommendations("anilistanime", anime["id"].toString());
 
 // Anilist Manga, key is id
 Future<List<Map<String, dynamic>>> getOptionsManga(String query) async =>
@@ -112,5 +112,5 @@ Future<List<Map<String, dynamic>>> getOptionsManga(String query) async =>
 Future<Map<String, dynamic>> getInfoManga(Map<String, dynamic> manga) async =>
   await _fetchInfo("anilistmanga", manga["id"].toString());
 
-Future<List<Map<String, dynamic>>> getRecsManga(String id) async =>
-  await _fetchRecommendations("anilistmanga", id);
+Future<List<Map<String, dynamic>>> getRecsManga(Map<String, dynamic> manga) async =>
+  await _fetchRecommendations("anilistmanga", manga["id"].toString());

@@ -13,7 +13,7 @@ Response handleErrorResponse(String error) {
     return Response.internalServerError(body: error);
   }
   else if ((errorLower.contains("no") || errorLower.contains("not")) && errorLower.contains("found")) {
-    return Response(204);
+    return Response.notFound(error);
   }
   return Response.badRequest(body: error);
 }
@@ -54,7 +54,8 @@ void main() async {
     final sb = StringBuffer()
       ..write('Available methods\n\n')
       ..write('/options?name=<query>\n')
-      ..write('/info?id=<query>');
+      ..write('/info?id=<query>\n')
+      ..write('/recommendations?id=<query>');
 
     return Response.ok(sb.toString());
   });
@@ -91,7 +92,6 @@ void main() async {
       }
       return listToJson(serializeList(recommendations));
     }
-
     return Response.notFound('Method not found');
   });
 

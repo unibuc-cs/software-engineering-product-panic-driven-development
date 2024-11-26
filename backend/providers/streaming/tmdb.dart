@@ -137,6 +137,31 @@ class Tmdb extends Provider {
     }
   }
 
+   Future<List<Map<String, dynamic>>> _getMediaRecommendations(String id) async {
+    try {
+      final params = {
+        "language": Uri.encodeQueryComponent("en-US"),
+      };
+      final url = "https://api.themoviedb.org/3/$_mediaType/$id/recommendations";
+      final response = await _getResponse(params, url);
+
+      if (response.isEmpty) {
+        return [];
+      }
+
+      return (response["results"] as List).map((media) {
+        return {
+          "id": media["id"],
+          "name": media[_mediaType == "movie" ? "title" : "name"]
+        };
+      }).toList();
+    }
+    catch (e) {
+      return [{"error": e.toString()}];
+    }
+  }
+
+  // Public methods
   @override
   Future<List<Map<String, dynamic>>> getOptions(String name) async {
     return _getMediaOptions(name);
@@ -153,7 +178,7 @@ class Tmdb extends Provider {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(String) async {
-    return [];
+  Future<List<Map<String, dynamic>>> getRecommendations(String id) async {
+    return _getMediaRecommendations(id);
   }
 }

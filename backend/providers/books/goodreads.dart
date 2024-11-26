@@ -4,6 +4,7 @@ import '../provider.dart';
 import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:puppeteer/puppeteer.dart';
 import 'package:html/parser.dart' show parse;
 
 class GoodReads extends Provider {
@@ -70,7 +71,7 @@ class GoodReads extends Provider {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getBooksFromSeries(String seriesUrl) async {
+  Future<List> _getBooksFromSeries(String seriesUrl) async {
     try {
       final document = await _getDocument(seriesUrl);
 
@@ -98,6 +99,7 @@ class GoodReads extends Provider {
     }
   }
 
+
   Future<Map<String, dynamic>> _getBookInfo(String bookUrl) async {
     try {
       final document = await _getDocument(bookUrl);
@@ -114,6 +116,10 @@ class GoodReads extends Provider {
                                   .trim().split("First published ").last ?? "";
       final parsedDate = DateFormat("MMMM d, y").parse(releaseDate);
 
+      final genres = document.querySelectorAll("span.BookPageMetadataSection__genreButton a")
+        .map((element) => element.text.trim())
+        .toList();
+
       return {
         "name": document.querySelector("h1.Text__title1")?.text.trim(),
         "author": document.querySelector("span.ContributorLink__name")?.text.trim(),
@@ -123,6 +129,7 @@ class GoodReads extends Provider {
         "description": document.querySelector("span.Formatted")?.text.trim(),
         "pages": jsonData["numberOfPages"],
         "cover": jsonData["image"],
+        "genres": genres,
         "book_format": jsonData["bookFormat"],
         "language": jsonData["inLanguage"],
         "series": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
@@ -131,6 +138,55 @@ class GoodReads extends Provider {
     }
     catch (e) {
       return {"error": e.toString()};
+    }
+  }
+
+  Future<List<Map<String, String>>> _getBookRecommendations(String bookUrl) async {
+    final browser = await puppeteer.launch(
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-gpu',
+        '--disable-software-rasterizer',
+        '--no-zygote',
+        '--disable-extensions'
+        '--disable-background-timer-throttling',
+      ]
+    );
+
+    try {
+      final page = await browser.newPage();
+
+      await page.goto(bookUrl, wait: Until.networkIdle);
+      await page.waitForSelector('.BookCard__clickCardTarget');
+
+      final recommendedBooks = await page.evaluate('''
+        function() {
+          const books = Array.from(document.querySelectorAll('.BookCard__clickCardTarget'));
+          return books.map(function(book) {
+            return {
+              title: book.querySelector('.BookCard__title')?.innerText || 'No title',
+              link: book.href || 'No link',
+            };
+          });
+        }
+      ''');
+
+      await browser.close();
+
+      return (recommendedBooks as List)
+        .map((book) => {
+          'title': book['title'] as String,
+          'link': book['link'] as String,
+        })
+        .where((book) => book['title'] != 'No title' && book['link'] != 'No link')
+        .toList();
+    }
+    catch (e) {
+      return [{"error": e.toString()}];
+    }
+    finally {
+      await browser.close();
     }
   }
 
@@ -146,8 +202,8 @@ class GoodReads extends Provider {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(String) async {
-    return [];
+  Future<List<Map<String, dynamic>>> getRecommendations(String bookUrl) async {
+    return instance._getBookRecommendations(bookUrl);
   }
 
   @override
