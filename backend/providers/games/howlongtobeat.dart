@@ -43,8 +43,8 @@ class HowLongToBeat extends Provider {
       }
 
       return parse(response.body);
-
-    } catch (e) {
+    }
+    catch (e) {
       return Document.html("");
     }
   }
@@ -70,8 +70,9 @@ class HowLongToBeat extends Provider {
         }
       }
       return times;
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 
@@ -104,7 +105,8 @@ class HowLongToBeat extends Provider {
       }
 
       return linkSet.toList();
-    } catch (e) {
+    }
+    catch (e) {
       return [];
     }
   }
@@ -128,8 +130,9 @@ class HowLongToBeat extends Provider {
 
       await Future.wait(fetches);
       return options;
-    } catch (e) {
-      return [];
+    }
+    catch (e) {
+      return [{"error": e.toString()}];
     }
   }
 
@@ -139,13 +142,13 @@ class HowLongToBeat extends Provider {
       final document = await _getDocument(gameLink);
 
       if (document == Document.html("")) {
-        return {};
+        return {"error": "$gameLink is a bad query"};
       }
 
       return await _gameTimes(document);
-
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 

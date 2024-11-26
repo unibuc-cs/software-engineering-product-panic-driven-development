@@ -36,8 +36,8 @@ class GoodReads extends Provider {
       }
 
       return parse(response.body);
-
-    } catch (e) {
+    }
+    catch (e) {
       return Document.html("");
     }
   }
@@ -47,7 +47,7 @@ class GoodReads extends Provider {
       final document = await _getDocument("https://www.goodreads.com/search?q=$bookName");
 
       if (document == Document.html("")) {
-        return [];
+        return [{"error": "No books found"}];
       }
 
       return document
@@ -64,9 +64,9 @@ class GoodReads extends Provider {
          // Remove the nulls that appear when the if from above is false
          .whereType<Map<String, dynamic>>()
          .toList();
-
-    } catch (e) {
-      return [];
+    }
+    catch (e) {
+      return [{"error": e.toString()}];
     }
   }
 
@@ -92,7 +92,8 @@ class GoodReads extends Provider {
       )
       .where((book) => !(book["index"]?.contains("-") ?? false))
       .toList();
-    } catch (e) {
+    }
+    catch (e) {
       return [];
     }
   }
@@ -102,7 +103,7 @@ class GoodReads extends Provider {
       final document = await _getDocument(bookUrl);
 
       if (document == Document.html("")) {
-        return {};
+        return {"error": "No books found"};
       }
 
       final jsonData = json.decode(document.querySelector("script[type='application/ld+json']")?.text ?? "{}");
@@ -127,8 +128,9 @@ class GoodReads extends Provider {
         "series": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
         "series_books": await instance._getBooksFromSeries(seriesElement?.querySelector("a")?.attributes['href'] ?? "")
       };
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 

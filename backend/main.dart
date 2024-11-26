@@ -7,6 +7,17 @@ import 'helpers/serialization.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+Response handleErrorResponse(String error) {
+  final errorLower = error.toLowerCase();
+  if (errorLower.contains("something went wrong")) {
+    return Response.internalServerError(body: error);
+  }
+  else if ((errorLower.contains("no") || errorLower.contains("not")) && errorLower.contains("found")) {
+    return Response(204);
+  }
+  return Response.badRequest(body: error);
+}
+
 void main() async {
   final router = Router();
 
@@ -61,14 +72,23 @@ void main() async {
 
     if (method == 'options') {
       final options = await providerManager.getOptions(parameter);
+      if (options.length == 1 && options[0].containsKey('error')) {
+        return handleErrorResponse(options[0]['error']);
+      }
       return listToJson(serializeList(options));
     }
     if (method == 'info') {
       final info = await providerManager.getInfo(parameter);
+      if (info.containsKey('error')) {
+        return handleErrorResponse(info['error']);
+      }
       return mapToJson(serializeMap(info));
     }
     if (method == 'recommendations') {
       final recommendations = await providerManager.getRecommendations(parameter);
+      if (recommendations.length == 1 && recommendations[0].containsKey('error')) {
+        return handleErrorResponse(recommendations[0]['error']);
+      }
       return listToJson(serializeList(recommendations));
     }
 

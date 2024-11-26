@@ -34,14 +34,17 @@ class Manager {
   Provider? getProvider() => provider;
 
   Future<List<Map<String, dynamic>>> getOptions(String query) async {
-    return await provider.getOptions(query) ?? [];
+    return await provider.getOptions(query) ??
+           [{"error": "Something went wrong" }];
   }
 
   Future<Map<String, dynamic>> getInfo(String item) async {
-    return await provider.getInfo(item) ?? {};
+    return await provider.getInfo(item) ??
+           {"error": "Something went wrong" };
   }
 
   Future<List<Map<String, dynamic>>> getRecommendations(String item) async {
-    return await provider.getRecommendations(item) ?? [];
+    return await provider.getRecommendations(item) ??
+           [{"error": "Something went wrong" }];
   }
 }

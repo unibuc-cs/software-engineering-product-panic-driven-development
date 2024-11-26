@@ -20,6 +20,9 @@ Map<String, dynamic> getBestMatch(String gameName, List<Map<String, dynamic>> ga
   int bestMatchPercentage = 0;
   gameName = gameName.replaceAll(RegExp(r'\W'), '').toLowerCase();
   for (final game in gameOptions) {
+    if (!game.containsKey("name")) {
+      continue;
+    }
     String name = game["name"]
       .replaceAll(RegExp(r"\(.*?\)"), "")
       .replaceAll(RegExp(r'\W'), '')
@@ -65,8 +68,8 @@ Future<Map<String, dynamic>> getGames(String selectedUser) async {
         .replaceAll("&", "and")
         .split(RegExp(r'\s+'))
         .join(' ');
-      final gameInfo = await getOptionsIGDB(name);
-      games[name] = getBestMatch(name, gameInfo);
+      final gameOptions = await getOptionsIGDB(name);
+      games[name] = getBestMatch(name, gameOptions);
     }));
   }
   await Future.wait(futures);
@@ -94,7 +97,7 @@ Future<Map<String, dynamic>> getInfoForGames(Map<String, dynamic> games) async {
 Future<void> main() async {
   final Stopwatch stopwatch = Stopwatch()..start();
 
-  final games = await getGames("giulian62");
+  final games = await getGames("The-Winner");
   final gamesInfo = await getInfoForGames(games);
 
   stopwatch.stop();

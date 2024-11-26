@@ -29,48 +29,47 @@ class Steam extends Provider {
         .getUrl(Uri.parse(url))
         .then((req) => req.close());
 
-      if (response.statusCode == 200) {
-        final body = await response.transform(utf8.decoder).join();
-        final List<dynamic>? games = jsonDecode(body)["response"]?["games"];
+      if (response.statusCode != 200) {
+        return {"error": "User not found"};
+      }
 
-        if (games == null || games.isEmpty) {
-          return {};
-        }
-        else {
-          games.sort((game1, game2) => game1["name"].compareTo(game2["name"]));
-          return {
-            // image url: https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/<id>/<icon>.jpg
-            "games": games
-              .where((game) =>
-                !game["name"].toLowerCase().contains("public test") &&
-                !game["name"].toLowerCase().contains("multiplayer") &&
-                !game["name"].toLowerCase().contains("open beta"))
-              .map((game) {
-                return {
-                  "id": game["appid"],
-                  "name": game["name"]
-                    .replaceAll("™", "")
-                    .replaceAll("®", "")
-                    .replaceAll("GOTY Edition", "Game of The Year Edition")
-                    .replaceAll("GOTY", "")
-                    .replaceAll("Single Player", "")
-                    .replaceAll(RegExp(r"\(.*?\)"), "")
-                    .replaceAll("’", "'")
-                    .trim(),
-                  "icon": game["img_icon_url"],
-                  "time_played": game["playtime_forever"],
-                  "last_played": _getDate(game["rtime_last_played"] ?? 0)
-                };
-              })
-              .toList()
-          };
-        }
+      final body = await response.transform(utf8.decoder).join();
+      final List<dynamic>? games = jsonDecode(body)["response"]?["games"];
+
+      if (games == null || games.isEmpty) {
+        return {"error": "No games found"};
       }
-      else {
-        return {};
-      }
-    } catch (e) {
-      return {};
+
+      games.sort((game1, game2) => game1["name"].compareTo(game2["name"]));
+      return {
+        // image url: https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/<id>/<icon>.jpg
+        "games": games
+          .where((game) =>
+            !game["name"].toLowerCase().contains("public test") &&
+            !game["name"].toLowerCase().contains("multiplayer") &&
+            !game["name"].toLowerCase().contains("open beta"))
+          .map((game) {
+            return {
+              "id": game["appid"],
+              "name": game["name"]
+                .replaceAll("™", "")
+                .replaceAll("®", "")
+                .replaceAll("GOTY Edition", "Game of The Year Edition")
+                .replaceAll("GOTY", "")
+                .replaceAll("Single Player", "")
+                .replaceAll(RegExp(r"\(.*?\)"), "")
+                .replaceAll("’", "'")
+                .trim(),
+              "icon": game["img_icon_url"],
+              "time_played": game["playtime_forever"],
+              "last_played": _getDate(game["rtime_last_played"] ?? 0)
+            };
+          })
+          .toList()
+      };
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 

@@ -29,8 +29,8 @@ class Tmdb extends Provider {
       }
 
       return json.decode(response.body);
-
-    } catch (e) {
+    }
+    catch (e) {
       return {};
     }
   }
@@ -53,9 +53,9 @@ class Tmdb extends Provider {
           "name": media[_mediaType == "movie" ? "title" : "name"]
         };
       }).toList();
-
-    } catch (e) {
-      return [];
+    }
+    catch (e) {
+      return [{ "error": e.toString() }];
     }
   }
 
@@ -72,9 +72,9 @@ class Tmdb extends Provider {
       }
 
       return response;
-
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 
@@ -99,7 +99,10 @@ class Tmdb extends Provider {
       final movie = await _getMediaById(movieId);
 
       if (movie.isEmpty) {
-        return {};
+        return {"error": "Movie not found"};
+      }
+      if (movie.containsKey("error")) {
+        return movie;
       }
 
       return {
@@ -108,9 +111,9 @@ class Tmdb extends Provider {
         "release_date": movie["release_date"],
         "duration": movie["runtime"]
       };
-
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 
@@ -119,15 +122,18 @@ class Tmdb extends Provider {
       final series = await _getMediaById(seriesId);
 
       if (series.isEmpty) {
-        return {};
+        return {"error": "Series not found"};
+      }
+      if (series.containsKey("error")) {
+        return series;
       }
 
       return {
         ..._sharedInfo(series),
       };
-
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 

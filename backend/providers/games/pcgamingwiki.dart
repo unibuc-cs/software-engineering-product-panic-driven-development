@@ -38,7 +38,7 @@ class PcGamingWiki extends Provider {
       final games = jsonDecode(response.body);
 
       if (!games.containsKey("query") || !games["query"].containsKey("search")) {
-        return [];
+        return [{"error": "No games found"}];
       }
 
       return (games["query"]["search"] as List).map((game) {
@@ -63,10 +63,9 @@ class PcGamingWiki extends Provider {
           }
           return uniqueOptions;
         });
-
-    } catch (e) {
-      print(e);
-      return [];
+    }
+    catch (e) {
+      return [{"error": e.toString()}];
     }
   }
 
@@ -76,7 +75,7 @@ class PcGamingWiki extends Provider {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode != 200) {
-        return {};
+        return {"error": "Game not found"};
       }
 
       final document = parse(response.body);
@@ -113,8 +112,9 @@ class PcGamingWiki extends Provider {
       }
 
       return gameInfo.isNotEmpty ? gameInfo : {};
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 

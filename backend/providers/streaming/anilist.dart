@@ -48,8 +48,8 @@ class Anilist extends Provider {
       }
 
       return json.decode(response.body)["data"];
-
-    } catch (e) {
+    }
+    catch (e) {
       return {};
     }
   }
@@ -72,7 +72,7 @@ class Anilist extends Provider {
       final response = await _getResponse(query);
 
       if (response.isEmpty) {
-        return [];
+        return [{"error": "No media found"}];
       }
 
       return (response["Page"]["media"] as List).map((media) {
@@ -82,9 +82,9 @@ class Anilist extends Provider {
           "name": _removeBadItems(media["title"]["english"] ?? media["title"]["romaji"])
         };
       }).toList();
-
-    } catch (e) {
-      return [];
+    }
+    catch (e) {
+      return [{"error": e.toString()}];
     }
   }
 
@@ -116,9 +116,9 @@ class Anilist extends Provider {
       }
 
       return response["Media"];
-
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 
@@ -151,16 +151,19 @@ class Anilist extends Provider {
       final anime = await _getMediaById(animeId, animeCustomFields);
 
       if (anime.isEmpty) {
-        return {};
+        return {"error": "No anime found"};
+      }
+      if (anime.containsKey("error")) {
+        return anime;
       }
 
       return {
         ..._sharedInfo(anime),
         "episodes": anime["episodes"]
       };
-
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 
@@ -172,16 +175,19 @@ class Anilist extends Provider {
       final manga = await _getMediaById(mangaId, mangaCustomFields);
 
       if (manga.isEmpty) {
-        return {};
+        return {"error": "No manga found"};
+      }
+      if (manga.containsKey("error")) {
+        return manga;
       }
 
       return {
         ..._sharedInfo(manga),
         "chapters": manga["chapters"]
       };
-
-    } catch (e) {
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 

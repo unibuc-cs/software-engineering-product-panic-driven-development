@@ -28,18 +28,6 @@ class IGDB extends Provider {
   }
 
   // Private methods
-  void reset() {
-    _artworks = [];
-    _cover = "";
-    _collections = [];
-    _developers = [];
-    _franchises = [];
-    _genres = [];
-    _platforms = [];
-    _publishers = [];
-    _websites = [];
-  }
-
   Map<String, String> _authHeaders(String accessToken) {
     return {
       "Client-ID": config.igdb_id ?? "",
@@ -55,12 +43,12 @@ class IGDB extends Provider {
         return response;
       }
       else {
-        print(response.statusCode);
-        print(endpoint);
-        print(body);
+        print("${response.statusCode} - $endpoint $body");
       }
-    } catch (e) {}
-    return null;
+    }
+    catch (e) {
+      return null;
+    }
   }
 
   Future<String> _getAccessToken() async {
@@ -69,10 +57,12 @@ class IGDB extends Provider {
       final response = await http.post(url, body: _params);
       if (response.statusCode == 200) {
         return jsonDecode(response.body)["access_token"];
-      } else {
+      }
+      else {
         return "";
       }
-    } catch (e) {
+    }
+    catch (e) {
       return "";
     }
   }
@@ -98,7 +88,8 @@ class IGDB extends Provider {
           _artworks.add(artwork["url"].replaceFirst("thumb", "original"));
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   Future<void> _getCover(String accessToken, Map<String, dynamic> game) async {
@@ -111,7 +102,8 @@ class IGDB extends Provider {
       if (response != null) {
         _cover = jsonDecode(response.body)[0]["url"].replaceFirst("thumb", "original");
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   Future<void> _getCollections(String accessToken, Map<String, dynamic> game) async {
@@ -132,7 +124,8 @@ class IGDB extends Provider {
           _collections.add(utf8.decode(collection["name"].runes.toList()));
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   Future<void> _getCompanies(String accessToken, Map<String, dynamic> game) async {
@@ -175,7 +168,8 @@ class IGDB extends Provider {
           }
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   Future<void> _getDevelopersAndPublishers(String accessToken, Map<String, dynamic> game) async {
@@ -196,7 +190,8 @@ class IGDB extends Provider {
           }
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   Future<void> _getFranchises(String accessToken, Map<String, dynamic> game) async {
@@ -217,7 +212,8 @@ class IGDB extends Provider {
           _franchises.add(utf8.decode(franchise["name"].runes.toList()));
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   Future<void> _getGenres(String accessToken, Map<String, dynamic> game) async {
@@ -233,7 +229,8 @@ class IGDB extends Provider {
           _genres.add(utf8.decode(genre["name"].runes.toList()));
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   Future<void> _getPlatforms(String accessToken, Map<String, dynamic> game) async {
@@ -249,7 +246,8 @@ class IGDB extends Provider {
           _platforms.add(utf8.decode(platform["name"].runes.toList()));
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   Future<void> _getWebsites(
@@ -266,7 +264,8 @@ class IGDB extends Provider {
           _websites.add(website["url"]);
         }
       }
-    } catch (e) {}
+    }
+    catch (e) {}
   }
 
   bool _containsAllWords(String name, String gameName) {
@@ -282,8 +281,7 @@ class IGDB extends Provider {
   List<dynamic> _filterGames(games) {
     final badWords = ["bundle", "pack"];
     return games
-        .where((game) =>
-            !badWords.any((word) => game["name"].toLowerCase().contains(word)))
+        .where((game) => !badWords.any((word) => game["name"].toLowerCase().contains(word)))
         .toList();
   }
 
@@ -298,8 +296,8 @@ class IGDB extends Provider {
         // where version_parent = null & parent_game = null
       );
 
-      if (response == null) {
-        return [];
+      if (response == null || response.body == "[]") {
+        return [{"error": "No games found"}];
       }
 
       var games = jsonDecode(response.body);
@@ -334,8 +332,9 @@ class IGDB extends Provider {
         }
       }
       return List<Map<String, dynamic>>.from(games);
-    } catch (e) {
-      return [];
+    }
+    catch (e) {
+      return [{"error": e.toString()}];
     }
   }
 
@@ -348,14 +347,11 @@ class IGDB extends Provider {
         body: "fields similar_games; where id = ${gameId};"
       );
 
-    if (response == null) {
-      return [];
+    if (response == null || response.body == "[]") {
+      return [{"error": "No games found"}];
     }
 
     var games = jsonDecode(response.body)[0]["similar_games"];
-    if (games == null) {
-      return [];
-    }
 
     List<dynamic> ids = [];
     for (var game in games) {
@@ -369,7 +365,7 @@ class IGDB extends Provider {
     );
 
     if (similarGamesResponse == null) {
-      return [];
+      return [{"error": "No games found"}];
     }
 
     games = jsonDecode(similarGamesResponse.body);
@@ -381,6 +377,9 @@ class IGDB extends Provider {
 
         // Add the year to the game name
         games[i]["name"] += " (${games[i]['first_release_date'].year})";
+
+        // Delete the 'first_release_date' key
+        games.remove("first_release_date");
       }
     }
     return List<Map<String, dynamic>>.from(games);
@@ -398,11 +397,12 @@ class IGDB extends Provider {
       );
 
       if (response == null) {
-        return {};
+        return {"error": "No games found"};
       }
 
       var game = jsonDecode(response.body)[0];
       game["name"] = utf8.decode(game["name"].runes.toList());
+
       if (game["first_release_date"] != null) {
         // Turn the Unix timestamp into a DateTime object
         game["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(game["first_release_date"] * 1000);
@@ -411,8 +411,12 @@ class IGDB extends Provider {
         game["name"] += " (${game['first_release_date'].year})";
 
         // Format the date as a string, removing the time
-        game["first_release_date"] = DateTime.parse(game["first_release_date"].toString().substring(0, 10));
+        game["release_date"] = DateTime.parse(game["first_release_date"].toString().substring(0, 10));
+
+        // Delete the 'first_release_date' key
+        game.remove("first_release_date");
       }
+
       if (game["summary"] != null) {
         game["summary"] = utf8.decode(game["summary"].runes.toList());
       }
@@ -420,60 +424,71 @@ class IGDB extends Provider {
       if (game["aggregated_rating"] != null) {
         game["critic_rating"] = (game["aggregated_rating"]).round();
         game.remove("aggregated_rating");
-      } else {
+      }
+      else {
         game["critic_rating"] = 0;
         game.remove("aggregated_rating");
       }
+
       if (game["artworks"] != null) {
         await _getArtworks(_accessToken, game);
         game["artworks"] = _artworks;
       }
+
       if (game["cover"] != null) {
         await _getCover(_accessToken, game);
         game["cover"] = _cover;
       }
+
       if (game["collections"] != null) {
         await _getCollections(_accessToken, game);
         game["collections"] = _collections;
       }
+
       if (game["franchises"] != null) {
         await _getFranchises(_accessToken, game);
         if (game["collections"] != null) {
           game["collections"] += _franchises;
-        } else {
+        }
+        else {
           game["collections"] = _franchises;
         }
       }
+
       if (game["genres"] != null) {
         await _getGenres(_accessToken, game);
         game["genres"] = _genres;
       }
+
       if (game["involved_companies"] != null) {
         await _getCompanies(_accessToken, game);
         game["developers"] = _developers;
         game["publishers"] = _publishers;
         game.remove("involved_companies");
       }
+
       if (game["platforms"] != null) {
         await _getPlatforms(_accessToken, game);
         game["platforms"] = _platforms;
       }
+
       if (game["rating"] != null) {
         game["user_rating"] = (game["rating"]).round();
         game.remove("rating");
-      } else {
+      }
+      else {
         game["user_rating"] = 0;
         game.remove("rating");
       }
+
       if (game["websites"] != null) {
         await _getWebsites(_accessToken, game);
         game["websites"] = _websites;
       }
-      reset();
       return game;
-    } catch (e) {
-      reset();
-      return {};
+    }
+    catch (e) {
+      return {"error": e.toString()};
     }
   }
 
