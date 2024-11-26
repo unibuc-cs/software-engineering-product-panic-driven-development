@@ -43,6 +43,10 @@ class Config {
     return getEnv('ANON_KEY_SUPABASE') ?? '';
   }
 
+  String get steam_key {
+    return getEnv('API_KEY_STEAM') ?? '';
+  }
+
   int get port {
     return int.parse(getEnv('PORT') ?? '8080');
   }
