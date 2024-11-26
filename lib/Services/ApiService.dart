@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-final baseUrl = const bool.fromEnvironment('LOCAL', defaultValue: false)
-  ? 'http://localhost:8080/api'
-  : 'https://mediamaster.fly.dev/api';
+final baseUrl = const bool.fromEnvironment("LOCAL", defaultValue: false)
+  ? "http://localhost:3007/api"
+  : "https://mediamaster.fly.dev/api";
 
 Future<dynamic> _fetchEndpoint(String endpoint) async {
   final response = await http.get(Uri.parse('$baseUrl/$endpoint'));
@@ -14,7 +14,7 @@ Future<dynamic> _fetchEndpoint(String endpoint) async {
 }
 
 Future<List<Map<String, dynamic>>> _fetchOptions(String serviceName, String query) async {
-  final data = await _fetchEndpoint('$serviceName/options?name=$query');
+  final data = await _fetchEndpoint("$serviceName/options?name=$query");
   if (data is List) {
     return List<Map<String, dynamic>>.from(data);
   }
@@ -22,7 +22,7 @@ Future<List<Map<String, dynamic>>> _fetchOptions(String serviceName, String quer
 }
 
 Future<Map<String, dynamic>> _fetchInfo(String serviceName, String query) async {
-  final data = await _fetchEndpoint('$serviceName/info?id=$query');
+  final data = await _fetchEndpoint("$serviceName/info?id=$query");
   if (data is Map) {
     return Map<String, dynamic>.from(data);
   }
@@ -30,7 +30,7 @@ Future<Map<String, dynamic>> _fetchInfo(String serviceName, String query) async 
 }
 
 Future<List<Map<String, dynamic>>> _fetchRecommendations(String serviceName, String query) async {
-  final data = await _fetchEndpoint('$serviceName/recommendations?id=$query');
+  final data = await _fetchEndpoint("$serviceName/recommendations?id=$query");
   if (data is List) {
     return List<Map<String, dynamic>>.from(data);
   }
@@ -38,41 +38,79 @@ Future<List<Map<String, dynamic>>> _fetchRecommendations(String serviceName, Str
 }
 
 // IGDB, key is id
-final getOptionsIGDB = (String query) async => await _fetchOptions('igdb', query);
-final getInfoIGDB = (Map<String, dynamic> game) async => await _fetchInfo('igdb', game['id'].toString());
-final getRecsIGDB = (String id) async => await _fetchRecommendations('igdb', id);
+Future<List<Map<String, dynamic>>> getOptionsIGDB(String query) async =>
+  await _fetchOptions("igdb", query);
+
+Future<Map<String, dynamic>> getInfoIGDB(Map<String, dynamic> game) async =>
+  await _fetchInfo("igdb", game["id"].toString());
+
+Future<List<Map<String, dynamic>>> getRecsIGDB (String id) async =>
+  await _fetchRecommendations("igdb", id);
 
 // PCGW, key is name
-final getOptionsPCGW = (String query) async => await _fetchOptions('pcgamingwiki', query);
-final getInfoPCGW = (Map<String, dynamic> game) async => await _fetchInfo('pcgamingwiki', game['name']);
-final getRecsPCGW = (String id) async => await _fetchRecommendations('pcgamingwiki', id);
+Future<List<Map<String, dynamic>>> getOptionsPCGW(String query) async =>
+  await _fetchOptions("pcgamingwiki", query);
+
+Future<Map<String, dynamic>> getInfoPCGW(Map<String, dynamic> game) async =>
+  await _fetchInfo("pcgamingwiki", game["name"]);
 
 // HLTB, key is link
-final getOptionsHLTB = (String query) async => await _fetchOptions('howlongtobeat', query);
-final getInfoHLTB = (Map<String, dynamic> game) async => await _fetchInfo('howlongtobeat', game['link']);
-final getRecsHLTB = (String id) async => await _fetchRecommendations('howlongtobeat', id);
+Future<List<Map<String, dynamic>>> getOptionsHLTB(String query) async =>
+  await _fetchOptions("howlongtobeat", query);
+
+Future<Map<String, dynamic>> getInfoHLTB(Map<String, dynamic> game) async =>
+  await _fetchInfo("howlongtobeat", game["link"]);
+
+// Steam
+Future<Map<String, dynamic>> getInfoSteam(String userId) async =>
+  await _fetchInfo("steam", userId);
 
 // Goodreads, key is link
-final getOptionsBook = (String query) async => await _fetchOptions('goodreads', query);
-final getInfoBook = (Map<String, dynamic> book) async => await _fetchInfo('goodreads', book['link']);
-final getRecsBook = (String id) async => await _fetchRecommendations('goodreads', id);
+Future<List<Map<String, dynamic>>> getOptionsBook(String query) async =>
+  await _fetchOptions("goodreads", query);
+
+Future<Map<String, dynamic>> getInfoBook(Map<String, dynamic> book) async =>
+  await _fetchInfo("goodreads", book["link"]);
+
+Future<List<Map<String, dynamic>>> getRecsBook(String id) async =>
+  await _fetchRecommendations("goodreads", id);
 
 // TMDB Movies, key is id
-final getOptionsMovie = (String query) async => await _fetchOptions('tmdbmovie', query);
-final getInfoMovie = (Map<String, dynamic> movie) async => await _fetchInfo('tmdbmovie', movie['id'].toString());
-final getRecsMovie = (String id) async => await _fetchRecommendations('tmdbmovie', id);
+Future<List<Map<String, dynamic>>> getOptionsMovie(String query) async =>
+  await _fetchOptions("tmdbmovie", query);
+
+Future<Map<String, dynamic>> getInfoMovie(Map<String, dynamic> movie) async =>
+  await _fetchInfo("tmdbmovie", movie["id"].toString());
+
+Future<List<Map<String, dynamic>>> getRecsMovie(String id) async =>
+  await _fetchRecommendations("tmdbmovie", id);
 
 // TMDB Series, key is id
-final getOptionsSeries = (String query) async => await _fetchOptions('tmdbseries', query);
-final getInfoSeries = (Map<String, dynamic> series) async => await _fetchInfo('tmdbseries', series['id'].toString());
-final getRecsSeries = (String id) async => await _fetchRecommendations('tmdbseries', id);
+Future<List<Map<String, dynamic>>> getOptionsSeries(String query) async =>
+  await _fetchOptions("tmdbseries", query);
+
+Future<Map<String, dynamic>> getInfoSeries(Map<String, dynamic> series) async =>
+  await _fetchInfo("tmdbseries", series["id"].toString());
+
+Future<List<Map<String, dynamic>>> getRecsSeries(String id) async =>
+  await _fetchRecommendations("tmdbseries", id);
 
 // Anilist Anime, key is id
-final getOptionsAnime = (String query) async => await _fetchOptions('anilistanime', query);
-final getInfoAnime = (Map<String, dynamic> anime) async => await _fetchInfo('anilistanime', anime['id'].toString());
-final getRecsAnime = (String id) async => await _fetchRecommendations('anilistanime', id);
+Future<List<Map<String, dynamic>>> getOptionsAnime(String query) async =>
+  await _fetchOptions("anilistanime", query);
+
+Future<Map<String, dynamic>> getInfoAnime(Map<String, dynamic> anime) async =>
+  await _fetchInfo("anilistanime", anime["id"].toString());
+
+Future<List<Map<String, dynamic>>> getRecsAnime(String id) async =>
+  await _fetchRecommendations("anilistanime", id);
 
 // Anilist Manga, key is id
-final getOptionsManga = (String query) async => await _fetchOptions('anilistmanga', query);
-final getInfoManga = (Map<String, dynamic> manga) async => await _fetchInfo('anilistmanga', manga['id'].toString());
-final getRecsManga = (String id) async => await _fetchRecommendations('anilistmanga', id);
+Future<List<Map<String, dynamic>>> getOptionsManga(String query) async =>
+  await _fetchOptions("anilistmanga", query);
+
+Future<Map<String, dynamic>> getInfoManga(Map<String, dynamic> manga) async =>
+  await _fetchInfo("anilistmanga", manga["id"].toString());
+
+Future<List<Map<String, dynamic>>> getRecsManga(String id) async =>
+  await _fetchRecommendations("anilistmanga", id);

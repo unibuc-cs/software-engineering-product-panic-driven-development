@@ -119,6 +119,7 @@ scripts:
   cli: dart backend/providers/cli.dart
   server: dart backend/main.dart
   deploy: fly deploy
+  test_steam: dart --define=LOCAL=true lib/Services/TestSteam.dart
   test_igdb: dart test/backend/providers/IGDB_test.dart
   test_hltb: dart test/backend/providers/HLTB_test.dart
   test_pcgw: dart test/backend/providers/PCGW_test.dart

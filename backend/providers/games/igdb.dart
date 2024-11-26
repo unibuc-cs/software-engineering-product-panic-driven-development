@@ -18,20 +18,14 @@ class IGDB extends Provider {
   List<dynamic> _publishers = [];
   List<String> _websites = [];
 
-  // Private constructor
-  IGDB._() {
+  // Public constructor
+  IGDB() {
     _params = {
       "client_id": config.igdb_id,
       "client_secret": config.igdb_secret,
       "grant_type": "client_credentials"
     };
   }
-
-  // Singleton instance
-  static final IGDB _instance = IGDB._();
-
-  // Accessor for the singleton instance
-  static IGDB get instance => _instance;
 
   // Private methods
   void reset() {
@@ -59,6 +53,11 @@ class IGDB extends Provider {
       final response = await http.post(url, headers: headers, body: body);
       if (response.statusCode == 200) {
         return response;
+      }
+      else {
+        print(response.statusCode);
+        print(endpoint);
+        print(body);
       }
     } catch (e) {}
     return null;
@@ -271,7 +270,7 @@ class IGDB extends Provider {
   }
 
   bool _containsAllWords(String name, String gameName) {
-    final words = gameName.split(" ");
+    final words = gameName.replaceAll(':', '').split(" ");
     for (var word in words) {
       if (!name.toLowerCase().contains(word.toLowerCase())) {
         return false;
@@ -288,29 +287,6 @@ class IGDB extends Provider {
         .toList();
   }
 
-  Future<List<dynamic>> _getAdditionalGames(String accessToken, List<dynamic> games) async {
-    try {
-      List<dynamic> ids = [];
-      for (var game in games) {
-        ids.add(game["id"]);
-      }
-
-      final response = await _makeRequest(
-        "games",
-        headers: _authHeaders(accessToken),
-        body: "fields id,first_release_date,name; where parent_game = (${ids.join(", ")});"
-      );
-
-      if (response != null) {
-        return _filterGames(jsonDecode(response.body));
-      } else {
-        return [];
-      }
-    } catch (e) {
-      return [];
-    }
-  }
-
   Future<List<Map<String, dynamic>>> _getGameOptions(String gameName) async {
     try {
       _accessToken = await _getAccessToken();
@@ -318,7 +294,8 @@ class IGDB extends Provider {
       final response = await _makeRequest(
         "games",
         headers: _authHeaders(_accessToken),
-        body: "fields id,first_release_date,name; search \"$gameName\"; where version_parent = null & parent_game = null;"
+        body: "fields id,first_release_date,name; search \"$gameName\";"
+        // where version_parent = null & parent_game = null
       );
 
       if (response == null) {
@@ -326,33 +303,34 @@ class IGDB extends Provider {
       }
 
       var games = jsonDecode(response.body);
+
       games = _filterGames(games)
           .where((game) => _containsAllWords(game["name"], gameName))
           .toList();
-      var additionalGames = await _getAdditionalGames(_accessToken, games);
-      additionalGames = _filterGames(additionalGames)
-          .where((game) => _containsAllWords(game["name"], gameName))
-          .toList();
-      games.addAll(additionalGames);
+
       for (int i = 0; i < games.length; ++i) {
         games[i]["name"] = utf8.decode(games[i]["name"].runes.toList());
         if (games[i]["first_release_date"] != null) {
           // Turn the Unix timestamp into a DateTime object
-          games[i]["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(games[i]["first_release_date"] * 1000);
+          final releaseDate = DateTime.fromMillisecondsSinceEpoch(games[i]["first_release_date"] * 1000);
 
           // Add the year to the game name
-          games[i]["name"] += " (${games[i]['first_release_date'].year})";
+          games[i]["name"] += " (${releaseDate.year})";
+
+          // Delete the 'first_release_date' key
+          games[i].remove("first_release_date");
         }
       }
 
       // Handle games with roman numerals
       final regex = RegExp(r'(\d+)$');
       final match = regex.firstMatch(gameName);
-      if (games.isEmpty && match != null) {
+      if (match != null) {
         final numberString = match.group(1);
         if (numberString != null) {
           final roman = int.parse(numberString).toRomanNumeralString() ?? '';
-          return await _getGameOptions(gameName.replaceFirst(numberString, roman));
+          final extraGames = await _getGameOptions(gameName.replaceFirst(numberString, roman));
+          games.addAll(extraGames);
         }
       }
       return List<Map<String, dynamic>>.from(games);
@@ -494,6 +472,7 @@ class IGDB extends Provider {
       reset();
       return game;
     } catch (e) {
+      reset();
       return {};
     }
   }
@@ -501,16 +480,16 @@ class IGDB extends Provider {
   // Public methods
   @override
   Future<List<Map<String, dynamic>>> getOptions(String gameName) async {
-    return instance._getGameOptions(gameName);
+    return _getGameOptions(gameName);
   }
 
   @override
   Future<Map<String, dynamic>> getInfo(String gameId) async {
-    return instance._getGameInfo(gameId);
+    return _getGameInfo(gameId);
   }
 
   @override
   Future<List<Map<String, dynamic>>> getRecommendations(String gameId) async {
-    return instance._getSimilarGames(gameId);
+    return _getSimilarGames(gameId);
   }
 }
