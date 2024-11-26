@@ -29,6 +29,7 @@ void main() async {
       ..write('/igdb\n')
       ..write('/pcgamingwiki\n')
       ..write('/howlongtobeat\n')
+      ..write('/steam\n')
       ..write('/goodreads\n')
       ..write('/tmdbmovie\n')
       ..write('/tmdbseries\n')
