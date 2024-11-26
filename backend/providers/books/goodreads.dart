@@ -147,15 +147,25 @@ class GoodReads extends Provider {
       args: [
         '--no-sandbox',
         '--disable-gpu',
-        '--disable-software-rasterizer',
-        '--no-zygote',
-        '--disable-extensions'
-        '--disable-background-timer-throttling',
-      ]
+        '--disable-extensions',
+        '--disable-logging',
+        '--disable-images',
+        '--disable-fonts',
+        '--disable-css',
+      ],
     );
 
     try {
       final page = await browser.newPage();
+      await page.setRequestInterception(true);
+      page.onRequest.listen((request) {
+        if (['image', 'stylesheet', 'font'].contains(request.resourceType)) {
+          request.abort();
+        }
+        else {
+          request.continueRequest();
+        }
+      });
 
       await page.goto(bookUrl, wait: Until.networkIdle);
       await page.waitForSelector('.BookCard__clickCardTarget');
@@ -172,15 +182,13 @@ class GoodReads extends Provider {
         }
       ''');
 
-      await browser.close();
-
       return (recommendedBooks as List)
-        .map((book) => {
-          'title': book['title'] as String,
-          'link': book['link'] as String,
-        })
-        .where((book) => book['title'] != 'No title' && book['link'] != 'No link')
-        .toList();
+          .map((book) => {
+            'title': book['title'] as String,
+            'link': book['link'] as String,
+          })
+          .where((book) => book['title'] != 'No title' && book['link'] != 'No link')
+          .toList();
     }
     catch (e) {
       return [{"error": e.toString()}];

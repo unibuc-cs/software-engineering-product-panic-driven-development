@@ -9,12 +9,8 @@ RUN apt-get update && apt-get install -y \
     git \
     sudo \
     libxss1 \
-    libappindicator3-1 \
-    libasound2 \
     libnss3 \
-    libgtk-3-0 \
     libx11-xcb1 \
-    libgdk-pixbuf2.0-0 \
     libgbm1 \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -55,8 +51,8 @@ RUN flutter config --no-cli-animations
 # Install dependencies
 RUN flutter pub get
 
-# Install Puppeteer dependencies for Chromium
-RUN npm install puppeteer --save
+# Install Puppeteer
+RUN npm install puppeteer
 
 # Run the backend server
 EXPOSE 8080
