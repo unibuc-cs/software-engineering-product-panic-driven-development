@@ -1,27 +1,15 @@
-import 'package:hive/hive.dart';
-
-class AppAchievement extends HiveObject {
-  // Hive fields
+class AppAchievement {
+  // Data
   int id;
   String name;
   String description;
   int xp;
 
-  // Automatic id generator
-  static int nextId = 0;
-
   AppAchievement(
       {this.id = -1,
       required this.name,
       required this.description,
-      this.xp = 100}) {
-    if (id == -1) {
-      id = nextId;
-    }
-    if (id >= nextId) {
-      nextId = id + 1;
-    }
-  }
+      this.xp = 100});
 
   @override
   bool operator ==(Object other) {
@@ -33,27 +21,21 @@ class AppAchievement extends HiveObject {
 
   @override
   int get hashCode => id;
-}
 
-class AppAchievementAdapter extends TypeAdapter<AppAchievement> {
-  @override
-  final int typeId = 1;
-
-  @override
-  AppAchievement read(BinaryReader reader) {
-    return AppAchievement(
-      id: reader.readInt(),
-      name: reader.readString(),
-      description: reader.readString(),
-      xp: reader.readInt(),
-    );
+  Map<String, dynamic> toSupa() {
+    return {
+      "name": name,
+      "description": description,
+      "xp": xp,
+    };
   }
 
-  @override
-  void write(BinaryWriter writer, AppAchievement obj) {
-    writer.writeInt(obj.id);
-    writer.writeString(obj.name);
-    writer.writeString(obj.description);
-    writer.writeInt(obj.xp);
+  factory AppAchievement.from(Map<String, dynamic> json) {
+    return AppAchievement(
+      id: json["id"],
+      name: json["name"],
+      description: json["description"],
+      xp: json["xp"],
+    );
   }
 }

@@ -1,9 +1,8 @@
-import 'package:hive/hive.dart';
-import 'media.dart';
-import 'user.dart';
+import "media.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
 
-class Wishlist extends HiveObject {
-  // Hive fields
+class Wishlist {
+  // Data
   int mediaId;
   int userId;
   String name;
@@ -15,12 +14,6 @@ class Wishlist extends HiveObject {
   String icon;
   String backgroundImage;
   DateTime lastInteracted;
-  int gameTime;
-  int bookReadPages;
-
-  // For ease of use
-  Media? _media;
-  User? _user;
 
   Wishlist(
       {required this.mediaId,
@@ -33,9 +26,7 @@ class Wishlist extends HiveObject {
       required this.series,
       required this.icon,
       required this.backgroundImage,
-      required this.lastInteracted,
-      this.gameTime = 0,
-      this.bookReadPages = 0});
+      required this.lastInteracted});
 
   @override
   bool operator ==(Object other) {
@@ -48,76 +39,48 @@ class Wishlist extends HiveObject {
   @override
   int get hashCode => Object.hash(mediaId, userId);
 
-  Media get media {
-    if (_media == null) {
-      Box<Media> box = Hive.box<Media>('media');
-      for (int i = 0; i < box.length; ++i) {
-        if (mediaId == box.getAt(i)!.id) {
-          _media = box.getAt(i);
-        }
-      }
-      if (_media == null) {
-        throw Exception(
-            "Wishlist of mediaId $mediaId and userId $userId does not have an associated Media object or mediaId value is wrong");
-      }
-    }
-    return _media!;
+  Map<String, dynamic> toSupa() {
+    return {
+      "mediaid": mediaId,
+      "userid": userId,
+      "name": name,
+      "userscore": userScore,
+      "addeddate": addedDate,
+      "coverimage": coverImage,
+      "status": status,
+      "series": series,
+      "icon": icon,
+      "backgroundimage": backgroundImage,
+      "lastinteracted": lastInteracted,
+    };
   }
 
-  User get user {
-    if (_user == null) {
-      Box<User> box = Hive.box<User>('users');
-      for (int i = 0; i < box.length; ++i) {
-        if (userId == box.getAt(i)!.id) {
-          _user = box.getAt(i);
-        }
-      }
-      if (_user == null) {
-        throw Exception(
-            "Wishlist of mediaId $mediaId and userId $userId does not have an associated User object or userId value is wrong");
-      }
-    }
-    return _user!;
-  }
-}
-
-class WishlistAdapter extends TypeAdapter<Wishlist> {
-  @override
-  final int typeId = 4;
-
-  @override
-  Wishlist read(BinaryReader reader) {
+  factory Wishlist.from(Map<String, dynamic> json) {
     return Wishlist(
-      mediaId: reader.readInt(),
-      userId: reader.readInt(),
-      name: reader.readString(),
-      userScore: reader.readInt(),
-      addedDate: reader.read(),
-      coverImage: reader.readString(),
-      status: reader.readString(),
-      series: reader.readString(),
-      icon: reader.readString(),
-      backgroundImage: reader.readString(),
-      lastInteracted: reader.read(),
-      gameTime: reader.readInt(),
-      bookReadPages: reader.readInt(),
+      mediaId: json["mediaid"],
+      userId: json["userid"],
+      name: json["name"],
+      userScore: json["userscore"],
+      addedDate: json["addeddate"],
+      coverImage: json["coverimage"],
+      status: json["status"],
+      series: json["series"],
+      icon: json["icon"],
+      backgroundImage: json["backgroundimage"],
+      lastInteracted: json["lastinteracted"],
     );
   }
 
-  @override
-  void write(BinaryWriter writer, Wishlist obj) {
-    writer.writeInt(obj.mediaId);
-    writer.writeInt(obj.userId);
-    writer.writeString(obj.name);
-    writer.writeInt(obj.userScore);
-    writer.write(obj.addedDate);
-    writer.writeString(obj.coverImage);
-    writer.writeString(obj.status);
-    writer.writeString(obj.series);
-    writer.writeString(obj.icon);
-    writer.writeString(obj.backgroundImage);
-    writer.write(obj.lastInteracted);
-    writer.writeInt(obj.gameTime);
-    writer.writeInt(obj.bookReadPages);
+  Future<Media> get media async {
+    return Media
+      .from(
+        await Supabase
+          .instance
+          .client
+          .from("media")
+          .select()
+          .eq("mediaid", mediaId)
+          .single()
+      );
   }
 }
