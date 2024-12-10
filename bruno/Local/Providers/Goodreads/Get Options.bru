@@ -1,0 +1,15 @@
+meta {
+  name: Get Options
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:3007/api/goodreads/options?name=The Final Empire
+  body: none
+  auth: none
+}
+
+params:query {
+  name: The Final Empire
+}

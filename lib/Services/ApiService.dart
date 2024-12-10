@@ -44,8 +44,8 @@ Future<List<Map<String, dynamic>>> getOptionsIGDB(String query) async =>
 Future<Map<String, dynamic>> getInfoIGDB(Map<String, dynamic> game) async =>
   await _fetchInfo("igdb", game["id"].toString());
 
-Future<List<Map<String, dynamic>>> getRecsIGDB (Map<String, dynamic> game) async =>
-  await _fetchRecommendations("igdb", game["id"].toString());
+Future<List<Map<String, dynamic>>> getRecsIGDB (String gameId) async =>
+  await _fetchRecommendations("igdb", gameId);
 
 // PCGW, key is name
 Future<List<Map<String, dynamic>>> getOptionsPCGW(String query) async =>
