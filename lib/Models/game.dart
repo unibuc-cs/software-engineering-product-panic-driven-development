@@ -1,10 +1,10 @@
-import 'package:hive/hive.dart';
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
+import "media.dart";
+import "media_type.dart";
 
-import 'media.dart';
-
-class Game extends HiveObject {
-  // Hive fields
+class Game extends MediaType {
+  // Data
   int mediaId;
   int id;
   int parentGameId;
@@ -25,13 +25,6 @@ class Game extends HiveObject {
   int HLTBAllStylesInSeconds;
   int HLTBCoopInSeconds;
   int HLTBVersusInSeconds;
-
-  // For ease of use
-  Media? _media;
-  Game? _parentGame;
-
-  // Automatic id generator
-  static int nextId = 0;
 
   Game({
     this.id = -1,
@@ -54,14 +47,7 @@ class Game extends HiveObject {
     this.HLTBAllStylesInSeconds = -1,
     this.HLTBCoopInSeconds = -1,
     this.HLTBVersusInSeconds = -1,
-  }) {
-    if (id == -1) {
-      id = nextId;
-    }
-    if (id >= nextId) {
-      nextId = id + 1;
-    }
-  }
+  });
 
   @override
   bool operator ==(Object other) {
@@ -74,39 +60,79 @@ class Game extends HiveObject {
   @override
   int get hashCode => id;
 
-  Media get media {
-    if (_media == null) {
-      Box<Media> box = Hive.box<Media>('media');
-      for (int i = 0; i < box.length; ++i) {
-        if (mediaId == box.getAt(i)!.id) {
-          _media = box.getAt(i);
-        }
-      }
-      if (_media == null) {
-        throw Exception(
-            "Game of id $id does not have an associated Media object or mediaId value is wrong ($mediaId)");
-      }
-    }
-    return _media!;
+  Map<String, dynamic> toSupa() {
+    return {
+      "mediaid": mediaId,
+      "parentgameid": parentGameId,
+      "igdbid": IGDBId,
+      "osminimum": OSMinimum,
+      "osrecommended": OSRecommended,
+      "cpuminimum": CPUMinimum,
+      "cpurecommended": CPURecommended,
+      "ramminimum": RAMMinimum,
+      "ramrecommended": RAMRecommended,
+      "hddminimum": HDDMinimum,
+      "hddrecommended": HDDRecommended,
+      "gpuminimum": GPUMinimum,
+      "gpurecommended": GPURecommended,
+      "hltbmaininseconds": HLTBMainInSeconds,
+      "hltbmainsideinseconds": HLTBMainSideInSeconds,
+      "hltbcompletionistinseconds": HLTBCompletionistInSeconds,
+      "hltballstylesinseconds": HLTBAllStylesInSeconds,
+      "hltbcoopinseconds": HLTBCoopInSeconds,
+      "hltbversusinseconds": HLTBVersusInSeconds,
+    };
   }
 
-  Game? get parentGame {
-    if (parentGameId == -1) {
-      return null;
-    }
-    if (_parentGame == null) {
-      Box<Game> box = Hive.box<Game>('games');
-      for (int i = 0; i < box.length; ++i) {
-        if (parentGameId == box.getAt(i)!.id) {
-          _parentGame = box.getAt(i);
-        }
-      }
-      if (_parentGame == null) {
-        throw Exception(
-            "Game of id $id does not have an associated Parent Game object or gameId value is wrong ($parentGameId)");
-      }
-    }
-    return _parentGame!;
+  factory Game.from(Map<String, dynamic> json) {
+    return Game(
+      id: json["id"],
+      mediaId: json["mediaid"],
+      parentGameId: json["parentgameid"],
+      IGDBId: json["igdbid"],
+      OSMinimum: json["osminimum"],
+      OSRecommended: json["osrecommended"],
+      CPUMinimum: json["cpuminimum"],
+      CPURecommended: json["cpurecommended"],
+      RAMMinimum: json["ramminimum"],
+      RAMRecommended: json["ramrecommended"],
+      HDDMinimum: json["hddminimum"],
+      HDDRecommended: json["hddrecommended"],
+      GPUMinimum: json["gpuminimum"],
+      GPURecommended: json["gpurecommended"],
+      HLTBMainInSeconds: json["hltbmaininseconds"],
+      HLTBMainSideInSeconds: json["hltbmainsideinseconds"],
+      HLTBCompletionistInSeconds: json["hltbcompletionistinseconds"],
+      HLTBAllStylesInSeconds: json["hltballstylesinseconds"],
+      HLTBCoopInSeconds: json["hltbcoopinseconds"],
+      HLTBVersusInSeconds: json["hltbversusinseconds"],
+    );
+  }
+
+  @override
+  Future<Media> get media async {
+    return Media
+      .from(
+        await Supabase
+          .instance
+          .client
+          .from("media")
+          .select()
+          .eq("mediaid", mediaId)
+          .single()
+      );
+  }
+
+  Future<Game?> get parentGame async {
+    return Game.from(
+      await Supabase
+        .instance
+        .client
+        .from("game")
+        .select()
+        .eq("gameid", parentGameId)
+        .single()
+    );
   }
 
   int getMinTimeToBeat() {
@@ -284,60 +310,5 @@ class Game extends HiveObject {
         ),
       ],
     );
-  }
-}
-
-class GameAdapter extends TypeAdapter<Game> {
-  @override
-  final int typeId = 7;
-
-  @override
-  Game read(BinaryReader reader) {
-    return Game(
-      id: reader.readInt(),
-      mediaId: reader.readInt(),
-      parentGameId: reader.readInt(),
-      IGDBId: reader.readInt(),
-      OSMinimum: reader.readString(),
-      OSRecommended: reader.readString(),
-      CPUMinimum: reader.readString(),
-      CPURecommended: reader.readString(),
-      RAMMinimum: reader.readString(),
-      RAMRecommended: reader.readString(),
-      HDDMinimum: reader.readString(),
-      HDDRecommended: reader.readString(),
-      GPUMinimum: reader.readString(),
-      GPURecommended: reader.readString(),
-      HLTBMainInSeconds: reader.readInt(),
-      HLTBMainSideInSeconds: reader.readInt(),
-      HLTBCompletionistInSeconds: reader.readInt(),
-      HLTBAllStylesInSeconds: reader.readInt(),
-      HLTBCoopInSeconds: reader.readInt(),
-      HLTBVersusInSeconds: reader.readInt(),
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, Game obj) {
-    writer.writeInt(obj.id);
-    writer.writeInt(obj.mediaId);
-    writer.writeInt(obj.parentGameId);
-    writer.writeInt(obj.IGDBId);
-    writer.writeString(obj.OSMinimum);
-    writer.writeString(obj.OSRecommended);
-    writer.writeString(obj.CPUMinimum);
-    writer.writeString(obj.CPURecommended);
-    writer.writeString(obj.RAMMinimum);
-    writer.writeString(obj.RAMRecommended);
-    writer.writeString(obj.HDDMinimum);
-    writer.writeString(obj.HDDRecommended);
-    writer.writeString(obj.GPUMinimum);
-    writer.writeString(obj.GPURecommended);
-    writer.writeInt(obj.HLTBMainInSeconds);
-    writer.writeInt(obj.HLTBMainSideInSeconds);
-    writer.writeInt(obj.HLTBCompletionistInSeconds);
-    writer.writeInt(obj.HLTBAllStylesInSeconds);
-    writer.writeInt(obj.HLTBCoopInSeconds);
-    writer.writeInt(obj.HLTBVersusInSeconds);
   }
 }

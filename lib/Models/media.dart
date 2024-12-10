@@ -1,18 +1,13 @@
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import "package:mediamaster/Models/media_user.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
+import "platform.dart";
+import "publisher.dart";
+import "creator.dart";
 
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 
-import 'creator.dart';
-import 'game.dart';
-import 'media_creator.dart';
-import 'media_platform.dart';
-import 'media_publisher.dart';
-import 'platform.dart';
-import 'publisher.dart';
-
-class Media extends HiveObject {
-  // Hive fields
+class Media {
+  // Data
   int id;
   String originalName;
   String description;
@@ -20,12 +15,6 @@ class Media extends HiveObject {
   int criticScore;
   int communityScore;
   String mediaType;
-
-  // For ease of use
-  HiveObject? _media;
-
-  // Automatic id generator
-  static int nextId = 0;
 
   static const TextStyle textStyle = TextStyle(color: Colors.white);
 
@@ -36,14 +25,7 @@ class Media extends HiveObject {
       required this.releaseDate,
       required this.criticScore,
       required this.communityScore,
-      required this.mediaType}) {
-    if (id == -1) {
-      id = nextId;
-    }
-    if (id >= nextId) {
-      nextId = id + 1;
-    }
-  }
+      required this.mediaType});
 
   @override
   bool operator ==(Object other) {
@@ -56,61 +38,72 @@ class Media extends HiveObject {
   @override
   int get hashCode => id;
 
-  HiveObject get media {
-    if (_media == null) {
-      if (mediaType == "Game") {
-        Box<Game> box = Hive.box<Game>('games');
-        for (int i = 0; i < box.length; ++i) {
-          if (id == box.getAt(i)!.mediaId) {
-            _media = box.getAt(i);
-          }
-        }
-      }
-      // TODO: Implement the other types
-      if (_media == null) {
-        throw Exception(
-            "Media of id $id does not have an associated (concrete) Media object or mediaType value is wrong ($mediaType)");
-      }
-    }
-    return _media!;
+  Map<String, dynamic> toSupa() {
+    return {
+      "originalname": originalName,
+      "description": description,
+      "releasedate": releaseDate,
+      "criticscore": criticScore,
+      "comunityscore": communityScore,
+      "mediatype": mediaType,
+    };
   }
 
-  List<Publisher> get publishers {
-    List<Publisher> ans = List.empty(growable: true);
-
-    for (var mp in Hive.box<MediaPublisher>('media-publishers').values) {
-      if (mp.mediaId == id) {
-        ans.add(mp.publisher);
-      }
-    }
-
-    return ans;
+  factory Media.from(Map<String, dynamic> json) {
+    return Media(
+      id: json["id"],
+      originalName: json["originalname"],
+      description: json["description"],
+      releaseDate: json["releasedate"],
+      criticScore: json["criticscore"],
+      communityScore: json["comunityscore"],
+      mediaType: json["mediatype"],
+    );
   }
 
-  List<Creator> get creators {
-    List<Creator> ans = List.empty(growable: true);
-
-    for (var mc in Hive.box<MediaCreator>('media-creators').values) {
-      if (mc.mediaId == id) {
-        ans.add(mc.creator);
-      }
-    }
-
-    return ans;
+  Future<List<Publisher>> get publishers async {
+    final supabase = Supabase.instance.client;
+    List<dynamic> publisherIds = await supabase
+      .from("mediapublisher")
+      .select("publisherid")
+      .eq("mediaid", id);
+    return (await supabase
+      .from("publisher")
+      .select()
+      .inFilter("id", publisherIds))
+      .map(Publisher.from)
+      .toList();
   }
 
-  List<Platform> get platforms {
-    List<Platform> ans = List.empty(growable: true);
-
-    for (var mp in Hive.box<MediaPlatform>('media-platforms').values) {
-      if (mp.mediaId == id) {
-        ans.add(mp.platform);
-      }
-    }
-
-    return ans;
+  Future<List<Creator>> get creators async {
+    final supabase = Supabase.instance.client;
+    List<dynamic> creatorsIds = await supabase
+      .from("mediacreator")
+      .select("creatorid")
+      .eq("mediaid", id);
+    return (await supabase
+      .from("creator")
+      .select()
+      .inFilter("id", creatorsIds))
+      .map(Creator.from)
+      .toList();
   }
 
+  Future<List<Platform>> get platforms async {
+    final supabase = Supabase.instance.client;
+    List<dynamic> platformsIds = await supabase
+      .from("mediaplatform")
+      .select("platformid")
+      .eq("mediaid", id);
+    return (await supabase
+      .from("platform")
+      .select()
+      .inFilter("id", platformsIds))
+      .map(Platform.from)
+      .toList();
+  }
+
+  // TODO: Make this more general
   Widget getListWidget(String title, List<String> items) {
     final ScrollController scrollController = ScrollController();
 
@@ -183,18 +176,18 @@ class Media extends HiveObject {
     return getListWidget('Release Date', List.of([releaseDate.toString().substring(0, 10)]));
   }
 
-  Widget getPublishersWidget() {
-    var pubs = publishers.map((pub) => pub.name).toList();
+  Future<Widget> getPublishersWidget() async {
+    var pubs = (await publishers).map((pub) => pub.name).toList();
     return getListWidget('Publisher${pubs.length <= 1 ? "" : "s"}', pubs.isEmpty ? List.of(["N/A"]) : pubs);
   }
 
-  Widget getCreatorsWidget() {
-    var crts = creators.map((crt) => crt.name).toList();
+  Future<Widget> getCreatorsWidget() async{
+    var crts = (await creators).map((crt) => crt.name).toList();
     return getListWidget('Creator${crts.length <= 1 ? "" : "s"}', crts.isEmpty ? List.of(["N/A"]) : crts);
   }
 
-  Widget getPlatformsWidget() {
-    var plts = platforms.map((plt) => plt.name).toList();
+  Future<Widget> getPlatformsWidget() async {
+    var plts = (await platforms).map((plt) => plt.name).toList();
     return getListWidget('Platform${plts.length <= 1 ? "" : "s"}', plts.isEmpty ? List.of(["N/A"]) : plts);
   }
 
@@ -217,33 +210,222 @@ class Media extends HiveObject {
 
     return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
   }
-}
 
-class MediaAdapter extends TypeAdapter<Media> {
-  @override
-  final int typeId = 3;
+  // New code here
 
-  @override
-  Media read(BinaryReader reader) {
-    return Media(
-      id: reader.readInt(),
-      originalName: reader.readString(),
-      description: reader.readString(),
-      releaseDate: reader.read(),
-      criticScore: reader.readInt(),
-      communityScore: reader.readInt(),
-      mediaType: reader.readString(),
-    );
+  Future<MediaUser> getCustomizations() async {
+    // TODO: Get the current user's id.
+    int userId=TODO HERE;
+    return MediaUser.from(await Supabase.instance.client.from("mediauser").select().eq("mediaid", id).eq("userid", userId).single());
   }
 
-  @override
-  void write(BinaryWriter writer, Media obj) {
-    writer.writeInt(obj.id);
-    writer.writeString(obj.originalName);
-    writer.writeString(obj.description);
-    writer.write(obj.releaseDate);
-    writer.writeInt(obj.criticScore);
-    writer.writeInt(obj.communityScore);
-    writer.writeString(obj.mediaType);
+  Future<Widget> displayMedia(Widget additionalButtons, Widget notesWidget) async {
+    MediaUser customizations = await getCustomizations();
+    String imageUrl = "https://${customizations.backgroundImage}";
+    String coverUrl = "https://${customizations.coverImage}";
+
+    return SizedBox.expand(
+      child: Container(
+        padding: const EdgeInsets.only(
+          top: 200,
+        ),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage(
+              imageUrl,
+            ),
+            alignment: Alignment.topCenter,
+          ),
+          color: Colors.black,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          color: const Color.fromARGB(224, 64, 64, 64),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Center(
+                  // Game name;
+                  child: Text(
+                    customizations.name,
+                    style: const TextStyle(color: Colors.white, fontSize: 24.0),
+                  ),
+                ),
+                additionalButtons,
+                // TODO: The following were the buttons. Might be useful when implementing specific types
+                /*Row(
+                  children: [
+                    Container(
+                      // Play button
+                      margin: const EdgeInsets.all(10),
+                      child: TextButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              const WidgetStatePropertyAll(Colors.lightGreen), // TODO: MaterialStateProperty was here before. If something does not look alright then this could be the cause
+                          shape:
+                            const WidgetStatePropertyAll(RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                              ),
+                            ), // TODO: MaterialStateProperty was here before. If something does not look alright then this could be the cause
+                        ),
+                        onPressed: () {
+                          playGame(game);
+                        },
+                        child: const Column(
+                          children: [
+                            Text(
+                              "Play",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 24.0,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              "(currently unnavailable)",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12.0,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      // HLTB button
+                      margin: const EdgeInsets.all(10),
+                      child: IconButton(
+                        onPressed: () {
+                          _showHLTBDialog(
+                            game,
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.access_alarm_outlined,
+                          color: Colors.white,
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color.fromARGB(255, 32, 32, 32)),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      // Sys Check button
+                      margin: const EdgeInsets.all(10),
+                      child: IconButton(
+                        onPressed: () {
+                          _showSysCheck(game);
+                        },
+                        icon: const Icon(
+                          Icons.monitor,
+                          color: Colors.white,
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color.fromARGB(255, 32, 32, 32)),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      // Settings button
+                      margin: const EdgeInsets.all(10),
+                      child: IconButton(
+                        onPressed: () {
+                          _showGameSettingsDialog(game);
+                        },
+                        icon: const Icon(
+                          Icons.settings,
+                          color: Colors.white,
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color.fromARGB(255, 32, 32, 32)),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      // Settings button
+                      margin: const EdgeInsets.all(10),
+                      child: TextButton(
+                        onPressed: () {
+                          _showGameRecommendationsDialog(game);
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color.fromARGB(255, 32, 32, 32)),
+                          foregroundColor:
+                              MaterialStateProperty.all(Colors.white),
+                          overlayColor: MaterialStateProperty.all(
+                              const Color.fromARGB(255, 32, 32, 32)),
+                        ),
+                        child: const Text('Similar games'),
+                      ),
+                    ),
+                  ],
+                ),*/
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        // Cover
+                        margin: const EdgeInsets.all(
+                          20,
+                        ),
+                        child: Image(
+                          image: NetworkImage(
+                            coverUrl,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: Container(
+                        // Description
+                        margin: const EdgeInsets.all(10),
+                        child: Text(
+                          description,
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        // Data (publisher, retailer, etc.)
+                        margin: const EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            getReleaseDateWidget(),
+                            await getPublishersWidget(),
+                            await getCreatorsWidget(),
+                            await getPlatformsWidget(),
+                            getRatingsWidget()
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                notesWidget,
+                // TODO: This might be useful when implementing the library
+                /*renderNotes(
+                  UserSystem().getUserNotes(
+                    game.media,
+                  ),
+                ),*/
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

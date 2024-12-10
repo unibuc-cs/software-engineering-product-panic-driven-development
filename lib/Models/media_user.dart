@@ -1,9 +1,8 @@
-import 'package:hive/hive.dart';
-import 'media.dart';
-import 'user.dart';
+import "media.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
 
-class MediaUser extends HiveObject {
-  // Hive fields
+class MediaUser {
+  // Data
   int mediaId;
   int userId;
   String name;
@@ -17,10 +16,6 @@ class MediaUser extends HiveObject {
   DateTime lastInteracted;
   int gameTime;
   int bookReadPages;
-
-  // For ease of use
-  Media? _media;
-  User? _user;
 
   MediaUser(
       {required this.mediaId,
@@ -48,76 +43,48 @@ class MediaUser extends HiveObject {
   @override
   int get hashCode => Object.hash(mediaId, userId);
 
-  Media get media {
-    if (_media == null) {
-      Box<Media> box = Hive.box<Media>('media');
-      for (int i = 0; i < box.length; ++i) {
-        if (mediaId == box.getAt(i)!.id) {
-          _media = box.getAt(i);
-        }
-      }
-      if (_media == null) {
-        throw Exception(
-            "MediaUser of mediaId $mediaId and userId $userId does not have an associated Media object or mediaId value is wrong");
-      }
-    }
-    return _media!;
+  Map<String, dynamic> toSupa() {
+    return {
+      "mediaid": mediaId,
+      "userid": userId,
+      "name": name,
+      "userscore": userScore,
+      "addeddate": addedDate,
+      "coverimage": coverImage,
+      "status": status,
+      "series": series,
+      "icon": icon,
+      "backgroundimage": backgroundImage,
+      "lastinteracted": lastInteracted,
+      "gametime": gameTime,
+      "bookreadpages": bookReadPages,
+    };
   }
 
-  User get user {
-    if (_user == null) {
-      Box<User> box = Hive.box<User>('users');
-      for (int i = 0; i < box.length; ++i) {
-        if (userId == box.getAt(i)!.id) {
-          _user = box.getAt(i);
-        }
-      }
-      if (_user == null) {
-        throw Exception(
-            "MediaUser of mediaId $mediaId and userId $userId does not have an associated User object or userId value is wrong");
-      }
-    }
-    return _user!;
-  }
-}
-
-class MediaUserAdapter extends TypeAdapter<MediaUser> {
-  @override
-  final int typeId = 6;
-
-  @override
-  MediaUser read(BinaryReader reader) {
+  factory MediaUser.from(Map<String, dynamic> json) {
     return MediaUser(
-      mediaId: reader.readInt(),
-      userId: reader.readInt(),
-      name: reader.readString(),
-      userScore: reader.readInt(),
-      addedDate: reader.read(),
-      coverImage: reader.readString(),
-      status: reader.readString(),
-      series: reader.readString(),
-      icon: reader.readString(),
-      backgroundImage: reader.readString(),
-      lastInteracted: reader.read(),
-      gameTime: reader.readInt(),
-      bookReadPages: reader.readInt(),
+      mediaId: json["mediaid"],
+      userId: json["userid"],
+      name: json["name"],
+      userScore: json["userscore"],
+      addedDate: json["addeddate"],
+      coverImage: json["coverimage"],
+      status: json["status"],
+      series: json["series"],
+      icon: json["icon"],
+      backgroundImage: json["backgroundimage"],
+      lastInteracted: json["lastinteracted"],
+      gameTime: json["gametime"],
+      bookReadPages: json["bookreadpages"],
     );
   }
 
-  @override
-  void write(BinaryWriter writer, MediaUser obj) {
-    writer.writeInt(obj.mediaId);
-    writer.writeInt(obj.userId);
-    writer.writeString(obj.name);
-    writer.writeInt(obj.userScore);
-    writer.write(obj.addedDate);
-    writer.writeString(obj.coverImage);
-    writer.writeString(obj.status);
-    writer.writeString(obj.series);
-    writer.writeString(obj.icon);
-    writer.writeString(obj.backgroundImage);
-    writer.write(obj.lastInteracted);
-    writer.writeInt(obj.gameTime);
-    writer.writeInt(obj.bookReadPages);
+  static Future<List<Media>> getUserMedia(int userId, String mediaType) async {
+    List<Media> ans = List.empty();
+    var ids = await Supabase.instance.client.from("mediauser").select("mediaid").eq("userid", userId);
+    for(var json in await Supabase.instance.client.from("media").select().inFilter("mediaid", ids).eq("mediatype", mediaType)) {
+      ans.add(Media.from(json));
+    }
+    return ans;
   }
 }
