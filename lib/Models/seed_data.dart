@@ -1,10 +1,9 @@
-import 'tag.dart';
-import 'genre.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void addSeedData() {
-  var tags = Hive.box<Tag>('tags');
-  if (tags.isEmpty) {
+void addSeedData() async {
+  final supabase=Supabase.instance.client;
+
+  if (await supabase.from("tag").count() == 0) {
     var tagsToAdd = [
       "Singleplayer",
       "Multiplayer",
@@ -17,17 +16,18 @@ void addSeedData() {
       "MMO",
     ];
 
+    List<dynamic> toInsert = List.empty();
+
     for (String tagName in tagsToAdd) {
-      tags.add(
-        Tag(
-          name: tagName,
-        ),
+      toInsert.add(
+        {"name": tagName}
       );
     }
+
+    supabase.from("tag").insert(toInsert);
   }
 
-  var genres = Hive.box<Genre>('genres');
-  if (genres.isEmpty) {
+  if (await supabase.from("genre").count() == 0) {
     var genresToAdd = [
       "Shooter",
       "Strategy",
@@ -67,12 +67,14 @@ void addSeedData() {
       "MOBA",
     ];
 
+    List<dynamic> toInsert = List.empty();
+
     for (String genreName in genresToAdd) {
-      genres.add(
-        Genre(
-          name: genreName,
-        ),
+      toInsert.add(
+        {"name": genreName}
       );
     }
+
+    supabase.from("genre").insert(toInsert);
   }
 }

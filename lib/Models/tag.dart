@@ -1,21 +1,9 @@
-import 'package:hive/hive.dart';
-
-class Tag extends HiveObject {
-  // Hive fields
+class Tag {
+  // Data
   int id;
   String name;
 
-  // Automatic id generator
-  static int nextId = 0;
-
-  Tag({this.id = -1, required this.name}) {
-    if (id == -1) {
-      id = nextId;
-    }
-    if (id >= nextId) {
-      nextId = id + 1;
-    }
-  }
+  Tag({this.id = -1, required this.name});
 
   @override
   bool operator ==(Object other) {
@@ -27,23 +15,17 @@ class Tag extends HiveObject {
 
   @override
   int get hashCode => id;
-}
 
-class TagAdapter extends TypeAdapter<Tag> {
-  @override
-  final int typeId = 14;
-
-  @override
-  Tag read(BinaryReader reader) {
-    return Tag(
-      id: reader.readInt(),
-      name: reader.readString(),
-    );
+  Map<String, dynamic> toSupa() {
+    return {
+      "name": name,
+    };
   }
 
-  @override
-  void write(BinaryWriter writer, Tag obj) {
-    writer.writeInt(obj.id);
-    writer.writeString(obj.name);
+  factory Tag.from(Map<String, dynamic> json) {
+    return Tag(
+      id: json["id"],
+      name: json["name"],
+    );
   }
 }

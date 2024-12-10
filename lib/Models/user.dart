@@ -1,32 +1,18 @@
-import 'package:hive/hive.dart';
-
-class User extends HiveObject {
-  // Hive fields
+class User {
+  // Data
   int id;
   String username;
-  // There is no way to make this unique from hive. This must be checked when we create the new User
   String email;
-  // This is hashed
-  String password;
+  String password; // This is hashed
   String hashSalt;
   DateTime creationDate = DateTime.now();
-
-  // Automatic id generator
-  static int nextId = 0;
 
   User(
       {this.id = -1,
       required this.username,
       required this.email,
       required this.hashSalt,
-      required this.password}) {
-    if (id == -1) {
-      id = nextId;
-    }
-    if (id >= nextId) {
-      nextId = id + 1;
-    }
-  }
+      required this.password});
 
   @override
   bool operator ==(Object other) {
@@ -38,30 +24,22 @@ class User extends HiveObject {
 
   @override
   int get hashCode => id;
-}
 
-class UserAdapter extends TypeAdapter<User> {
-  @override
-  final int typeId = 0;
-
-  @override
-  User read(BinaryReader reader) {
-    return User(
-      id: reader.readInt(),
-      username: reader.readString(),
-      email: reader.readString(),
-      password: reader.readString(),
-      hashSalt: reader.readString(),
-    )..creationDate = reader.read();
+  Map<String, dynamic> toSupa() {
+    return,;dasdasddasdasd;
+    return {
+      "username": username,
+      "description": description,
+      "xp": xp,
+    };
   }
 
-  @override
-  void write(BinaryWriter writer, User obj) {
-    writer.writeInt(obj.id);
-    writer.writeString(obj.username);
-    writer.writeString(obj.email);
-    writer.writeString(obj.password);
-    writer.writeString(obj.hashSalt);
-    writer.write(obj.creationDate);
+  factory AppAchievement.from(Map<String, dynamic> json) {
+    return AppAchievement(
+      id: json["id"],
+      name: json["name"],
+      description: json["description"],
+      xp: json["xp"],
+    );
   }
 }

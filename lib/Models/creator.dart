@@ -1,21 +1,9 @@
-import 'package:hive/hive.dart';
-
-class Creator extends HiveObject {
-  // Hive fields
+class Creator {
+  // Data
   int id;
   String name;
 
-  // Automatic id generator
-  static int nextId = 0;
-
-  Creator({this.id = -1, required this.name}) {
-    if (id == -1) {
-      id = nextId;
-    }
-    if (id >= nextId) {
-      nextId = id + 1;
-    }
-  }
+  Creator({this.id = -1, required this.name});
 
   @override
   bool operator ==(Object other) {
@@ -27,23 +15,17 @@ class Creator extends HiveObject {
 
   @override
   int get hashCode => id;
-}
 
-class CreatorAdapter extends TypeAdapter<Creator> {
-  @override
-  final int typeId = 22;
-
-  @override
-  Creator read(BinaryReader reader) {
-    return Creator(
-      id: reader.readInt(),
-      name: reader.readString(),
-    );
+  Map<String, dynamic> toSupa() {
+    return {
+      "name": name,
+    };
   }
 
-  @override
-  void write(BinaryWriter writer, Creator obj) {
-    writer.writeInt(obj.id);
-    writer.writeString(obj.name);
+  factory Creator.from(Map<String, dynamic> json) {
+    return Creator(
+      id: json["id"],
+      name: json["name"],
+    );
   }
 }
