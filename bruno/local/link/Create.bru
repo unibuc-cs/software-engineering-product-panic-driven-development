@@ -1,0 +1,18 @@
+meta {
+  name: Create
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3007/api/links
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "YT trailer 123",
+    "href": "this is a link"
+  }
+}

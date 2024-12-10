@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'helpers/config.dart';
+import 'controllers/links.dart';
 import 'providers/manager.dart';
 import 'helpers/middleware.dart';
 import 'package:shelf/shelf.dart';
@@ -33,7 +34,7 @@ void main() async {
   router.get('/health', (Request request) {
     return Response.ok('Server is healthy!');
   });
-
+  
   router.get('/api', (Request request) {
     final sb = StringBuffer()
       ..write('Available services\n\n')
@@ -49,6 +50,8 @@ void main() async {
 
     return Response.ok(sb.toString());
   });
+
+  router.mount('/api/links', linksRouter().call);
 
   router.get('/api/<provider>', (Request request) {
     final sb = StringBuffer()
