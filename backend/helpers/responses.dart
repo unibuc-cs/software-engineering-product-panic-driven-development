@@ -1,5 +1,5 @@
-import 'package:shelf/shelf.dart';
 import 'dart:convert';
+import 'package:shelf/shelf.dart';
 
 Response sendResponse(dynamic data, String status) {
   final headersJson = {'Content-Type': 'application/json'};
@@ -43,6 +43,8 @@ Response sendNoContent() => sendResponse("", "204");
 Response sendBadRequest(data) => sendResponse(data, "400");
 Response sendNotFound(data) => sendResponse(data, "404");
 Response sendInternalError(data) => sendResponse(data, "500");
+Response unknownEndpoint(Request req) => sendNotFound('Endpoint not found');
+Response faviconNotFound(Request req) => sendNotFound('No favicon');
 
 Response handleServiceErrors(String error) {
   final errorLower = error.toLowerCase();

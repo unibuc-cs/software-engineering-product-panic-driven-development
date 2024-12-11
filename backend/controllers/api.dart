@@ -1,28 +1,29 @@
 import 'links.dart';
-import 'dart:convert';
 import 'publishers.dart';
 import '../helpers/utils.dart';
 import '../services/manager.dart';
-import 'package:shelf/shelf.dart';
 import '../helpers/responses.dart';
-import '../services/provider.dart';
-import '../helpers/db_connection.dart';
-import 'package:shelf_router/shelf_router.dart';
+import '../helpers/validators.dart';
+import 'package:shelf_plus/shelf_plus.dart';
 
-Router apiRouter() {
-  final router = Router();
+RouterPlus apiRouter() {
+  final router = Router().plus;
+
+  router.mount('/links', linksRouter());
+  router.mount('/publishers', publishersRouter());
 
   router.get('/health', (Request request) {
     return sendOk('Server is healthy!');
   });
 
-  router.mount('/links', linksRouter().call);
-  router.mount('/publishers', publishersRouter().call);
-
   router.get('/<service>/<method>', (Request request, String service, String method) async {
+    validateService(service);
+    validateMethod(method);
     final Map<String, String> queryParams = request.url.queryParameters;
     final serviceManager = Manager(service);
-    final parameter = method == 'options' ? queryParams['name'] : queryParams['id'];
+    final parameter = method == 'options'
+      ? queryParams['name']
+      : queryParams['id'];
 
     if (parameter == null) {
       return sendBadRequest('Missing parameter for the $method method');

@@ -1,40 +1,4 @@
-import 'dart:io';
 import 'package:ansicolor/ansicolor.dart';
-
-String capitalize(String str) {
-    return str.replaceFirst(str[0], str[0].toUpperCase());
-}
-
-void coloredPrint(String message, String color) {
-  var pen = AnsiPen();
-  if (color == "red") {
-    pen = pen..red();
-  }
-  else if (color == "green") {
-    pen = pen..green();
-  }
-  else {
-    pen..reset();
-  }
-  print(pen(message));
-}
-
-void redPrint(message) => coloredPrint(message, "red");
-void greenPrint(message) => coloredPrint(message, "green");
-
-void validate(Map<String, dynamic> body, {List<String> fields = const []}) {
-  if (body["id"] != null) {
-    throw Exception('The body shouldn\'t contain an id field');
-  }
-  for (var field in fields) {
-    if (body[field] == null) {
-      throw Exception('${capitalize(field)} is required');
-    }
-    else if (body[field].runtimeType == String && body[field] == "") {
-      throw Exception('${capitalize(field)} cannot be empty');
-    }
-  }
-}
 
 dynamic serialize(dynamic data) {
   if (data is Map<String, dynamic>) {
@@ -55,4 +19,33 @@ dynamic serialize(dynamic data) {
     return data.map((e) => serialize(e)).toList();
   }
   return data;
+}
+
+String capitalize(String str) {
+    return str.replaceFirst(str[0], str[0].toUpperCase());
+}
+
+String colored(dynamic message, String color) {
+  var pen = AnsiPen();
+  if (color == "red") {
+    pen = pen..red();
+  }
+  else if (color == "green") {
+    pen = pen..xterm(10);
+  }
+  else if (color == "blue") {
+    pen = pen..xterm(45);
+  }
+  else {
+    pen..reset();
+  }
+  return pen(message.toString());
+}
+
+String redColored(message) => colored(message, "red");
+String greenColored(message) => colored(message, "green");
+String blueColored(message) => colored(message, "blue");
+
+void startupLog(address, port) {
+  print('${blueColored('[STARTED]')} Listening at http://$address:$port');
 }

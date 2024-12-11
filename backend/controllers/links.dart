@@ -1,12 +1,10 @@
-import 'dart:convert';
-import '../helpers/utils.dart';
-import 'package:shelf/shelf.dart';
 import '../helpers/responses.dart';
+import '../helpers/validators.dart';
 import '../helpers/db_connection.dart';
-import 'package:shelf_router/shelf_router.dart';
+import 'package:shelf_plus/shelf_plus.dart';
 
-Router linksRouter() {
-  final router = Router();
+RouterPlus linksRouter() {
+  final router = Router().plus;
   final _supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
@@ -26,8 +24,8 @@ Router linksRouter() {
   });
 
   router.post('/', (Request req) async {
-    final body = jsonDecode(await req.readAsString());
-    validate(body, fields:
+    final body = await req.body.asJson;
+    validateBody(body, fields:
       [
         "name",
         "href"
@@ -43,8 +41,8 @@ Router linksRouter() {
   });
 
   router.put('/<id>', (Request req, String id) async {
-    final body = jsonDecode(await req.readAsString());
-    validate(body);
+    final body = await req.body.asJson;
+    validateBody(body);
 
     final link = await _supabase
       .from('link')
