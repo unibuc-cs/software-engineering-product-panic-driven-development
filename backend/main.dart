@@ -14,9 +14,9 @@ Future<HttpServer> createServer() async {
   router.mount('/api', apiRouter().call);
 
   final handler = const Pipeline()
-      .addMiddleware(logger())
-      .addMiddleware(errorHandling())
-      .addMiddleware(unknownEndpoint())
+      .addMiddleware(logger)
+      .addMiddleware(errorHandling)
+      .addMiddleware(unknownEndpoint)
       .addHandler(router);
 
   final server = await serve(

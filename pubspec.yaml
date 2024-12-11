@@ -125,7 +125,7 @@ scripts:
 
   server: dart backend/main.dart
   server:dev: dart run --define=RELOAD=true --enable-vm-service backend/main.dart
-  server:npm: nodemon -x "dart run backend/main.dart" -e dart
+  server:node: nodemon -x "dart run backend/main.dart" -e dart
 
   deploy: fly deploy
   cli: dart backend/providers/cli.dart

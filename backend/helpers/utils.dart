@@ -5,7 +5,7 @@ String capitalize(String str) {
     return str.replaceFirst(str[0], str[0].toUpperCase());
 }
 
-String coloredPrint(String message, String color) {
+void coloredPrint(String message, String color) {
   var pen = AnsiPen();
   if (color == "red") {
     pen = pen..red();
@@ -16,11 +16,11 @@ String coloredPrint(String message, String color) {
   else {
     pen..reset();
   }
-  return pen(message);
+  print(pen(message));
 }
 
-String redPrint(message) => coloredPrint(message, "red");
-String greenPrint(message) => coloredPrint(message, "green");
+void redPrint(message) => coloredPrint(message, "red");
+void greenPrint(message) => coloredPrint(message, "green");
 
 void validate(Map<String, dynamic> body, {List<String> fields = const []}) {
   if (body["id"] != null) {
