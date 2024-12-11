@@ -15,6 +15,7 @@ Handler init() {
 void main() => shelfRun(
   init,
   defaultBindPort: Config().port,
+  defaultBindAddress: bool.fromEnvironment("LOCAL", defaultValue: false) ? 'localhost' : '0.0.0.0',
   defaultEnableHotReload: bool.fromEnvironment("RELOAD", defaultValue: false),
   onStarted: startupLog
 );
