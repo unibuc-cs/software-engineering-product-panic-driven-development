@@ -94,6 +94,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  axios_package:
+    dependency: "direct main"
+    description:
+      name: axios_package
+      sha256: "8ae0aef04316ffad2f44e9139842d84d61fdab0d4ba0c445b32443bd3145e93b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   basic_utils:
     dependency: "direct main"
     description:

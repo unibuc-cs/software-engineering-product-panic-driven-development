@@ -60,6 +60,7 @@ dependencies:
   shelf_hotreload: ^1.5.0
   shelf_plus: ^1.10.0
   ansicolor: ^2.0.3
+  axios_package: ^0.0.3
 
 dev_dependencies:
   flutter_test:
