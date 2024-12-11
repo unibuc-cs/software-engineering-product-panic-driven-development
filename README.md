@@ -6,7 +6,6 @@ We describe our app in more detail on the Wiki: https://github.com/unibuc-cs/sof
 - https://mediamaster.fly.dev/
 
 ## Usage
-
 - Activate Run Pubspec Script
 ```bash
 dart pub global activate rps
@@ -23,7 +22,7 @@ flutter pub get
 
 - Run in debug mode
 ```bash
-rps dev
+rps app:dev
 ```
 or
 ```bash
@@ -32,11 +31,39 @@ flutter run -d windows
 
 - Run in release mode
 ```bash
-rps run
+rps app
 ```
 or
 ```bash
 flutter run -d windows --release
+```
+
+## Backend
+- Start the server
+```bash
+rps server
+```
+or
+```bash
+dart backend/main.dart
+```
+
+- Start the server with hot reload
+```bash
+rps server:dev
+```
+or
+```bash
+dart run --enable-vm-service backend/main.dart
+```
+
+- Start the server with nodemon
+```bash
+rps server:nodemon
+```
+or
+```bash
+nodemon -x "dart run backend/main.dart" -e dart
 ```
 
 ## Testing
@@ -48,10 +75,10 @@ rps cli
 
 - Test all services with unit tests
 ```bash
-rps test_all
+rps test
 ```
 
 - Test individual services with unit tests (replace {service} with igdb, hltb or pcgw)
 ```bash
-rps test_{service}
+rps test:{service}
 ```

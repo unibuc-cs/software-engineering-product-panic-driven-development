@@ -21,8 +21,8 @@ class IGDB extends Provider {
   // Public constructor
   IGDB() {
     _params = {
-      "client_id": config.igdb_id,
-      "client_secret": config.igdb_secret,
+      "client_id": config.igdbId,
+      "client_secret": config.igdbSecret,
       "grant_type": "client_credentials"
     };
   }
@@ -30,7 +30,7 @@ class IGDB extends Provider {
   // Private methods
   Map<String, String> _authHeaders(String accessToken) {
     return {
-      "Client-ID": config.igdb_id ?? "",
+      "Client-ID": config.igdbId ?? "",
       "Authorization": "Bearer $accessToken",
     };
   }

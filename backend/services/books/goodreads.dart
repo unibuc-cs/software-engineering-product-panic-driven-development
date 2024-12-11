@@ -14,7 +14,7 @@ class GoodReads extends Provider {
   // Private constructor
   GoodReads._() {
     _headers = {
-      "User-Agent": config.goodreads_agents
+      "User-Agent": config.goodreadsAgents
     };
   }
 

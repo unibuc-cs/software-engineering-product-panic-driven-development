@@ -12,7 +12,7 @@ class Tmdb extends Provider {
   Tmdb({required String mediaType}) : _mediaType = mediaType {
      _headers = {
       "accept": "application/json",
-      "Authorization": "Bearer ${config.tmdb_token}"
+      "Authorization": "Bearer ${config.tmdbToken}"
     };
   }
 

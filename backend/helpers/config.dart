@@ -19,31 +19,31 @@ class Config {
     return _dotenv[key] ?? Platform.environment[key];
   }
 
-  String get igdb_id {
+  String get igdbId {
     return getEnv('CLIENT_ID_IGDB') ?? '';
   }
 
-  String get igdb_secret {
+  String get igdbSecret {
     return getEnv('CLIENT_SECRET_IGDB') ?? '';
   }
 
-  String get goodreads_agents {
+  String get goodreadsAgents {
     return getEnv('USER_AGENTS_GOODREADS') ?? '';
   }
 
-  String get tmdb_token {
+  String get tmdbToken {
     return getEnv('ACCESS_TOKEN_TMDB') ?? '';
   }
 
-  String get supabase_url {
+  String get supabaseUrl {
     return getEnv('URL_SUPABASE') ?? '';
   }
 
-  String get supabase_key {
+  String get supabaseKey {
     return getEnv('ANON_KEY_SUPABASE') ?? '';
   }
 
-  String get steam_key {
+  String get steamKey {
     return getEnv('API_KEY_STEAM') ?? '';
   }
 

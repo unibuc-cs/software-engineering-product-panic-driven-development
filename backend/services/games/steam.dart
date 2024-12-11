@@ -24,7 +24,7 @@ class Steam extends Provider {
 
   Future<Map<String, dynamic>> _getSteamList(String userId) async {
     try {
-      final String url = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${config.steam_key}&steamid=$userId&include_appinfo=true";
+      final String url = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${config.steamKey}&steamid=$userId&include_appinfo=true";
       final response = await HttpClient()
         .getUrl(Uri.parse(url))
         .then((req) => req.close());

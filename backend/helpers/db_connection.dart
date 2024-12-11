@@ -3,8 +3,8 @@ import 'package:supabase/supabase.dart';
 
 class SupabaseClientSingleton {
   static final SupabaseClient _client = SupabaseClient(
-    Config().supabase_url, 
-    Config().supabase_key,                      
+    Config().supabaseUrl,
+    Config().supabaseKey,
   );
 
   static SupabaseClient get client => _client;

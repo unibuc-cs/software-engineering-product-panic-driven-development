@@ -5,14 +5,13 @@ meta {
 }
 
 put {
-  url: http://localhost:3007/api/links/3
+  url: http://localhost:3007/api/publishers/{{idValid}}
   body: json
   auth: none
 }
 
 body:json {
   {
-    "href": "Test update no name",
-    "id": {{idInvalid}}
+    "name": "Team Apple"
   }
 }
