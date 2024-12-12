@@ -10,4 +10,8 @@ abstract class MediaType {
   Future<Widget> get additionalButtons async {
     throw UnimplementedError("Getter additionalButtons was not defined for this type");
   }
+
+  int getMediaId() {
+    throw UnimplementedError("Getter getMediaId was not defined for this type");
+  }
 }

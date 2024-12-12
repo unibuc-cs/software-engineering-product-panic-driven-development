@@ -28,4 +28,15 @@ class Platform {
       name: json["name"],
     );
   }
+
+  // TODO: Endpoint this
+  // static Future<Platform?> tryGet(String name) async {
+  //   var list = await Supabase.instance.client.from("platform").select().eq("name", name);
+
+  //   if (list.isEmpty) {
+  //     return null;
+  //   }
+
+  //   return Platform.from(list.first);
+  // }
 }

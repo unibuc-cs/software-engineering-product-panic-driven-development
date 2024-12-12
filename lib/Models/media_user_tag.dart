@@ -35,4 +35,10 @@ class MediaUserTag {
       tagId: json["tagid"],
     );
   }
+
+  // TODO: Endpoint this
+  // Returns a set of genre ids such that there exists a MediaUserGenre in the database that has these 3 properties
+  // static Future<Set<int>> getAllFor(int mediaId, int userId) async {
+  //   return (await Supabase.instance.client.from("mediausergenre").select("genreid").eq("mediaid", mediaId).eq("userid", userId)).map((x) => x["genreid"] as int).toSet();
+  // }
 }
