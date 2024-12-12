@@ -1,5 +1,3 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 class Platform {
   // Data
   int id;
@@ -31,13 +29,14 @@ class Platform {
     );
   }
 
-  static Future<Platform?> tryGet(String name) async {
-    var list = await Supabase.instance.client.from("platform").select().eq("name", name);
+  // TODO: Endpoint this
+  // static Future<Platform?> tryGet(String name) async {
+  //   var list = await Supabase.instance.client.from("platform").select().eq("name", name);
 
-    if (list.isEmpty) {
-      return null;
-    }
+  //   if (list.isEmpty) {
+  //     return null;
+  //   }
 
-    return Platform.from(list.first);
-  }
+  //   return Platform.from(list.first);
+  // }
 }

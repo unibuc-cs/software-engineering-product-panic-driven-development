@@ -1,5 +1,3 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 class Publisher {
   // Data
   int id;
@@ -31,13 +29,14 @@ class Publisher {
     );
   }
 
-  static Future<Publisher?> tryGet(String name) async {
-    var list = await Supabase.instance.client.from("publisher").select().eq("name", name);
+  // TODO: Endpoint this
+  // static Future<Publisher?> tryGet(String name) async {
+  //   var list = await Supabase.instance.client.from("publisher").select().eq("name", name);
 
-    if (list.isEmpty) {
-      return null;
-    }
+  //   if (list.isEmpty) {
+  //     return null;
+  //   }
 
-    return Publisher.from(list.first);
-  }
+  //   return Publisher.from(list.first);
+  // }
 }

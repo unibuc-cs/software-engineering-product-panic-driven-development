@@ -1,6 +1,3 @@
-import "media.dart";
-import "package:supabase_flutter/supabase_flutter.dart";
-
 class Wishlist {
   // Data
   int mediaId;
@@ -71,16 +68,17 @@ class Wishlist {
     );
   }
 
-  Future<Media> get media async {
-    return Media
-      .from(
-        await Supabase
-          .instance
-          .client
-          .from("media")
-          .select()
-          .eq("mediaid", mediaId)
-          .single()
-      );
-  }
+  // TODO: Endpoint this
+  // Future<Media> get media async {
+  //   return Media
+  //     .from(
+  //       await Supabase
+  //         .instance
+  //         .client
+  //         .from("media")
+  //         .select()
+  //         .eq("mediaid", mediaId)
+  //         .single()
+  //     );
+  // }
 }

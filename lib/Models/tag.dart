@@ -1,5 +1,3 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 class Tag {
   // Data
   int id;
@@ -31,8 +29,8 @@ class Tag {
     );
   }
 
-  // TODO: endpoint this
-  static Future<List<Tag>> getAllTags() async {
-    return (await Supabase.instance.client.from("tag").select()).map(Tag.from).toList();
-  }
+  // TODO: Endpoint this
+  // static Future<List<Tag>> getAllTags() async {
+  //   return (await Supabase.instance.client.from("tag").select()).map(Tag.from).toList();
+  // }
 }

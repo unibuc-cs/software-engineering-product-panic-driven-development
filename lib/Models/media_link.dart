@@ -1,6 +1,3 @@
-import "link.dart";
-import "package:supabase_flutter/supabase_flutter.dart";
-
 class MediaLink {
   // Data
   int mediaId;
@@ -33,20 +30,23 @@ class MediaLink {
     );
   }
 
-  static Future<List<Link>> getLinks(int mediaId) async {
-    List<dynamic> ids = await Supabase
-      .instance
-      .client
-      .from("medialink")
-      .select("linkid")
-      .eq("mediaid", mediaId);
+  // TODO: Endpoint this
+  // static Future<List<Link>> getLinks(int mediaId) async {
+  //   List<dynamic> ids = await Supabase
+  //     .instance
+  //     .client
+  //     .from("medialink")
+  //     .select("linkid")
+  //     .eq("mediaid", mediaId);
     
-    List<Link> ans = List.empty();
+  //   List<Link> ans = List.empty(
+  //     growable: true,
+  //   );
 
-    for(var json in await Supabase.instance.client.from("link").select().inFilter("id", ids)) {
-      ans.add(Link.from(json));
-    }
+  //   for(var json in await Supabase.instance.client.from("link").select().inFilter("id", ids)) {
+  //     ans.add(Link.from(json));
+  //   }
     
-    return ans;
-  }
+  //   return ans;
+  // }
 }

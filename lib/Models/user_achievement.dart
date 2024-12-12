@@ -1,6 +1,3 @@
-import 'package:mediamaster/Models/app_achievement.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 class UserAchievement {
   // Data
   int userId;
@@ -40,12 +37,13 @@ class UserAchievement {
     );
   }
 
-  Future<List<AppAchievement>> getAchievements(int userId) async {
-    var ids = await Supabase.instance.client.from("userachievements").select("achievementid").eq("userid", userId);
-    List<AppAchievement> ans=List.empty();
-    for(var json in await Supabase.instance.client.from("appachievement").select().inFilter("id", ids)) {
-      ans.add(AppAchievement.from(json));
-    }
-    return ans;
-  }
+  // TODO: Endpoint this
+  // Future<List<AppAchievement>> getAchievements(int userId) async {
+  //   var ids = await Supabase.instance.client.from("userachievements").select("achievementid").eq("userid", userId);
+  //   List<AppAchievement> ans=List.empty();
+  //   for(var json in await Supabase.instance.client.from("appachievement").select().inFilter("id", ids)) {
+  //     ans.add(AppAchievement.from(json));
+  //   }
+  //   return ans;
+  // }
 }
