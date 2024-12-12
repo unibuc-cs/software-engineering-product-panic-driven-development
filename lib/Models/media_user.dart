@@ -1,6 +1,3 @@
-import "media.dart";
-import "package:supabase_flutter/supabase_flutter.dart";
-
 class MediaUser {
   // Data
   int mediaId;
@@ -79,12 +76,13 @@ class MediaUser {
     );
   }
 
-  static Future<List<Media>> getUserMedia(int userId, String mediaType) async {
-    List<Media> ans = List.empty();
-    var ids = await Supabase.instance.client.from("mediauser").select("mediaid").eq("userid", userId);
-    for(var json in await Supabase.instance.client.from("media").select().inFilter("mediaid", ids).eq("mediatype", mediaType)) {
-      ans.add(Media.from(json));
-    }
-    return ans;
-  }
+  // TODO: Endpoint this
+  // static Future<List<Media>> getUserMedia(int userId, String mediaType) async {
+  //   List<Media> ans = List.empty();
+  //   var ids = await Supabase.instance.client.from("mediauser").select("mediaid").eq("userid", userId);
+  //   for(var json in await Supabase.instance.client.from("media").select().inFilter("mediaid", ids).eq("mediatype", mediaType)) {
+  //     ans.add(Media.from(json));
+  //   }
+  //   return ans;
+  // }
 }

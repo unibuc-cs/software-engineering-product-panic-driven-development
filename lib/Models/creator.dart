@@ -28,4 +28,15 @@ class Creator {
       name: json["name"],
     );
   }
+
+  // TODO: Endpoint this
+  // static Future<Creator?> tryGet(String name) async {
+  //   var list = await Supabase.instance.client.from("creator").select().eq("name", name);
+
+  //   if (list.isEmpty) {
+  //     return null;
+  //   }
+
+  //   return Creator.from(list.first);
+  // }
 }

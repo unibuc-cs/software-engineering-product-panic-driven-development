@@ -1,5 +1,6 @@
 import "package:mediamaster/Models/media_user.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import "../UserSystem.dart";
 import "platform.dart";
 import "publisher.dart";
 import "creator.dart";
@@ -215,7 +216,7 @@ class Media {
 
   Future<MediaUser> getCustomizations() async {
     // TODO: Get the current user's id.
-    int userId=TODO HERE;
+    int userId=UserSystem().getCurrentUserId();
     return MediaUser.from(await Supabase.instance.client.from("mediauser").select().eq("mediaid", id).eq("userid", userId).single());
   }
 

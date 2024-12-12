@@ -28,4 +28,9 @@ class Genre {
       name: json["name"],
     );
   }
+  
+  // TODO: Endpoint this
+  // static Future<List<Genre>> getAllGenres() async {
+  //   return (await Supabase.instance.client.from("genre").select()).map(Genre.from).toList();
+  // }
 }
