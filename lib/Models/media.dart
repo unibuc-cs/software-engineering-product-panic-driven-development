@@ -213,7 +213,7 @@ class Media {
 
   // New code here
 
-  Future<MediaUser> getCustomizations() async {
+  /*Future<MediaUser> getCustomizations() async {
     // TODO: Get the current user's id.
     int userId=TODO HERE;
     return MediaUser.from(await Supabase.instance.client.from("mediauser").select().eq("mediaid", id).eq("userid", userId).single());
@@ -427,5 +427,5 @@ class Media {
         ),
       ),
     );
-  }
+  }*/
 }

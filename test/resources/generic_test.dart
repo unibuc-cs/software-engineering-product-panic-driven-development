@@ -19,7 +19,7 @@ Future<void> runService<T>(
   }
 
   try {
-    final data = await service.getAll();
+    final data = await service.readAll();
     print('Got all\n[');
     data.forEach((item) {
       print('  ${toJson(item)}');
@@ -31,7 +31,7 @@ Future<void> runService<T>(
   }
 
   try {
-    final data = await service.getById(id);
+    final data = await service.readById(id);
     print('Got ${toJson(data)} by id');
   }
   catch (e) {

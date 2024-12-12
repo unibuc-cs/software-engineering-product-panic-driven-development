@@ -1,8 +1,12 @@
+import 'tags.dart';
 import 'links.dart';
+import 'genres.dart';
+import 'medias.dart';
 import 'creators.dart';
 import 'platforms.dart';
 import 'retailers.dart';
 import 'publishers.dart';
+import 'app_achievements.dart';
 import '../helpers/utils.dart';
 import '../services/manager.dart';
 import '../helpers/responses.dart';
@@ -12,11 +16,15 @@ import 'package:shelf_plus/shelf_plus.dart';
 RouterPlus apiRouter() {
   final router = Router(notFoundHandler: unknownEndpoint).plus;
 
+  router.mount('/tags', tagsRouter());
   router.mount('/links', linksRouter());
+  router.mount('/genres', genresRouter());
+  router.mount('/medias', mediasRouter());
   router.mount('/creators', creatorsRouter());
   router.mount('/platforms', platformsRouter());
   router.mount('/retailers', retailersRouter());
   router.mount('/publishers', publishersRouter());
+  router.mount('/appachievements', appAchievementsRouter());
 
   router.get('/health', (Request request) {
     return sendOk('Server is healthy!');

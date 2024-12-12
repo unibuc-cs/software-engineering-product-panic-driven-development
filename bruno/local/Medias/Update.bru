@@ -1,0 +1,22 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3007/api/medias/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "originalname": "update test",
+    "description": "update test",
+    "releasedate": "2023-02-24T00:00:00.000",
+    "criticscore": 83,
+    "communityscore": 93,
+    "mediatype": "book"
+  }
+}

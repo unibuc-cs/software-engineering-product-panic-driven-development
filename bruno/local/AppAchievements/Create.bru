@@ -1,0 +1,19 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3007/api/appachievements
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Only starting...",
+    "description": "Completed 5 games",
+    "xp": 10
+  }
+}

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'request.dart';
 
 class Service<T> {
@@ -21,7 +20,7 @@ class Service<T> {
     );
   }
 
-  Future<List<T>> getAll() async {
+  Future<List<T>> readAll() async {
     return await request<List<T>>(
       method: 'GET',
       endpoint: '/$resource',
@@ -29,7 +28,7 @@ class Service<T> {
     );
   }
 
-  Future<T> getById(int id) async {
+  Future<T> readById(int id) async {
     return await request<T>(
       method: 'GET',
       endpoint: '/$resource/$id',
@@ -50,7 +49,7 @@ class Service<T> {
     return await request<void>(
       method: 'DELETE',
       endpoint: '/$resource/$id',
-      fromJson: (_) => null,
+      fromJson: (_) {},
     );
   }
 }

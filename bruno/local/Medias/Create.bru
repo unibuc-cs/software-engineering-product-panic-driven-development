@@ -1,0 +1,22 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3007/api/medias
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "originalname": "test",
+    "description": "test",
+    "releasedate": "2017-02-24T00:00:00.000",
+    "criticscore": 80,
+    "communityscore": 90,
+    "mediatype": "game"
+  }
+}
