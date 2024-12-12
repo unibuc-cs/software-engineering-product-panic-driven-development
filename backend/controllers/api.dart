@@ -15,8 +15,8 @@ RouterPlus apiRouter() {
   router.mount('/links', linksRouter());
   router.mount('/creators', creatorsRouter());
   router.mount('/platforms', platformsRouter());
-  router.mount('/publishers', publishersRouter());
   router.mount('/retailers', retailersRouter());
+  router.mount('/publishers', publishersRouter());
 
   router.get('/health', (Request request) {
     return sendOk('Server is healthy!');

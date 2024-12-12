@@ -1,0 +1,17 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3007/api/platforms/{{idValid}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Epic Games"
+  }
+}

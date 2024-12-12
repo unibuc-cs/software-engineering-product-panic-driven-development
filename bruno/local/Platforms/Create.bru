@@ -1,0 +1,17 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3007/api/platforms
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Steam"
+  }
+}
