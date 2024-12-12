@@ -296,7 +296,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
               foregroundColor: WidgetStatePropertyAll(Colors.white),
             ),
-            child: Text(UserSystem().currentUser!.username),
+            // child: Text(UserSystem().currentUser!.username), // TODO: Username here
+            child: Text("Username placeholder"),
           ),
           IconButton(
               onPressed: () {
@@ -874,7 +875,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                   .from("mediauser")
                   .delete()
                   .eq("mediaid", mediaId)
-                  .eq("userid", UserSystem().currentUser.id);
+                  .eq("userid", UserSystem().currentUser!.id);
                 setState(() {
                   selectedMediaId = -1; // TODO: Might want to move to some random media instead of this
                 });

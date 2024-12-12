@@ -1,5 +1,5 @@
 import 'package:mediamaster/Models/media_type.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supa; // The "as supa" is required because 2 different User exists
 import 'Models/user.dart';
 import 'Models/game.dart';
 
@@ -32,11 +32,15 @@ class UserSystem {
   }
 
   int getCurrentUserId() {
-    return currentUser.id;
+    if (currentUser != null) {
+      return currentUser!.id;
+    }
+    return -1;
   }
 
   Future<List<Game>> getUserGames() async {
-    var ids = (await Supabase
+    var ids = (await supa
+                     .Supabase
                      .instance
                      .client
                      .from("media-user")
@@ -46,7 +50,8 @@ class UserSystem {
                       .toList();
 
     return
-      (await Supabase
+      (await supa
+        .Supabase
         .instance
         .client
         .from("game")
