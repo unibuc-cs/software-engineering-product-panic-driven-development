@@ -70,7 +70,7 @@ scripts:
   test:creator       : dart --define=LOCAL=true test/resources/creator_test.dart
   test:genre         : dart --define=LOCAL=true test/resources/genre_test.dart
   test:link          : dart --define=LOCAL=true test/resources/link_test.dart
- #test:media         : flutter pub run --dart-define=LOCAL=true test/resources/media_test.dart
+  test:media         : dart --define=LOCAL=true test/resources/media_test.dart
   test:platform      : dart --define=LOCAL=true test/resources/platform_test.dart
   test:publisher     : dart --define=LOCAL=true test/resources/publisher_test.dart
   test:retailer      : dart --define=LOCAL=true test/resources/retailer_test.dart

@@ -1,9 +1,12 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'tag.dart';
+import 'genre.dart';
+import '../Services/tag_service.dart';
+import '../Services/genre_service.dart';
 
-void addSeedData() async {
-  final supabase=Supabase.instance.client;
+Future<void> addSeedData() async {
+  TagService tagServ = TagService();
 
-  if (await supabase.from("tag").count() == 0) {
+  if ((await tagServ.readAll()).isEmpty) {
     var tagsToAdd = [
       "Singleplayer",
       "Multiplayer",
@@ -16,18 +19,14 @@ void addSeedData() async {
       "MMO",
     ];
 
-    List<dynamic> toInsert = List.empty();
-
     for (String tagName in tagsToAdd) {
-      toInsert.add(
-        {"name": tagName}
-      );
+      tagServ.create(Tag(name: tagName));
     }
-
-    supabase.from("tag").insert(toInsert);
   }
 
-  if (await supabase.from("genre").count() == 0) {
+  GenreService genreServ = GenreService();
+
+  if ((await genreServ.readAll()).isEmpty) {
     var genresToAdd = [
       "Shooter",
       "Strategy",
@@ -67,14 +66,12 @@ void addSeedData() async {
       "MOBA",
     ];
 
-    List<dynamic> toInsert = List.empty();
-
     for (String genreName in genresToAdd) {
-      toInsert.add(
-        {"name": genreName}
-      );
+      genreServ.create(Genre(name: genreName));
     }
-
-    supabase.from("genre").insert(toInsert);
   }
+}
+
+Future<void> main() async {
+  await addSeedData();
 }
