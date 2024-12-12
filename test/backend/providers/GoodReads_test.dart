@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import '../../../lib/Services/ApiService.dart';
+import '../../../lib/Services/provider_service.dart';
 
 void main() {
   group('Goodreads', () {

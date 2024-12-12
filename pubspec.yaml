@@ -53,8 +53,8 @@ dependencies:
   intl: ^0.19.0
   supabase: ^2.6.0
   supabase_flutter: ^2.8.0
-  shelf: ^1.4.1
   puppeteer: ^3.15.0
+  shelf: ^1.4.1
   shelf_router: ^1.1.4
   shelf_static: ^1.1.3
   shelf_hotreload: ^1.5.0
@@ -118,24 +118,21 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
 scripts:
-  restore: flutter clean && flutter pub get
-
-  app: flutter run -d windows
-  app:dev: flutter run -d windows --release
-  app:local: flutter run --dart-define=LOCAL=true -d windows
-
-  server: dart run --define=LOCAL=true backend/main.dart
-  server:dev: dart run --define=RELOAD=true --define=LOCAL=true --enable-vm-service backend/main.dart
-  server:node: nodemon -x "dart run --define=LOCAL=true backend/main.dart" -e dart
-
-  deploy: fly deploy
-  cli: dart backend/providers/cli.dart
-
-  test:steam: dart --define=LOCAL=true lib/Services/TestSteam.dart
-  test:igdb: dart test/backend/providers/IGDB_test.dart
-  test:hltb: dart test/backend/providers/HLTB_test.dart
-  test:pcgw: dart test/backend/providers/PCGW_test.dart
+  restore       : flutter clean && flutter pub get
+  app           : flutter run -d windows
+  app:dev       : flutter run -d windows --release
+  app:local     : flutter run --dart-define=LOCAL=true -d windows
+  server        : dart run --define=LOCAL=true backend/main.dart
+  server:dev    : dart run --define=RELOAD=true --define=LOCAL=true --enable-vm-service backend/main.dart
+  server:node   : nodemon -x "dart run --define=LOCAL=true backend/main.dart" -e dart
+  deploy        : fly deploy
+  cli           : dart backend/providers/cli.dart
+  test:steam    : dart --define=LOCAL=true test/backend/providers/Steam_test.dart
+  test:igdb     : dart test/backend/providers/IGDB_test.dart
+  test:hltb     : dart test/backend/providers/HLTB_test.dart
+  test:pcgw     : dart test/backend/providers/PCGW_test.dart
   test:goodreads: dart test/backend/providers/GoodReads_test.dart
-  test:tmdb: dart test/backend/providers/TMDB_test.dart
-  test:anilist: dart test/backend/providers/Anilist_test.dart
-  test: flutter test
+  test:tmdb     : dart test/backend/providers/TMDB_test.dart
+  test:anilist  : dart test/backend/providers/Anilist_test.dart
+  test:link     : dart test/frontend/services/Link_test.dart
+  test:publisher: dart test/frontend/services/Publisher_test.dart

@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import '../../../lib/Services/ApiService.dart';
+import '../../../lib/Services/provider_service.dart';
 
 void main() {
   group('Anilist', () {
@@ -32,7 +32,7 @@ void main() {
           'id': 16498
         });
         expect(anime_info, isNotNull);
-        expect(anime_info['title']['english'], contains('Attack on Titan'));
+        expect(anime_info['name'], contains('Attack on Titan'));
         expect(anime_info['episodes'], 25);
         expect(anime_info['release_date'], contains('2013-04-07'));
         expect(anime_info['genres'][0], contains('Action'));
@@ -68,7 +68,7 @@ void main() {
           'id': 132182
         });
         expect(manga_info, isNotNull);
-        expect(manga_info['title']['english'], contains('Blue Box'));
+        expect(manga_info['name'], contains('Blue Box'));
         expect(manga_info['release_date'], contains('2021-04-12'));
         expect(manga_info['genres'][0], contains('Romance'));
       });

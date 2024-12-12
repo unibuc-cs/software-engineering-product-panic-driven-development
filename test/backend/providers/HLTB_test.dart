@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import '../../../lib/Services/ApiService.dart';
+import '../../../lib/Services/provider_service.dart';
 
 double getHours(String time) {
   final hours = time.split(' ')[0];
