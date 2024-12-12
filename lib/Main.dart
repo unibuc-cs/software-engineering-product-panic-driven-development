@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'Models/seed_data.dart';
-import 'Models/database_adapters.dart';
 
 import 'Auth/signup_screen.dart';
 import 'Auth/signup_bloc.dart';
@@ -15,13 +14,12 @@ import 'package:dotenv/dotenv.dart';
 void main() async {
   final env = DotEnv(includePlatformEnvironment: true)..load();
 
-  await initHiveAndAdapters();
-  addSeedData();
-
   await Supabase.initialize(
     url: env['URL_SUPABASE'] ?? 'default_value',
     anonKey: env['ANON_KEY_SUPABASE'] ?? 'default_value',
   );
+
+  addSeedData();
 
   runApp(MyApp());
 }

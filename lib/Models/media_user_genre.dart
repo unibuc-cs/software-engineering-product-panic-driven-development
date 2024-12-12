@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class MediaUserGenre {
   // Data
   int mediaId;
@@ -34,5 +36,11 @@ class MediaUserGenre {
       userId: json["userid"],
       genreId: json["genreid"],
     );
+  }
+
+  // TODO: Move this to some endpoint
+  // Returns a set of tag ids such that there exists a MediaUserTag in the database that has these 3 properties
+  static Future<Set<int>> getAllFor(int mediaId, int userId) async {
+    return (await Supabase.instance.client.from("mediausertag").select("tagid").eq("mediaid", mediaId).eq("userid", userId)).map((x) => x["tagid"] as int).toSet();
   }
 }

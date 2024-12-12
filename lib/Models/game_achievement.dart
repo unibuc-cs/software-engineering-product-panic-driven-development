@@ -1,5 +1,3 @@
-import 'game.dart';
-
 class GameAchievement {
   // Data
   int id;
@@ -39,21 +37,5 @@ class GameAchievement {
       name: json["name"],
       description: json["description"],
     );
-  }
-
-  Game get game {
-    if (_game == null) {
-      Box<Game> box = Hive.box<Game>('games');
-      for (int i = 0; i < box.length; ++i) {
-        if (gameId == box.getAt(i)!.id) {
-          _game = box.getAt(i);
-        }
-      }
-      if (_game == null) {
-        throw Exception(
-            "Game Achievement of id $id does not have an associated Game object or gameId value is wrong ($gameId)");
-      }
-    }
-    return _game!;
   }
 }

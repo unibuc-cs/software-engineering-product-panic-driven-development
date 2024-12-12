@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class Genre {
   // Data
   int id;
@@ -27,5 +29,10 @@ class Genre {
       id: json["id"],
       name: json["name"],
     );
+  }
+  
+  // TODO: endpoint this
+  static Future<List<Genre>> getAllGenres() async {
+    return (await Supabase.instance.client.from("genre").select()).map(Genre.from).toList();
   }
 }

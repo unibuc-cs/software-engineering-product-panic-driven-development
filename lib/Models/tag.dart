@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class Tag {
   // Data
   int id;
@@ -27,5 +29,10 @@ class Tag {
       id: json["id"],
       name: json["name"],
     );
+  }
+
+  // TODO: endpoint this
+  static Future<List<Tag>> getAllTags() async {
+    return (await Supabase.instance.client.from("tag").select()).map(Tag.from).toList();
   }
 }

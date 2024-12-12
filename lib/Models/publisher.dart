@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class Publisher {
   // Data
   int id;
@@ -27,5 +29,15 @@ class Publisher {
       id: json["id"],
       name: json["name"],
     );
+  }
+
+  static Future<Publisher?> tryGet(String name) async {
+    var list = await Supabase.instance.client.from("publisher").select().eq("name", name);
+
+    if (list.isEmpty) {
+      return null;
+    }
+
+    return Publisher.from(list.first);
   }
 }
