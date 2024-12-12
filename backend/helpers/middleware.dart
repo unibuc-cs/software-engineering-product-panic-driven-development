@@ -11,7 +11,7 @@ Handler logger(innerHandler) {
     final method = request.method;
     final url = request.requestedUri.path;
     final status = response.statusCode;
-    print('${greenColored(method)} $url ${greenColored(status)} - ${responseTime} ms');
+    print('${greenColored(padEnd(method, 6))} $url ${greenColored(status)} - ${responseTime} ms');
     return response.change(headers: {'X-Response-Time': '$responseTime ms'});
   };
 }

@@ -25,6 +25,13 @@ String capitalize(String str) {
     return str.replaceFirst(str[0], str[0].toUpperCase());
 }
 
+String padEnd(String input, int length, [String pad = ' ']) {
+  if (input.length >= length) {
+    return input;
+  }
+  return input + pad * (length - input.length);
+}
+
 String colored(dynamic message, String color) {
   var pen = AnsiPen();
   if (color == "red") {

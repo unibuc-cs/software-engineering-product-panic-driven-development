@@ -1,4 +1,7 @@
 import 'links.dart';
+import 'creators.dart';
+import 'platforms.dart';
+import 'retailers.dart';
 import 'publishers.dart';
 import '../helpers/utils.dart';
 import '../services/manager.dart';
@@ -7,10 +10,13 @@ import '../helpers/validators.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus apiRouter() {
-  final router = Router().plus;
+  final router = Router(notFoundHandler: unknownEndpoint).plus;
 
   router.mount('/links', linksRouter());
+  router.mount('/creators', creatorsRouter());
+  router.mount('/platforms', platformsRouter());
   router.mount('/publishers', publishersRouter());
+  router.mount('/retailers', retailersRouter());
 
   router.get('/health', (Request request) {
     return sendOk('Server is healthy!');
