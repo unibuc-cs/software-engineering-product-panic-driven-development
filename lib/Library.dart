@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mediamaster/Models/game.dart';
+import 'package:mediamaster/Models/media_creator.dart';
+import 'package:mediamaster/Models/media_platform.dart';
+import 'package:mediamaster/Models/media_publisher.dart';
 import 'package:mediamaster/Models/media_type.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mediamaster/Services/creator_service.dart';
+import 'package:mediamaster/Services/genre_service.dart';
+import 'package:mediamaster/Services/media_service.dart';
+import 'package:mediamaster/Services/platform_service.dart';
+import 'package:mediamaster/Services/publisher_service.dart';
+import 'package:mediamaster/Services/tag_service.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:mediamaster/Models/note.dart';
 import 'package:pair/pair.dart';
 import 'dart:async';
-import 'Services/ApiService.dart';
+import 'Services/provider_service.dart';
 
 import 'Models/genre.dart';
 import 'Models/publisher.dart';
@@ -96,7 +104,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   bool filterAll = true;
   Set<Genre> selectedGenresIds = {};
   Set<Tag> selectedTagsIds = {};
-  final supabase = Supabase.instance.client;
 
   @override
   void initState() {
@@ -200,6 +207,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError("Media type already in db is not implemented");
     }
 
+    // Notat
     List<dynamic> media = (await supabase.from("media").select("id").eq("originalname", name).eq("mediatype", dbName)).map((x) => x["id"]).toList();
 
     if (media.isEmpty) {
@@ -207,6 +215,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     if (MT == Game) {
+      // Notat
       return Game.from(await supabase.from(dbName).select().eq("mediaid", media.first).single()) as MT;
     }
 
@@ -222,7 +231,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError("Media type already in wishlist is not implemented");
     }
 
-    return (await supabase.from("media").select("id").eq("originalname", name).eq("mediatype", dbName)).isNotEmpty;
+    // Notat
+    return (await supabase.from("wishlist").select("id").eq("originalname", name).eq("mediatype", dbName)).isNotEmpty;
   }
 
   Future<bool> mediaAlreadyInLibrary(String name) async {
@@ -234,8 +244,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError("Media type already in library is not implemented");
     }
 
+    // Notat
     var id = (await supabase.from("media").select("id").eq("originalname", name).eq("mediatype", dbName).single())["id"];
-    return (await supabase.from("mediauser").select().eq("mediaid", id)).isNotEmpty;
+    // TODO: ManyToMany
+    return (await supabase.from("mediauser").select().eq("mediaid", id).eq("userid", UserSystem().getCurrentUserId())).isNotEmpty;
   }
 
   @override
@@ -417,6 +429,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError("getSelectedMT is not implemented for this media type");
     }
 
+    // Notat
     List<Map<String, dynamic>> list = (await supabase.from(mtDbName).select().eq("mediaid", selectedMediaId));
     if (list.isEmpty) {
       return null;
@@ -675,8 +688,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError("Sorting is not implemented for this media type");
     }
 
-    List<Tag> tags = await Tag.getAllTags(); // TODO: I don't know if we want all tags
-    List<Genre> genres = await Genre.getAllGenres(); // TODO: I don't know if we want all genres
+    List<Tag> tags = await TagService().readAll(); // TODO: I don't know if we want all tags
+    List<Genre> genres = await GenreService().readAll(); // TODO: I don't know if we want all genres
 
     if (context.mounted) {
       return showDialog(
@@ -869,6 +882,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               onPressed: () {
                 // TODO: We might also want to remove the mediausertag and mediausergenre but I am not sure for now
                 // TODO: Endpoint this
+                // TODO: ManyToMany
                 Supabase
                   .instance
                   .client
@@ -1004,9 +1018,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
 
       // TODO: Endpoint
-      media.id = (await supabase.from("media").insert(media.toSupa()).select()).map(Media.from).first.id;
+      media.id = (await MediaService().create(media)).id;
 
-      Game newGame = Game(
+      nullableGame = Game(
         mediaId: media.id,
         parentGameId:
             -1 /*TODO in the next semester: Add parameter/call to API to check if this is a DLC*/,
@@ -1074,19 +1088,17 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         List<String> gamePublishers = (selectedGame['publishers'] as List<dynamic>).map((x) => x.toString()).toList();
 
         for (String publisherString in gamePublishers) {
+          // Notat
           Publisher? publisher = await Publisher.tryGet(publisherString);
           if (publisher == null) {
             // A new publisher. Add it to the database
             publisher = Publisher(
               name: publisherString,
             );
-            // TODO: Endpoint
-            List<Publisher> list = (await supabase.from("publisher").insert(publisher.toSupa()).select()).map(Publisher.from).toList();
-            publisher.id = list.first.id;
+            publisher = await PublisherService().create(publisher);
           }
 
-          // TODO: Endpoint
-          await supabase.from("mediapublisher").insert({"mediaid": newGame.mediaId, "publisherid": publisher.id});
+          await MediaPublisherService().create(MediaPublisher(mediaId: nullableGame.mediaId, publisherId: publisher.id))
         }
       }
 
@@ -1095,19 +1107,17 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         List<String> gameCreators = (selectedGame['developers'] as List<dynamic>).map((x) => x.toString()).toList();
         
         for (String creatorString in gameCreators) {
+          // Notat
           Creator? creator = await Creator.tryGet(creatorString);
           if (creator == null) {
             // A new developer. Add it to the database
             creator = Creator(
               name: creatorString,
             );
-            // TODO: Endpoint
-            List<Creator> list = (await supabase.from("creator").insert(creator.toSupa()).select()).map(Creator.from).toList();
-            creator.id = list.first.id;
+            creator = await CreatorService().create(creator);
           }
 
-          // TODO: Endpoint
-          await supabase.from("mediacreator").insert({"mediaid": newGame.mediaId, "creatorid": creator.id});
+          await MediaCreatorService().create(MediaCreator(mediaId: nullableGame.mediaId, creatorId: creator.id));
         }
       }
 
@@ -1116,26 +1126,21 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         List<dynamic> gamePlatforms = (selectedGame['platforms'] as List<dynamic>).map((x) => x.toString()).toList();
         
         for (String platformString in gamePlatforms) {
+          // Notat
           Platform? platform = await Platform.tryGet(platformString);
           if (platform == null) {
             // A new platform. Add it to the database
             platform = Platform(
               name: platformString,
             );
-            // TODO: Endpoint
-            List<Platform> list = (await supabase.from("platform").insert(platform.toSupa()).select()).map(Platform.from).toList();
-            platform.id = list.first.id;
+            platform = await PlatformService().create(platform);
           }
 
-          // TODO: Endpoint
-          await supabase.from("mediaplatform").insert({"mediaid": newGame.mediaId, "platformid": platform.id});
+          await MediaPlatformService().create(MediaPlatform(mediaId: nullableGame.mediaId, platformId: platform.id));
         }
       }
 
-      // TODO: Endpoint
-      newGame.id = (await supabase.from("game").insert(newGame.toSupa()).select()).map(Game.from).first.id;
-
-      nullableGame = newGame;
+      nullableGame = await GameService().create(nullableGame);
     }
 
     Game game = nullableGame;
@@ -1155,8 +1160,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         lastInteracted: DateTime.now(),
       );
 
-      // TODO: Endpoint
-      await supabase.from("mediauser").insert(mu.toSupa());
+      MediaUserService().create(mu);
     }
   }
 
@@ -1173,7 +1177,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     if (mt == null) {
       return Container(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withAlpha(128),
         child: Center(
           child: Text(
             "Choose a $mediaType",
@@ -1194,6 +1198,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       .displayMedia(
         additionalButtons,
         renderNotes(
+          // Notat
           await Note.getNotes(UserSystem().getCurrentUserId(), mt.getMediaId())
         ),
       );
@@ -1231,7 +1236,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                   userId: UserSystem().currentUser!.id,
                   content: controller.text,
                 );
-                Supabase.instance.client.from("note").insert(note.toSupa()); // TODO: Use endpoint
+                await NoteService().create(note);
                 Navigator.of(context).pop();
                 setState(() {});
               },
@@ -1267,8 +1272,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     void removeNote() async {
-      note as Note;
-      await Supabase.instance.client.from("note").delete().eq("id", note.id);
+      await NoteService().delete((note as Note).id);
       setState(() {});
     }
 
