@@ -22,7 +22,7 @@ dynamic serialize(dynamic data) {
 }
 
 String capitalize(String str) {
-    return str.replaceFirst(str[0], str[0].toUpperCase());
+  return str.replaceFirst(str[0], str[0].toUpperCase());
 }
 
 String padEnd(String input, int length, [String pad = ' ']) {

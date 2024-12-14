@@ -1,16 +1,27 @@
-import 'utils.dart';
-
 void validateBody(Map<String, dynamic> body, {List<String> fields = const []}) {
   if (body["id"] != null) {
     throw Exception('The body shouldn\'t contain an id field');
   }
   for (var field in fields) {
     if (body[field] == null) {
-      throw Exception('${capitalize(field)} is required');
+      throw Exception('$field is required');
     }
     else if (body[field].runtimeType == String && body[field] == "") {
-      throw Exception('${capitalize(field)} cannot be empty');
+      throw Exception('$field cannot be empty');
     }
+  }
+}
+
+Future<void> validateExistence(dynamic id, String table, dynamic _supabase) async {
+  try {
+    await _supabase
+      .from(table)
+      .select()
+      .eq('id', id)
+      .single();
+  }
+  catch (e) {
+    throw Exception('${table.toLowerCase()}Id not found');
   }
 }
 

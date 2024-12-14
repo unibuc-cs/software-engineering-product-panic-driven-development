@@ -8,10 +8,10 @@ RouterPlus appAchievementsRouter() {
   final _supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final appAchievement = await _supabase
+    final appAchievements = await _supabase
       .from('appachievement')
       .select();
-    return sendOk(appAchievement);
+    return sendOk(appAchievements);
   });
 
   router.get('/<id>', (Request req, String id) async {

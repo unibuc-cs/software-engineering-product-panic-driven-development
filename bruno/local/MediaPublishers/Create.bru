@@ -1,0 +1,18 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3007/api/mediapublishers
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 6,
+    "publisherid": 2
+  }
+}

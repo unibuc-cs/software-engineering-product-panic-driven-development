@@ -6,7 +6,12 @@ import 'creators.dart';
 import 'platforms.dart';
 import 'retailers.dart';
 import 'publishers.dart';
+import 'media_links.dart';
+import 'media_creators.dart';
+import 'media_retailers.dart';
+import 'media_platforms.dart';
 import 'app_achievements.dart';
+import 'media_publishers.dart';
 import '../helpers/utils.dart';
 import '../services/manager.dart';
 import '../helpers/responses.dart';
@@ -24,6 +29,11 @@ RouterPlus apiRouter() {
   router.mount('/platforms', platformsRouter());
   router.mount('/retailers', retailersRouter());
   router.mount('/publishers', publishersRouter());
+  router.mount('/medialinks', mediaLinksRouter());
+  router.mount('/mediacreators', mediaCreatorsRouter());
+  router.mount('/mediaplatforms', mediaPlatformsRouter());
+  router.mount('/mediaretailers', mediaRetailersRouter());
+  router.mount('/mediapublishers', mediaPublishersRouter());
   router.mount('/appachievements', appAchievementsRouter());
 
   router.get('/health', (Request request) {

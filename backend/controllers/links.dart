@@ -55,6 +55,11 @@ RouterPlus linksRouter() {
 
   router.delete('/<id>', (Request req, String id) async {
     await _supabase
+      .from('medialink')
+      .delete()
+      .eq('linkid', id);
+    
+    await _supabase
       .from('link')
       .delete()
       .eq('id', id);

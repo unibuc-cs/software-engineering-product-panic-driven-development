@@ -54,6 +54,11 @@ RouterPlus creatorsRouter() {
 
   router.delete('/<id>', (Request req, String id) async {
     await _supabase
+      .from('mediacreator')
+      .delete()
+      .eq('creatorid', id);
+    
+    await _supabase
       .from('creator')
       .delete()
       .eq('id', id);

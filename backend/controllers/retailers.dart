@@ -54,6 +54,11 @@ RouterPlus retailersRouter() {
 
   router.delete('/<id>', (Request req, String id) async {
     await _supabase
+      .from('mediaretailer')
+      .delete()
+      .eq('retailerid', id);
+
+    await _supabase
       .from('retailer')
       .delete()
       .eq('id', id);

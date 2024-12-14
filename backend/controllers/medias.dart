@@ -19,7 +19,7 @@ RouterPlus mediasRouter() {
     final media = await _supabase
       .from('media')
       .select()
-      .eq('id',id)
+      .eq('id', id)
       .single();
     return sendOk(serialize(media));
   });
@@ -52,13 +52,38 @@ RouterPlus mediasRouter() {
     final media = await _supabase
       .from('media')
       .update(body)
-      .eq('id',id)
+      .eq('id', id)
       .select()
       .single();
     return sendOk(serialize(media));
   });
 
   router.delete('/<id>', (Request req, String id) async {
+    await _supabase
+      .from('mediacreator')
+      .delete()
+      .eq('mediaid', id);
+    
+    await _supabase
+      .from('medialink')
+      .delete()
+      .eq('mediaid', id);
+
+    await _supabase
+      .from('mediaplatform')
+      .delete()
+      .eq('mediaid', id);
+    
+    await _supabase
+      .from('mediapublisher')
+      .delete()
+      .eq('mediaid', id);
+
+    await _supabase
+      .from('mediaretailer')
+      .delete()
+      .eq('mediaid', id);
+
     await _supabase
       .from('media')
       .delete()

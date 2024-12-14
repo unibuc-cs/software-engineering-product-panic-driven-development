@@ -54,6 +54,11 @@ RouterPlus publishersRouter() {
 
   router.delete('/<id>', (Request req, String id) async {
     await _supabase
+      .from('mediapublisher')
+      .delete()
+      .eq('publisherid', id);
+
+    await _supabase
       .from('publisher')
       .delete()
       .eq('id', id);

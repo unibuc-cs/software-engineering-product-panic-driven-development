@@ -8,10 +8,10 @@ RouterPlus tagsRouter() {
   final _supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final tag = await _supabase
+    final tags = await _supabase
       .from('tag')
       .select();
-    return sendOk(tag);
+    return sendOk(tags);
   });
 
   router.get('/<id>', (Request req, String id) async {

@@ -31,6 +31,9 @@ Handler errorHandling(innerHandler) {
       if (errMsg.contains('could not find the')) {
         return sendBadRequest('Invalid body');
       }
+      if (errMsg.contains('Id not found')) {
+        return sendBadRequest(errMsg);
+      }
       if (
         errMsg.contains('is required') ||
         errMsg.contains('cannot be empty') ||

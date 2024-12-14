@@ -71,6 +71,11 @@ scripts:
   test:genre         : dart --define=LOCAL=true test/resources/genre_test.dart
   test:link          : dart --define=LOCAL=true test/resources/link_test.dart
   test:media         : dart --define=LOCAL=true test/resources/media_test.dart
+  test:mediacreator  : dart --define=LOCAL=true test/resources/media_creator_test.dart
+  test:medialink     : dart --define=LOCAL=true test/resources/media_link_test.dart
+  test:mediaplatform : dart --define=LOCAL=true test/resources/media_platform_test.dart
+  test:mediapublisher: dart --define=LOCAL=true test/resources/media_publisher_test.dart
+  test:mediaretailer : dart --define=LOCAL=true test/resources/media_retailer_test.dart
   test:platform      : dart --define=LOCAL=true test/resources/platform_test.dart
   test:publisher     : dart --define=LOCAL=true test/resources/publisher_test.dart
   test:retailer      : dart --define=LOCAL=true test/resources/retailer_test.dart
