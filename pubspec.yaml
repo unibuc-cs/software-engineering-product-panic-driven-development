@@ -67,6 +67,8 @@ scripts:
   test:goodreads     : dart --define=LOCAL=true test/providers/goodreads_test.dart
   test:tmdb          : dart --define=LOCAL=true test/providers/tmdb_test.dart
   test:anilist       : dart --define=LOCAL=true test/providers/anilist_test.dart
+  test:appachievement: dart --define=LOCAL=true test/resources/app_achievement_test.dart
+  test:book          : dart --define=LOCAL=true test/resources/book_test.dart
   test:creator       : dart --define=LOCAL=true test/resources/creator_test.dart
   test:genre         : dart --define=LOCAL=true test/resources/genre_test.dart
   test:link          : dart --define=LOCAL=true test/resources/link_test.dart
@@ -80,4 +82,3 @@ scripts:
   test:publisher     : dart --define=LOCAL=true test/resources/publisher_test.dart
   test:retailer      : dart --define=LOCAL=true test/resources/retailer_test.dart
   test:tag           : dart --define=LOCAL=true test/resources/tag_test.dart
-  test:appachievement: dart --define=LOCAL=true test/resources/app_achievement_test.dart

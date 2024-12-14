@@ -29,7 +29,7 @@ RouterPlus mediaPublishersRouter() {
     validateBody(body, fields:
       [
         "mediaid",
-        "publisherid"
+        "publisherid",
       ]
     );
     await validateExistence(body["mediaid"], 'media', _supabase);
@@ -45,7 +45,6 @@ RouterPlus mediaPublishersRouter() {
 
   router.put('/<mediaId>/<publisherId>', (Request req, String mediaId, String publisherId) async {
     final body = await req.body.asJson;
-    validateBody(body);
     await validateExistence(body["mediaid"], 'media', _supabase);
     await validateExistence(body["publisherid"], 'publisher', _supabase);
 

@@ -24,10 +24,15 @@ RouterPlus creatorsRouter() {
   });
 
   router.post('/', (Request req) async {
-    final body = await req.body.asJson;
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
     validateBody(body, fields:
       [
-        "name"
+        "name",
       ]
     );
 
@@ -40,8 +45,12 @@ RouterPlus creatorsRouter() {
   });
 
   router.put('/<id>', (Request req, String id) async {
-    final body = await req.body.asJson;
-    validateBody(body);
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
 
     final creator = await _supabase
       .from('creator')

@@ -3,24 +3,24 @@ import '../helpers/validators.dart';
 import '../helpers/db_connection.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
-RouterPlus platformsRouter() {
+RouterPlus booksRouter() {
   final router = Router().plus;
   final _supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final platforms = await _supabase
-      .from('platform')
+    final books = await _supabase
+      .from('book')
       .select();
-    return sendOk(platforms);
+    return sendOk(books);
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final platform = await _supabase
-      .from('platform')
+    final book = await _supabase
+      .from('book')
       .select()
       .eq('id', id)
       .single();
-    return sendOk(platform);
+    return sendOk(book);
   });
 
   router.post('/', (Request req) async {
@@ -32,16 +32,25 @@ RouterPlus platformsRouter() {
     );
     validateBody(body, fields:
       [
-        "name",
+        "mediaid",
+        "originallanguage",
+        "totalpages",
       ]
     );
 
-    final plaform = await _supabase
-      .from('platform')
+    await _supabase
+      .from('media')
+      .select()
+      .eq('id', body["mediaid"])
+      .eq('mediatype', "book")
+      .single();
+
+    final book = await _supabase
+      .from('book')
       .insert(body)
       .select()
       .single();
-    return sendCreated(plaform);
+    return sendCreated(book);
   });
 
   router.put('/<id>', (Request req, String id) async {
@@ -49,28 +58,21 @@ RouterPlus platformsRouter() {
     body = discardFromBody(body, fields:
       [
         "id",
+        "mediaid",
       ]
     );
 
-    final platform = await _supabase
-      .from('platform')
+    final book = await _supabase
+      .from('book')
       .update(body)
       .eq('id', id)
       .select()
       .single();
-    return sendOk(platform);
+    return sendOk(book);
   });
 
+  // This is intended, because we don't want to delete any book for caching
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
-      .from('mediaplatform')
-      .delete()
-      .eq('platformid', id);
-
-    await _supabase
-      .from('platform')
-      .delete()
-      .eq('id', id);
     return sendNoContent();
   });
 

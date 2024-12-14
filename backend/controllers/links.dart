@@ -24,11 +24,16 @@ RouterPlus linksRouter() {
   });
 
   router.post('/', (Request req) async {
-    final body = await req.body.asJson;
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
     validateBody(body, fields:
       [
         "name",
-        "href"
+        "href",
       ]
     );
 
@@ -41,8 +46,12 @@ RouterPlus linksRouter() {
   });
 
   router.put('/<id>', (Request req, String id) async {
-    final body = await req.body.asJson;
-    validateBody(body);
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
 
     final link = await _supabase
       .from('link')

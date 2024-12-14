@@ -29,7 +29,7 @@ RouterPlus mediaLinksRouter() {
     validateBody(body, fields:
       [
         "mediaid",
-        "linkid"
+        "linkid",
       ]
     );
     await validateExistence(body["mediaid"], 'media', _supabase);
@@ -45,7 +45,6 @@ RouterPlus mediaLinksRouter() {
 
   router.put('/<mediaId>/<linkId>', (Request req, String mediaId, String linkId) async {
     final body = await req.body.asJson;
-    validateBody(body);
     await validateExistence(body["mediaid"], 'media', _supabase);
     await validateExistence(body["linkid"], 'link', _supabase);
 

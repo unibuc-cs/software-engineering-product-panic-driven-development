@@ -24,7 +24,12 @@ RouterPlus tagsRouter() {
   });
 
   router.post('/', (Request req) async {
-    final body = await req.body.asJson;
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
     validateBody(body, fields:
       [
         "name",
@@ -40,8 +45,12 @@ RouterPlus tagsRouter() {
   });
 
   router.put('/<id>', (Request req, String id) async {
-    final body = await req.body.asJson;
-    validateBody(body);
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
 
     final tag = await _supabase
       .from('tag')

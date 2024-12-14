@@ -1,4 +1,5 @@
 import 'tags.dart';
+import 'books.dart';
 import 'links.dart';
 import 'genres.dart';
 import 'medias.dart';
@@ -22,6 +23,7 @@ RouterPlus apiRouter() {
   final router = Router(notFoundHandler: unknownEndpoint).plus;
 
   router.mount('/tags', tagsRouter());
+  router.mount('/books', booksRouter());
   router.mount('/links', linksRouter());
   router.mount('/genres', genresRouter());
   router.mount('/medias', mediasRouter());

@@ -1,7 +1,13 @@
-void validateBody(Map<String, dynamic> body, {List<String> fields = const []}) {
-  if (body["id"] != null) {
-    throw Exception('The body shouldn\'t contain an id field');
+Map<String, dynamic> discardFromBody(Map<String, dynamic> body, {required List<String> fields}) {
+  for (var field in fields) {
+    if (body[field] != null) {
+      body.remove(field);
+    }
   }
+  return body;
+}
+
+void validateBody(Map<String, dynamic> body, {required List<String> fields}) {
   for (var field in fields) {
     if (body[field] == null) {
       throw Exception('$field is required');
@@ -10,6 +16,15 @@ void validateBody(Map<String, dynamic> body, {List<String> fields = const []}) {
       throw Exception('$field cannot be empty');
     }
   }
+}
+
+Map<String, dynamic> populateBody(Map<String, dynamic> body, {required Map<String, dynamic> defaultFields}) {
+  defaultFields.forEach((key,value) {
+    if (body[key] == null) {
+      body[key] = value;
+    }
+  });
+  return body;
 }
 
 Future<void> validateExistence(dynamic id, String table, dynamic _supabase) async {

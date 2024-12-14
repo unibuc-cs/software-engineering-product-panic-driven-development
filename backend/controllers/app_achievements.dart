@@ -24,13 +24,22 @@ RouterPlus appAchievementsRouter() {
   });
 
   router.post('/', (Request req) async {
-    final body = await req.body.asJson;
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
     validateBody(body, fields:
       [
         "name",
         "description",
-        "xp",
       ]
+    );
+    body = populateBody(body, defaultFields:
+      {
+        "xp": 100,
+      }
     );
 
     final appAchievement = await _supabase
@@ -42,8 +51,12 @@ RouterPlus appAchievementsRouter() {
   });
 
   router.put('/<id>', (Request req, String id) async {
-    final body = await req.body.asJson;
-    validateBody(body);
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
 
     final appAchievement = await _supabase
       .from('appachievement')

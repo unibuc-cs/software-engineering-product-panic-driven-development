@@ -1,0 +1,19 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3007/api/books
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 10,
+    "originallanguage": "english",
+    "totalpages": 100
+  }
+}

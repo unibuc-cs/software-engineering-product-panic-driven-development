@@ -37,7 +37,6 @@ Handler errorHandling(innerHandler) {
       if (
         errMsg.contains('is required') ||
         errMsg.contains('cannot be empty') ||
-        errMsg.contains('contain an id field') ||
         errMsg.contains('not found')
       ) {
         return sendBadRequest(capitalize(errMsg.replaceAll('exception: ', '')));

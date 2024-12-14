@@ -51,48 +51,48 @@ class Media {
     );
   }
 
-  // TODO: Turn this into an endpoint
-  Future<List<Publisher>> get publishers async {
-    final supabase = Supabase.instance.client;
-    List<dynamic> publisherIds = await supabase
-      .from("mediapublisher")
-      .select("publisherid")
-      .eq("mediaid", id);
-    return (await supabase
-      .from("publisher")
-      .select()
-      .inFilter("id", publisherIds))
-      .map(Publisher.from)
-      .toList();
-  }
+  // // TODO: Turn this into an endpoint
+  // Future<List<Publisher>> get publishers async {
+  //   final supabase = Supabase.instance.client;
+  //   List<dynamic> publisherIds = await supabase
+  //     .from("mediapublisher")
+  //     .select("publisherid")
+  //     .eq("mediaid", id);
+  //   return (await supabase
+  //     .from("publisher")
+  //     .select()
+  //     .inFilter("id", publisherIds))
+  //     .map(Publisher.from)
+  //     .toList();
+  // }
 
-  // TODO: Turn this into an endpoint
-  Future<List<Creator>> get creators async {
-    final supabase = Supabase.instance.client;
-    List<dynamic> creatorsIds = await supabase
-      .from("mediacreator")
-      .select("creatorid")
-      .eq("mediaid", id);
-    return (await supabase
-      .from("creator")
-      .select()
-      .inFilter("id", creatorsIds))
-      .map(Creator.from)
-      .toList();
-  }
+  // // TODO: Turn this into an endpoint
+  // Future<List<Creator>> get creators async {
+  //   final supabase = Supabase.instance.client;
+  //   List<dynamic> creatorsIds = await supabase
+  //     .from("mediacreator")
+  //     .select("creatorid")
+  //     .eq("mediaid", id);
+  //   return (await supabase
+  //     .from("creator")
+  //     .select()
+  //     .inFilter("id", creatorsIds))
+  //     .map(Creator.from)
+  //     .toList();
+  // }
 
-  // TODO: Turn this into an endpoint
-  Future<List<Platform>> get platforms async {
-    final supabase = Supabase.instance.client;
-    List<dynamic> platformsIds = await supabase
-      .from("mediaplatform")
-      .select("platformid")
-      .eq("mediaid", id);
-    return (await supabase
-      .from("platform")
-      .select()
-      .inFilter("id", platformsIds))
-      .map(Platform.from)
-      .toList();
-  }
+  // // TODO: Turn this into an endpoint
+  // Future<List<Platform>> get platforms async {
+  //   final supabase = Supabase.instance.client;
+  //   List<dynamic> platformsIds = await supabase
+  //     .from("mediaplatform")
+  //     .select("platformid")
+  //     .eq("mediaid", id);
+  //   return (await supabase
+  //     .from("platform")
+  //     .select()
+  //     .inFilter("id", platformsIds))
+  //     .map(Platform.from)
+  //     .toList();
+  // }
 }

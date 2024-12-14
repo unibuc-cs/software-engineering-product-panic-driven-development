@@ -25,7 +25,12 @@ RouterPlus mediasRouter() {
   });
 
   router.post('/', (Request req) async {
-    final body = await req.body.asJson;
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
     validateBody(body, fields:
       [
         "originalname",
@@ -33,7 +38,7 @@ RouterPlus mediasRouter() {
         "releasedate",
         "criticscore",
         "communityscore",
-        "mediatype"
+        "mediatype",
       ]
     );
 
@@ -46,8 +51,13 @@ RouterPlus mediasRouter() {
   });
 
   router.put('/<id>', (Request req, String id) async {
-    final body = await req.body.asJson;
-    validateBody(body);
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+        "mediatype",
+      ]
+    );
 
     final media = await _supabase
       .from('media')
@@ -58,36 +68,8 @@ RouterPlus mediasRouter() {
     return sendOk(serialize(media));
   });
 
+  // This is intended, because we don't want to delete any form of media for caching
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
-      .from('mediacreator')
-      .delete()
-      .eq('mediaid', id);
-    
-    await _supabase
-      .from('medialink')
-      .delete()
-      .eq('mediaid', id);
-
-    await _supabase
-      .from('mediaplatform')
-      .delete()
-      .eq('mediaid', id);
-    
-    await _supabase
-      .from('mediapublisher')
-      .delete()
-      .eq('mediaid', id);
-
-    await _supabase
-      .from('mediaretailer')
-      .delete()
-      .eq('mediaid', id);
-
-    await _supabase
-      .from('media')
-      .delete()
-      .eq('id', id);
     return sendNoContent();
   });
 

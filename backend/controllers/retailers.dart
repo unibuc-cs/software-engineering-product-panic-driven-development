@@ -24,10 +24,15 @@ RouterPlus retailersRouter() {
   });
 
   router.post('/', (Request req) async {
-    final body = await req.body.asJson;
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
     validateBody(body, fields:
       [
-        "name"
+        "name",
       ]
     );
 
@@ -40,8 +45,12 @@ RouterPlus retailersRouter() {
   });
 
   router.put('/<id>', (Request req, String id) async {
-    final body = await req.body.asJson;
-    validateBody(body);
+    dynamic body = await req.body.asJson;
+    body = discardFromBody(body, fields:
+      [
+        "id",
+      ]
+    );
 
     final retailer = await _supabase
       .from('retailer')

@@ -1,0 +1,19 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3007/api/books/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 12,
+    "originallanguage": "english",
+    "totalpages": 100
+  }
+}
