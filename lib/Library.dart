@@ -12,6 +12,8 @@ import 'package:mediamaster/Services/publisher_service.dart';
 import 'package:mediamaster/Services/tag_service.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:mediamaster/Models/note.dart';
+import 'package:mediamaster/Widgets/game_widgets.dart';
+import 'package:mediamaster/Widgets/media_widgets.dart';
 import 'package:pair/pair.dart';
 import 'dart:async';
 import 'Services/provider_service.dart';
@@ -1188,20 +1190,20 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     if (MT == Game) {
-      additionalButtons = Game.getAditionalButtons(mt as Game, context, () {setState(() {});});
+      additionalButtons = getAditionalButtons(mt as Game, context, () {setState(() {});});
     }
     else {
       throw UnimplementedError("Get additional buttons for this media type is not implemented");
     }
 
-    return (await mt.media)
-      .displayMedia(
-        additionalButtons,
-        renderNotes(
-          // Notat
-          await Note.getNotes(UserSystem().getCurrentUserId(), mt.getMediaId())
-        ),
-      );
+    return await displayMedia(
+      await mt.media,
+      additionalButtons,
+      renderNotes(
+        // Notat
+        await Note.getNotes(UserSystem().getCurrentUserId(), mt.getMediaId())
+      ),
+    );
   }
 
   Future<void> _showNewStickyDialog(int mediaId) {
