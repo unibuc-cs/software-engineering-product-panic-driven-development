@@ -429,7 +429,7 @@ Future<void> _showGameRecommendationsDialog(Game game, BuildContext context) asy
   }
 }
 
-Widget getAditionalButtons(Game game, BuildContext context, Function() resetState) {
+Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() resetState) {
   return Row(
     children: [
       Container(

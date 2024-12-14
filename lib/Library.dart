@@ -1166,7 +1166,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
   }
 
-  // TODO: FIX THIS FUNCTION
   Future<Widget> _displayMedia(MT? mt) async {
     String mediaType = "";
     Widget additionalButtons = Container();
@@ -1190,7 +1189,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     if (MT == Game) {
-      additionalButtons = getAditionalButtons(mt as Game, context, () {setState(() {});});
+      additionalButtons = await getAdditionalButtons(mt as Game, context, () {setState(() {});});
     }
     else {
       throw UnimplementedError("Get additional buttons for this media type is not implemented");

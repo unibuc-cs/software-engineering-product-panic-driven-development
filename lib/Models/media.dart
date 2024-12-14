@@ -1,9 +1,3 @@
-import "package:mediamaster/Models/media_user.dart";
-import "../UserSystem.dart";
-import "platform.dart";
-import "publisher.dart";
-import "creator.dart";
-
 class Media {
   // Data
   int id;

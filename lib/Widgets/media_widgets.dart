@@ -1,7 +1,10 @@
 import "package:flutter/material.dart";
+import "package:mediamaster/Models/game.dart";
 import "package:mediamaster/Models/media.dart";
+import "package:mediamaster/Models/media_type.dart";
 import "package:mediamaster/Models/media_user.dart";
 import "package:mediamaster/UserSystem.dart";
+import "package:mediamaster/Widgets/game_widgets.dart";
 
 // TODO: Make this more general
 // Auxilliary function for general list widgets (publishers, creators, ...)
@@ -211,4 +214,11 @@ Future<Widget> displayMedia(Media media, Widget additionalButtons, Widget notesW
       ),
     ),
   );
+}
+
+Future<Widget> getAdditionalButtons<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) async {
+  if (MT == Game) {
+    return getAdditionalButtonsForGame(mt as Game, context, resetState);
+  }
+  throw UnimplementedError("getAdditionalButtons was not defined for this type");
 }

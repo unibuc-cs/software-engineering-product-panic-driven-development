@@ -1,4 +1,4 @@
-class Season{
+class Season {
   // Data
   int TVSeriesId;
   int id;
