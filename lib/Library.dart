@@ -69,38 +69,37 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         return increasing * (await a.media).releaseDate.compareTo((await b.media).releaseDate);
       },
     ),
-    // TODO: Think if there is some simple/easy way to add these
-    /*
-    Pair<String, dynamic>( // TODO: FIX THIS
-      "By time to beat",
-      (Game a, Game b, int increasing) {
-        int ta = a.getMinTimeToBeat();
-        int tb = b.getMinTimeToBeat();
+    if (MT == Game)
+      Pair<String, dynamic>(
+        "By time to beat",
+        (MT a, MT b, int increasing) {
+          int ta = getMinTimeToBeat(a as Game);
+          int tb = getMinTimeToBeat(b as Game);
 
-        if (tb == -1) {
-          return -1;
-        }
-        if (ta == -1) {
-          return 1;
-        }
-        return increasing * ta.compareTo(tb);
-      },
-    ),
-    Pair<String, dynamic>( // TODO: FIX THIS
-      "By time to 100%",
-      (Game a, Game b, int increasing) {
-        if (b.HLTBCompletionistInSeconds == -1) {
-          return -1;
-        }
-        if (a.HLTBCompletionistInSeconds == -1) {
-          return 1;
-        }
-        return increasing *
-            a.HLTBCompletionistInSeconds.compareTo(
-                b.HLTBCompletionistInSeconds);
-      },
-    ),
-    */
+          if (tb == -1) {
+            return -1;
+          }
+          if (ta == -1) {
+            return 1;
+          }
+          return increasing * ta.compareTo(tb);
+        },
+      ),
+    if (MT == Game)
+      Pair<String, dynamic>(
+        "By time to 100%",
+        (MT a, MT b, int increasing) {
+          if ((b as Game).HLTBCompletionistInSeconds == -1) {
+            return -1;
+          }
+          if ((a as Game).HLTBCompletionistInSeconds == -1) {
+            return 1;
+          }
+          return increasing *
+              a.HLTBCompletionistInSeconds.compareTo(
+                  b.HLTBCompletionistInSeconds);
+        },
+      ),
      // TODO: ADD OTHER SORTING METHODS
   ];
   bool filterAll = true;
