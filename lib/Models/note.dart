@@ -1,5 +1,3 @@
-import "package:supabase_flutter/supabase_flutter.dart";
-
 class Note {
   // Data
   int id;
@@ -48,15 +46,16 @@ class Note {
     return note;
   }
 
-  static Future<List<Note>> getNotes(int userId, int mediaId) async {
-    return (await Supabase
-      .instance
-      .client
-      .from("note")
-      .select()
-      .eq("userid", userId)
-      .eq("mediaid", mediaId)
-    ).map(Note.from)
-     .toList();
-  }
+  // TODO: Endpoint this
+  // static Future<List<Note>> getNotes(int userId, int mediaId) async {
+  //   return (await Supabase
+  //     .instance
+  //     .client
+  //     .from("note")
+  //     .select()
+  //     .eq("userid", userId)
+  //     .eq("mediaid", mediaId)
+  //   ).map(Note.from)
+  //    .toList();
+  // }
 }
