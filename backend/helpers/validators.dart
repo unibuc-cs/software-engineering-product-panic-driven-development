@@ -1,10 +1,9 @@
-Map<String, dynamic> discardFromBody(Map<String, dynamic> body, {required List<String> fields}) {
+void discardFromBody(Map<String, dynamic> body, {required List<String> fields}) {
   for (var field in fields) {
     if (body[field] != null) {
       body.remove(field);
     }
   }
-  return body;
 }
 
 void validateBody(Map<String, dynamic> body, {required List<String> fields}) {
@@ -18,13 +17,12 @@ void validateBody(Map<String, dynamic> body, {required List<String> fields}) {
   }
 }
 
-Map<String, dynamic> populateBody(Map<String, dynamic> body, {required Map<String, dynamic> defaultFields}) {
+void populateBody(Map<String, dynamic> body, {required Map<String, dynamic> defaultFields}) {
   defaultFields.forEach((key,value) {
     if (body[key] == null) {
       body[key] = value;
     }
   });
-  return body;
 }
 
 Future<void> validateExistence(dynamic id, String table, dynamic _supabase) async {

@@ -25,7 +25,7 @@ RouterPlus appAchievementsRouter() {
 
   router.post('/', (Request req) async {
     dynamic body = await req.body.asJson;
-    body = discardFromBody(body, fields:
+    discardFromBody(body, fields:
       [
         "id",
       ]
@@ -36,7 +36,7 @@ RouterPlus appAchievementsRouter() {
         "description",
       ]
     );
-    body = populateBody(body, defaultFields:
+    populateBody(body, defaultFields:
       {
         "xp": 100,
       }
@@ -52,7 +52,7 @@ RouterPlus appAchievementsRouter() {
 
   router.put('/<id>', (Request req, String id) async {
     dynamic body = await req.body.asJson;
-    body = discardFromBody(body, fields:
+    discardFromBody(body, fields:
       [
         "id",
       ]
