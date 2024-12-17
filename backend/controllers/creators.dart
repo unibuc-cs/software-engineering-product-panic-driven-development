@@ -14,6 +14,17 @@ RouterPlus creatorsRouter() {
     return sendOk(creators);
   });
 
+  router.get('/name', (Request req) async {
+    final queryParams = req.url.queryParameters;
+    final name = queryParams["query"] ?? "";
+    final creator = await _supabase
+      .from('creator')
+      .select()
+      .ilike('name', name)
+      .single();
+    return sendOk(creator);
+  });
+
   router.get('/<id>', (Request req, String id) async {
     final creator = await _supabase
       .from('creator')

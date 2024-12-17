@@ -5,10 +5,10 @@ import '../../lib/Services/platform_service.dart';
 
 void main() async {
   Platform dummyPlatform = Platform(
-    name: 'Steam',
+    name: 'XBOX X',
   );
   Platform updatedDummyPlatform = Platform(
-    name: 'Epic Games',
+    name: 'PS5',
   );
 
   await runService(
@@ -17,4 +17,12 @@ void main() async {
     updatedDummyPlatform,
     (platform) => platform.toSupa()
   );
+
+  try {
+    final data = await PlatformService().readByName("PS4");
+    print('Got ${data.toSupa()} by name');
+  }
+  catch (e) {
+    print('GetByName error: $e');
+  }
 }

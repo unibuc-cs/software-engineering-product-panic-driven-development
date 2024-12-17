@@ -14,6 +14,17 @@ RouterPlus publishersRouter() {
     return sendOk(publishers);
   });
 
+  router.get('/name', (Request req) async {
+    final queryParams = req.url.queryParameters;
+    final name = queryParams["query"] ?? "";
+    final publisher = await _supabase
+      .from('publisher')
+      .select()
+      .ilike('name', name)
+      .single();
+    return sendOk(publisher);
+  });
+
   router.get('/<id>', (Request req, String id) async {
     final publisher = await _supabase
       .from('publisher')

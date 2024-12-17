@@ -17,4 +17,12 @@ void main() async {
     updatedDummyCreator,
     (creator) => creator.toSupa()
   );
+
+  try {
+    final data = await CreatorService().readByName("Team Cherry");
+    print('Got ${data.toSupa()} by name');
+  }
+  catch (e) {
+    print('GetByName error: $e');
+  }
 }

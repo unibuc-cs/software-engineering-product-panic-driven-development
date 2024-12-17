@@ -19,4 +19,12 @@ void main() async {
     updatedDummyLink,
     (link) => link.toSupa()
   );
+
+  try {
+    final data = await LinkService().readByName("test");
+    print('Got ${data.toSupa()} by name');
+  }
+  catch (e) {
+    print('GetByName error: $e');
+  }
 }

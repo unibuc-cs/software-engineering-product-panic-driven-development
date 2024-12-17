@@ -14,6 +14,17 @@ RouterPlus linksRouter() {
     return sendOk(links);
   });
 
+  router.get('/name', (Request req) async {
+    final queryParams = req.url.queryParameters;
+    final name = queryParams["query"] ?? "";
+    final link = await _supabase
+      .from('link')
+      .select()
+      .ilike('name', name)
+      .single();
+    return sendOk(link);
+  });
+
   router.get('/<id>', (Request req, String id) async {
     final link = await _supabase
       .from('link')

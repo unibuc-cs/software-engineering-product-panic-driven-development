@@ -14,6 +14,17 @@ RouterPlus platformsRouter() {
     return sendOk(platforms);
   });
 
+  router.get('/name', (Request req) async {
+    final queryParams = req.url.queryParameters;
+    final name = queryParams["query"] ?? "";
+    final platform = await _supabase
+      .from('platform')
+      .select()
+      .ilike('name', name)
+      .single();
+    return sendOk(platform);
+  });
+
   router.get('/<id>', (Request req, String id) async {
     final platform = await _supabase
       .from('platform')

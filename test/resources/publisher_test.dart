@@ -17,4 +17,12 @@ void main() async {
     updatedDummyPublisher,
     (publisher) => publisher.toSupa()
   );
+
+  try {
+    final data = await PublisherService().readByName("Team");
+    print('Got ${data.toSupa()} by name');
+  }
+  catch (e) {
+    print('GetByName error: $e');
+  }
 }

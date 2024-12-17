@@ -1,0 +1,15 @@
+meta {
+  name: ReadName
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:3007/api/publishers/name?query=Team Cherry
+  body: none
+  auth: none
+}
+
+params:query {
+  query: Team Cherry
+}
