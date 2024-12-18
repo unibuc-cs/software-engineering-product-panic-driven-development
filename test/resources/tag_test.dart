@@ -4,17 +4,17 @@ import '../../lib/Models/tag.dart';
 import '../../lib/Services/tag_service.dart';
 
 void main() async {
-  Tag dummyTag = Tag(
+  Tag dummy = Tag(
     name: 'Dummy',
   );
-  Tag updatedDummyTag = Tag(
+  Tag updated = Tag(
     name: 'Updated Dummy',
   );
 
   await runService(
-    TagService(),
-    dummyTag,
-    updatedDummyTag,
-    (tag) => tag.toSupa()
+    service    : TagService(),
+    dummyItem  : dummy,
+    updatedItem: updated,
+    toJson     : (tag) => tag.toSupa(),
   );
 }

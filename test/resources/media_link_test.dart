@@ -1,24 +1,26 @@
 import 'dart:core';
-import 'generic_many_to_many_test.dart';
+import 'generic_test.dart';
 import '../../lib/Models/media_link.dart';
+import '../../lib/Services/link_service.dart';
 import '../../lib/Services/media_link_service.dart';
 
 void main() async {
-  MediaLink dummyMediaLink = MediaLink(
-    mediaId: 7,
-    linkId: 5,
-  );
-  MediaLink updatedDummyMediaLink = MediaLink(
-    mediaId: 8,
-    linkId: 10,
+  Map<String, dynamic> link = {
+    'name': 'example',
+    'href': 'http://example.com',
+  };
+  MediaLink dummy = MediaLink(
+    mediaId: 1,
+    linkId : await getValidId(
+      service: LinkService(),
+      backup : link,
+    ),
   );
 
   await runService(
-    MediaLinkService(),
-    dummyMediaLink,
-    updatedDummyMediaLink,
-    "media",
-    "link",
-    (mediaLink) => mediaLink.toSupa()
+    service  : MediaLinkService(),
+    dummyItem: dummy,
+    tables   : ["media", "link"],
+    toJson   : (mediaLink) => mediaLink.toSupa(),
   );
 }

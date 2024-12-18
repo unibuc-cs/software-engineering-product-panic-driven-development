@@ -4,17 +4,17 @@ import '../../lib/Models/genre.dart';
 import '../../lib/Services/genre_service.dart';
 
 void main() async {
-  Genre dummyGenre= Genre(
+  Genre dummy = Genre(
     name: 'Dummy',
   );
-  Genre updatedDummyGenre = Genre(
+  Genre updated = Genre(
     name: 'Updated Dummy',
   );
 
   await runService(
-    GenreService(),
-    dummyGenre,
-    updatedDummyGenre,
-    (genre) => genre.toSupa()
+    service    : GenreService(),
+    dummyItem  : dummy,
+    updatedItem: updated,
+    toJson     : (genre) => genre.toSupa(),
   );
 }

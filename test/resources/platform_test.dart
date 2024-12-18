@@ -4,25 +4,18 @@ import '../../lib/Models/platform.dart';
 import '../../lib/Services/platform_service.dart';
 
 void main() async {
-  Platform dummyPlatform = Platform(
+  Platform dummy = Platform(
     name: 'XBOX X',
   );
-  Platform updatedDummyPlatform = Platform(
+  Platform updated = Platform(
     name: 'PS5',
   );
 
   await runService(
-    PlatformService(),
-    dummyPlatform,
-    updatedDummyPlatform,
-    (platform) => platform.toSupa()
+    service    : PlatformService(),
+    dummyItem  : dummy,
+    updatedItem: updated,
+    itemName   : "PS4",
+    toJson     : (platform) => platform.toSupa(),
   );
-
-  try {
-    final data = await PlatformService().readByName("PS4");
-    print('Got ${data.toSupa()} by name');
-  }
-  catch (e) {
-    print('GetByName error: $e');
-  }
 }

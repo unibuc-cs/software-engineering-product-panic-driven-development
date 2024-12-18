@@ -4,7 +4,7 @@ import '../../lib/Models/media.dart';
 import '../../lib/Services/media_service.dart';
 
 void main() async {
-  Media dummyMedia = Media(
+  Media dummy = Media(
     originalName: 'Dummy',
     description: 'Description dummy',
     releaseDate: DateTime.now(),
@@ -12,7 +12,7 @@ void main() async {
     communityScore: 93,
     mediaType: 'game',
   );
-  Media updatedDummyMedia = Media(
+  Media updated = Media(
     originalName: 'Updated Dummy',
     description: 'Updated description dummy',
     releaseDate: DateTime.now(),
@@ -22,9 +22,9 @@ void main() async {
   );
 
   await runService(
-    MediaService(),
-    dummyMedia,
-    updatedDummyMedia,
-    (media) => media.toSupa()
+    service    : MediaService(),
+    dummyItem  : dummy,
+    updatedItem: updated,
+    toJson     : (media) => media.toSupa(),
   );
 }

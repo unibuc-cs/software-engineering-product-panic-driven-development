@@ -4,25 +4,18 @@ import '../../lib/Models/publisher.dart';
 import '../../lib/Services/publisher_service.dart';
 
 void main() async {
-  Publisher dummyPublisher = Publisher(
+  Publisher dummy = Publisher(
     name: 'Team Cherry',
   );
-  Publisher updatedDummyPublisher = Publisher(
+  Publisher updated = Publisher(
     name: 'Team Pear',
   );
 
   await runService(
-    PublisherService(),
-    dummyPublisher,
-    updatedDummyPublisher,
-    (publisher) => publisher.toSupa()
+    service    : PublisherService(),
+    dummyItem  : dummy,
+    updatedItem: updated,
+    itemName   : "Team",
+    toJson     : (publisher) => publisher.toSupa(),
   );
-
-  try {
-    final data = await PublisherService().readByName("Team");
-    print('Got ${data.toSupa()} by name');
-  }
-  catch (e) {
-    print('GetByName error: $e');
-  }
 }

@@ -4,13 +4,13 @@ import '../../lib/Models/book.dart';
 import '../../lib/Services/book_service.dart';
 
 void main() async {
-  Book dummyBook = Book(
+  Book dummy = Book(
     mediaId: 8,
     language: "english",
     totalPages: 100,
     format: "paperback",
   );
-  Book updatedDummyBook = Book(
+  Book updated = Book(
     mediaId: 10,
     language: "romanian",
     totalPages: 10,
@@ -18,9 +18,9 @@ void main() async {
   );
 
   await runService(
-    BookService(),
-    dummyBook,
-    updatedDummyBook,
-    (book) => book.toSupa()
+    service    : BookService(),
+    dummyItem  : dummy,
+    updatedItem: updated,
+    toJson     : (book) => book.toSupa(),
   );
 }

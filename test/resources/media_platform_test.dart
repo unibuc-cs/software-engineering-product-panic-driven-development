@@ -1,24 +1,25 @@
 import 'dart:core';
-import 'generic_many_to_many_test.dart';
+import 'generic_test.dart';
 import '../../lib/Models/media_platform.dart';
+import '../../lib/Services/platform_service.dart';
 import '../../lib/Services/media_platform_service.dart';
 
 void main() async {
-  MediaPlatform dummyMediaPlatform = MediaPlatform(
-    mediaId: 6,
-    platformId: 1,
-  );
-  MediaPlatform updatedDummyMediaPlatform = MediaPlatform(
-    mediaId: 7,
-    platformId: 3,
+  Map<String, dynamic> platform = {
+    'name': 'PC',
+  };
+  MediaPlatform dummy = MediaPlatform(
+    mediaId   : 1,
+    platformId: await getValidId(
+      service: PlatformService(),
+      backup : platform,
+    ),
   );
 
   await runService(
-    MediaPlatformService(),
-    dummyMediaPlatform,
-    updatedDummyMediaPlatform,
-    "media",
-    "platform",
-    (mediaPlatform) => mediaPlatform.toSupa()
+    service  : MediaPlatformService(),
+    dummyItem: dummy,
+    tables   : ["media", "platform"],
+    toJson   : (mediaPlatform) => mediaPlatform.toSupa(),
   );
 }

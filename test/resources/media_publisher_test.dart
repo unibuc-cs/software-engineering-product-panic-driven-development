@@ -1,24 +1,25 @@
 import 'dart:core';
-import 'generic_many_to_many_test.dart';
+import 'generic_test.dart';
 import '../../lib/Models/media_publisher.dart';
+import '../../lib/Services/publisher_service.dart';
 import '../../lib/Services/media_publisher_service.dart';
 
 void main() async {
-  MediaPublisher dummyMediaPublisher = MediaPublisher(
-    mediaId: 4,
-    publisherId: 3,
-  );
-  MediaPublisher updatedDummyMediaPublisher = MediaPublisher(
-    mediaId: 4,
-    publisherId: 8,
+  Map<String, dynamic> publisher = {
+    'name': 'Team17',
+  };
+  MediaPublisher dummy = MediaPublisher(
+    mediaId    : 1,
+    publisherId: await getValidId(
+      service: PublisherService(),
+      backup : publisher,
+    ),
   );
 
   await runService(
-    MediaPublisherService(),
-    dummyMediaPublisher,
-    updatedDummyMediaPublisher,
-    "media",
-    "publisher",
-    (mediaPublisher) => mediaPublisher.toSupa()
+    service  : MediaPublisherService(),
+    dummyItem: dummy,
+    tables   : ["media", "publisher"],
+    toJson   : (mediaPlatform) => mediaPlatform.toSupa(),
   );
 }

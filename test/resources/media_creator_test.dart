@@ -1,24 +1,25 @@
 import 'dart:core';
-import 'generic_many_to_many_test.dart';
+import 'generic_test.dart';
 import '../../lib/Models/media_creator.dart';
+import '../../lib/Services/creator_service.dart';
 import '../../lib/Services/media_creator_service.dart';
 
 void main() async {
-  MediaCreator dummyMediaCreator = MediaCreator(
-    mediaId: 4,
-    creatorId: 6,
-  );
-  MediaCreator updatedDummyMediaCreator = MediaCreator(
-    mediaId: 5,
-    creatorId: 7,
+  Map<String, dynamic> creator = {
+    'name': 'From Software',
+  };
+  MediaCreator dummy = MediaCreator(
+    mediaId  : 1,
+    creatorId: await getValidId(
+      service: CreatorService(),
+      backup : creator,
+    ),
   );
 
   await runService(
-    MediaCreatorService(),
-    dummyMediaCreator,
-    updatedDummyMediaCreator,
-    "media",
-    "creator",
-    (mediaCreator) => mediaCreator.toSupa()
+    service   : MediaCreatorService(),
+    dummyItem : dummy,
+    tables    : ["media", "creator"],
+    toJson    : (link) => link.toSupa(),
   );
 }
