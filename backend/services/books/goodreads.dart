@@ -121,19 +121,19 @@ class GoodReads extends Provider {
         .toList();
 
       return {
-        "name": document.querySelector("h1.Text__title1")?.text.trim(),
-        "creators": document.querySelector("span.ContributorLink__name")?.text.trim(),
+        "originalname": document.querySelector("h1.Text__title1")?.text.trim(),
+        "creators": [document.querySelector("span.ContributorLink__name")?.text.trim()],
         "links": bookUrl,
-        "communityscore": document.querySelector("div.RatingStatistics__rating")?.text.trim(),
+        "communityscore": (double.parse(document.querySelector("div.RatingStatistics__rating")!.text.trim()) * 20).round().toString(),
         "releasedate": DateFormat("yyyy-MM-dd").format(parsedDate),
         "description": document.querySelector("span.Formatted")?.text.trim(),
         "totalpages": jsonData["numberOfPages"],
-        "cover": jsonData["image"],
+        "coverimage": jsonData["image"],
         "genres": genres,
         "format": jsonData["bookFormat"],
-        "originallanguage": jsonData["inLanguage"],
-        "series": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
-        "series_books": await instance._getBooksFromSeries(seriesElement?.querySelector("a")?.attributes['href'] ?? "")
+        "language": jsonData["inLanguage"],
+        "series_name": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
+        "series": await instance._getBooksFromSeries(seriesElement?.querySelector("a")?.attributes['href'] ?? "")
       };
     }
     catch (e) {

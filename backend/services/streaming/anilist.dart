@@ -138,7 +138,7 @@ class Anilist extends Provider {
 
     return {
       "id": media["id"],
-      "name": _removeBadItems(media["title"]["english"] ?? media["title"]["romaji"]),
+      "originalname": _removeBadItems(media["title"]["english"] ?? media["title"]["romaji"]),
       "description": _removeBadItems(media["description"] ?? ""),
       "releasedate": DateTime.parse(
         '${media["startDate"]["year"]}-'
@@ -146,7 +146,7 @@ class Anilist extends Provider {
         '${formatTwoDigits(media["startDate"]["day"] ?? 1)}'
       ),
       "genres": media["genres"],
-      "cover_image": media["coverImage"]["large"],
+      "coverimage": media["coverImage"]["large"],
       "communityscore": media["meanScore"],
       "criticscore": media["averageScore"],
       "status": media["status"],

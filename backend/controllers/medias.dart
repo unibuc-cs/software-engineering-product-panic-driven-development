@@ -31,13 +31,12 @@ RouterPlus mediasRouter() {
         "id",
       ]
     );
+
+    // TO DO: fix the releasedate format
     validateBody(body, fields:
       [
         "originalname",
         "description",
-        "releasedate",
-        "criticscore",
-        "communityscore",
         "mediatype",
       ]
     );

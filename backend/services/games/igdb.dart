@@ -401,14 +401,15 @@ class IGDB extends Provider {
       }
 
       var game = jsonDecode(response.body)[0];
-      game["name"] = utf8.decode(game["name"].runes.toList());
+      game["originalname"] = utf8.decode(game["name"].runes.toList());
+      game.remove("name");
 
       if (game["first_release_date"] != null) {
         // Turn the Unix timestamp into a DateTime object
         game["first_release_date"] = DateTime.fromMillisecondsSinceEpoch(game["first_release_date"] * 1000);
 
         // Add the year to the game name
-        game["name"] += " (${game['first_release_date'].year})";
+        game["originalname"] += " (${game['first_release_date'].year})";
 
         // Format the date as a string, removing the time
         game["releasedate"] = DateTime.parse(game["first_release_date"].toString().substring(0, 10));
@@ -438,7 +439,8 @@ class IGDB extends Provider {
 
       if (game["cover"] != null) {
         await _getCover(_accessToken, game);
-        game["cover"] = _cover;
+        game["coverimage"] = _cover;
+        game.remove("cover");
       }
 
       if (game["collections"] != null) {
@@ -464,7 +466,7 @@ class IGDB extends Provider {
 
       if (game["involved_companies"] != null) {
         await _getCompanies(_accessToken, game);
-        game["developers"] = _developers;
+        game["creators"] = _developers;
         game["publishers"] = _publishers;
         game.remove("involved_companies");
       }

@@ -6,13 +6,15 @@ import '../../lib/Services/book_service.dart';
 void main() async {
   Book dummyBook = Book(
     mediaId: 8,
-    originalLanguage: "english",
+    language: "english",
     totalPages: 100,
+    format: "paperback",
   );
   Book updatedDummyBook = Book(
     mediaId: 10,
-    originalLanguage: "english",
-    totalPages: 100,
+    language: "romanian",
+    totalPages: 10,
+    format: "hardcover",
   );
 
   await runService(

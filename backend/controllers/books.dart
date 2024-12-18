@@ -24,33 +24,27 @@ RouterPlus booksRouter() {
   });
 
   router.post('/', (Request req) async {
-    dynamic body = await req.body.asJson;
+    final body = await req.body.asJson;
+
     discardFromBody(body, fields:
       [
         "id",
       ]
     );
-    validateBody(body, fields:
+
+    body["mediatype"] = "book";
+    final specificBodies = splitBody(body, mediaType: "book");
+    
+    validateBody(specificBodies["bookBody"]!, fields:
       [
-        "mediaid",
-        "originallanguage",
+        "language",
         "totalpages",
+        "format",
       ]
     );
 
-    await _supabase
-      .from('media')
-      .select()
-      .eq('id', body["mediaid"])
-      .eq('mediatype', "book")
-      .single();
-
-    final book = await _supabase
-      .from('book')
-      .insert(body)
-      .select()
-      .single();
-    return sendCreated(book);
+    final result = await createFromBody(specificBodies, mediaType: "book");
+    return sendOk(result);
   });
 
   router.put('/<id>', (Request req, String id) async {
