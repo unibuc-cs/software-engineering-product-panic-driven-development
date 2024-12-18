@@ -1,11 +1,10 @@
 import '../Models/media_series.dart';
-import 'general/service_many_to_many.dart';
+import 'general/service.dart';
 
-class MediaSeriesService extends ServiceManyToMany<MediaSeries> {
-  MediaSeriesService()
-      : super(
-          resource: 'mediaseries',
-          fromJson: (json) => MediaSeries.from(json),
-          toJson  : (mediaSeries) => mediaSeries.toSupa(),
-        );
+class MediaSeriesService extends Service<MediaSeries> {
+  MediaSeriesService() : super(
+    resource: 'mediaseries',
+    fromJson: (json) => MediaSeries.from(json),
+    toJson  : (mediaSeries) => mediaSeries.toSupa(),
+  );
 }
