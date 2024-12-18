@@ -411,22 +411,23 @@ class IGDB extends Provider {
         game["name"] += " (${game['first_release_date'].year})";
 
         // Format the date as a string, removing the time
-        game["release_date"] = DateTime.parse(game["first_release_date"].toString().substring(0, 10));
+        game["releasedate"] = DateTime.parse(game["first_release_date"].toString().substring(0, 10));
 
         // Delete the 'first_release_date' key
         game.remove("first_release_date");
       }
 
       if (game["summary"] != null) {
-        game["summary"] = utf8.decode(game["summary"].runes.toList());
+        game["description"] = utf8.decode(game["summary"].runes.toList());
+        game.remove("summary");
       }
 
       if (game["aggregated_rating"] != null) {
-        game["critic_rating"] = (game["aggregated_rating"]).round();
+        game["criticscore"] = (game["aggregated_rating"]).round();
         game.remove("aggregated_rating");
       }
       else {
-        game["critic_rating"] = 0;
+        game["criticscore"] = 0;
         game.remove("aggregated_rating");
       }
 
@@ -442,16 +443,17 @@ class IGDB extends Provider {
 
       if (game["collections"] != null) {
         await _getCollections(_accessToken, game);
-        game["collections"] = _collections;
+        game["series"] = _collections;
+        game.remove("collections");
       }
 
       if (game["franchises"] != null) {
         await _getFranchises(_accessToken, game);
-        if (game["collections"] != null) {
-          game["collections"] += _franchises;
+        if (game["series"] != null) {
+          game["series"] += _franchises;
         }
         else {
-          game["collections"] = _franchises;
+          game["series"] = _franchises;
         }
       }
 
@@ -473,17 +475,18 @@ class IGDB extends Provider {
       }
 
       if (game["rating"] != null) {
-        game["user_rating"] = (game["rating"]).round();
+        game["communityscore"] = (game["rating"]).round();
         game.remove("rating");
       }
       else {
-        game["user_rating"] = 0;
+        game["communityscore"] = 0;
         game.remove("rating");
       }
 
       if (game["websites"] != null) {
         await _getWebsites(_accessToken, game);
-        game["websites"] = _websites;
+        game["links"] = _websites;
+        game.remove("websites");
       }
       return game;
     }

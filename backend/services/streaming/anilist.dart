@@ -140,15 +140,15 @@ class Anilist extends Provider {
       "id": media["id"],
       "name": _removeBadItems(media["title"]["english"] ?? media["title"]["romaji"]),
       "description": _removeBadItems(media["description"] ?? ""),
-      "release_date": DateTime.parse(
+      "releasedate": DateTime.parse(
         '${media["startDate"]["year"]}-'
         '${formatTwoDigits(media["startDate"]["month"] ?? 1)}-'
         '${formatTwoDigits(media["startDate"]["day"] ?? 1)}'
       ),
       "genres": media["genres"],
       "cover_image": media["coverImage"]["large"],
-      "user_rating": media["meanScore"],
-      "critic_rating": media["averageScore"],
+      "communityscore": media["meanScore"],
+      "criticscore": media["averageScore"],
       "status": media["status"],
       "links": media["externalLinks"].map((link) => link["url"]).toList()
     };

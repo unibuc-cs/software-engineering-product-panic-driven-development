@@ -122,16 +122,16 @@ class GoodReads extends Provider {
 
       return {
         "name": document.querySelector("h1.Text__title1")?.text.trim(),
-        "author": document.querySelector("span.ContributorLink__name")?.text.trim(),
-        "link": bookUrl,
-        "rating": document.querySelector("div.RatingStatistics__rating")?.text.trim(),
-        "release_date": DateFormat("yyyy-MM-dd").format(parsedDate),
+        "creators": document.querySelector("span.ContributorLink__name")?.text.trim(),
+        "links": bookUrl,
+        "communityscore": document.querySelector("div.RatingStatistics__rating")?.text.trim(),
+        "releasedate": DateFormat("yyyy-MM-dd").format(parsedDate),
         "description": document.querySelector("span.Formatted")?.text.trim(),
-        "pages": jsonData["numberOfPages"],
+        "totalpages": jsonData["numberOfPages"],
         "cover": jsonData["image"],
         "genres": genres,
         "book_format": jsonData["bookFormat"],
-        "language": jsonData["inLanguage"],
+        "originallanguage": jsonData["inLanguage"],
         "series": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
         "series_books": await instance._getBooksFromSeries(seriesElement?.querySelector("a")?.attributes['href'] ?? "")
       };

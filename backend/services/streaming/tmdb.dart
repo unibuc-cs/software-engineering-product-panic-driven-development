@@ -83,14 +83,14 @@ class Tmdb extends Provider {
     return {
       "name": media[_mediaType == "movie" ? "title" : "name"],
       "description": media["overview"],
-      "language": media["original_language"],
-      "artwork": media["backdrop_path"],
+      "originallanguage": media["original_language"],
+      "artworks": media["backdrop_path"],
       "cover": media["poster_path"],
-      "producers": media["production_companies"].map((dynamic producer) {
+      "creators": media["production_companies"].map((dynamic producer) {
         return producer["name"];
       }).toList(),
       "status": media["status"],
-      "community_rating": media["vote_average"]
+      "communityscore": media["vote_average"]
     };
   }
 
@@ -107,8 +107,8 @@ class Tmdb extends Provider {
 
       return {
         ..._sharedInfo(movie),
-        "collection": (movie["belongs_to_collection"] as Map<String, dynamic>?)?["name"] ?? null,
-        "release_date": movie["release_date"],
+        "series": (movie["belongs_to_collection"] as Map<String, dynamic>?)?["name"] ?? null,
+        "releasedate": movie["release_date"],
         "duration": movie["runtime"]
       };
     }
