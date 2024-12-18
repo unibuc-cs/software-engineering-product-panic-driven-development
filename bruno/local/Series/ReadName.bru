@@ -1,0 +1,15 @@
+meta {
+  name: ReadName
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3007/api/series/name?query=dummy
+  body: none
+  auth: none
+}
+
+params:query {
+  query: dummy
+}

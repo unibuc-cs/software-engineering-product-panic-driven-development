@@ -1,0 +1,19 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3007/api/mediaseries/1/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 1,
+    "seriesid": 4,
+    "index": 4
+  }
+}

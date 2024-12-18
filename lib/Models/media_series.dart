@@ -2,8 +2,9 @@ class MediaSeries {
   // Data
   int mediaId;
   int seriesId;
+  int index;
 
-  MediaSeries({required this.mediaId, required this.seriesId});
+  MediaSeries({required this.mediaId, required this.seriesId, required this.index});
 
   @override
   bool operator ==(Object other) {
@@ -20,6 +21,7 @@ class MediaSeries {
     return {
       "mediaid": mediaId,
       "seriesid": seriesId,
+      "index": index,
     };
   }
 
@@ -27,6 +29,7 @@ class MediaSeries {
     return MediaSeries(
       mediaId: json["mediaid"],
       seriesId: json["seriesid"],
+      index: json["index"],
     );
   }
 }

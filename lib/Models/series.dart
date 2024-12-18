@@ -2,9 +2,8 @@ class Series {
   // Data
   int id;
   String name;
-  String index;
 
-  Series({this.id = -1, required this.name, required this.index});
+  Series({this.id = -1, required this.name});
 
   @override
   bool operator ==(Object other) {
@@ -20,7 +19,6 @@ class Series {
   Map<String, dynamic> toSupa() {
     return {
       "name": name,
-      "index": index,
     };
   }
 
@@ -28,7 +26,6 @@ class Series {
     return Series(
       id: json["id"],
       name: json["name"],
-      index: json["index"],
     );
   }
 }

@@ -130,7 +130,7 @@ class GoodReads extends Provider {
         "totalpages": jsonData["numberOfPages"],
         "cover": jsonData["image"],
         "genres": genres,
-        "book_format": jsonData["bookFormat"],
+        "format": jsonData["bookFormat"],
         "originallanguage": jsonData["inLanguage"],
         "series": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
         "series_books": await instance._getBooksFromSeries(seriesElement?.querySelector("a")?.attributes['href'] ?? "")
