@@ -4,12 +4,12 @@ class TVSeries extends MediaType {
   // Data
   int mediaId;
   int id;
-  String originalLanguage;
+  String language;
 
   TVSeries({
     this.id = -1,
     required this.mediaId,
-    required this.originalLanguage,
+    required this.language,
   });
 
   @override
@@ -31,7 +31,7 @@ class TVSeries extends MediaType {
   Map<String, dynamic> toSupa() {
     return {
       "mediaid": mediaId,
-      "originallanguage": originalLanguage,
+      "language": language,
     };
   }
 
@@ -39,7 +39,7 @@ class TVSeries extends MediaType {
     return TVSeries(
       id: json["id"],
       mediaId: json["mediaid"],
-      originalLanguage: json["originallanguage"],
+      language: json["language"],
     );
   }
 }

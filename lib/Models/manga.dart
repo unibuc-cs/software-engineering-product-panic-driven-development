@@ -4,13 +4,13 @@ class Manga extends MediaType {
   // Data
   int mediaId;
   int id;
-  String originalLanguage;
+  String language;
   int totalPages;
 
   Manga({
     this.id = -1,
     required this.mediaId,
-    required this.originalLanguage,
+    required this.language,
     required this.totalPages,
   });
 
@@ -33,7 +33,7 @@ class Manga extends MediaType {
   Map<String, dynamic> toSupa() {
     return {
       "mediaid": mediaId,
-      "originallanguage": originalLanguage,
+      "language": language,
       "totalpages": totalPages,
     };
   }
@@ -42,7 +42,7 @@ class Manga extends MediaType {
     return Manga(
       id: json["id"],
       mediaId: json["mediaid"],
-      originalLanguage: json["originallanguage"],
+      language: json["language"],
       totalPages: json["totalpages"],
     );
   }

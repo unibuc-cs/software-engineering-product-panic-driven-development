@@ -4,13 +4,13 @@ class Movie extends MediaType {
   // Data
   int mediaId;
   int id;
-  String originalLanguage;
+  String language;
   int durationInSeconds;
 
   Movie({
     this.id = -1,
     required this.mediaId,
-    required this.originalLanguage,
+    required this.language,
     required this.durationInSeconds,
   });
 
@@ -33,7 +33,7 @@ class Movie extends MediaType {
   Map<String, dynamic> toSupa() {
     return {
       "mediaid": mediaId,
-      "originallanguage": originalLanguage,
+      "language": language,
       "durationinseconds": durationInSeconds,
     };
   }
@@ -42,7 +42,7 @@ class Movie extends MediaType {
     return Movie(
       id: json["id"],
       mediaId: json["mediaid"],
-      originalLanguage: json["originallanguage"],
+      language: json["language"],
       durationInSeconds: json["durationinseconds"],
     );
   }
