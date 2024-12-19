@@ -43,6 +43,9 @@ String colored(dynamic message, String color) {
   else if (color == "blue") {
     pen = pen..xterm(45);
   }
+  else if (color == "grey") {
+    pen = pen..xterm(237);
+  }
   else {
     pen..reset();
   }
@@ -52,6 +55,7 @@ String colored(dynamic message, String color) {
 String redColored(message) => colored(message, "red");
 String greenColored(message) => colored(message, "green");
 String blueColored(message) => colored(message, "blue");
+String greyColored(message) => colored(message, "grey");
 
 void startupLog(address, port) {
   print('${blueColored('[STARTED]')} Listening at http://$address:$port');

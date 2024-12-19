@@ -1,21 +1,19 @@
 import 'request.dart';
+import '../../Models/model.dart';
 
-class Service<T> {
+class Service<T extends Model> {
   final String resource;
-  final T Function(dynamic) fromJson;
-  final Map<String, dynamic> Function(T) toJson;
+  late final T Function(dynamic) fromJson;
 
-  Service({
-    required this.resource,
-    required this.fromJson,
-    required this.toJson,
-  });
+  Service(this.resource, fromJson) {
+    this.fromJson = (json) => fromJson(json);
+  }
 
   Future<T> create(dynamic model) async {
     Map<String, dynamic> body;
 
     if (model is T) {
-      body = toJson(model);
+      body = model.toJson();
     }
     else if (model is Map<String, dynamic>) {
       body = model;
@@ -55,7 +53,7 @@ class Service<T> {
   Future<T> update(List<int> ids, T model) async {
     return await putRequest<T>(
       endpoint: '/$resource/${ids.join('/')}',
-      body    : toJson(model),
+      body    : model.toJson(),
       fromJson: fromJson,
     );
   }

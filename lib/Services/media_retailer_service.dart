@@ -1,10 +1,6 @@
-import '../Models/media_retailer.dart';
 import 'general/service.dart';
+import '../Models/media_retailer.dart';
 
 class MediaRetailerService extends Service<MediaRetailer> {
-  MediaRetailerService() : super(
-    resource: 'mediaretailers',
-    fromJson: (json) => MediaRetailer.from(json),
-    toJson  : (mediaRetailer) => mediaRetailer.toJson(),
-  );
+  MediaRetailerService() : super(MediaRetailer.endpoint, MediaRetailer.from);
 }

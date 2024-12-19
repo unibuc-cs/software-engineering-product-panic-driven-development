@@ -28,6 +28,7 @@ Future<T> request<T>({
   else if (methodUpper == 'DELETE') {
     response = await axios.delete(endpoint);
     errMsg = 'Failed to delete data at $endpoint: ${response.statusCode}';
+    return Future.value(null);
   }
   else {
     throw UnsupportedError('HTTP method $method is not supported');
@@ -36,21 +37,7 @@ Future<T> request<T>({
   if (response.statusCode < 200 || response.statusCode > 299) {
     throw Exception(errMsg);
   }
-  if (methodUpper == 'DELETE') {
-    return fromJson(null);
-  }
   return fromJson(jsonDecode(response.body));
-}
-
-Future<T> getRequest<T>({
-  required String endpoint,
-  required T Function(dynamic) fromJson,
-}) async {
-  return await request<T>(
-    method: 'GET',
-    endpoint: endpoint,
-    fromJson: fromJson,
-  );
 }
 
 Future<T> postRequest<T>({
@@ -62,6 +49,17 @@ Future<T> postRequest<T>({
     method: 'POST',
     endpoint: endpoint,
     body: body,
+    fromJson: fromJson,
+  );
+}
+
+Future<T> getRequest<T>({
+  required String endpoint,
+  required T Function(dynamic) fromJson,
+}) async {
+  return await request<T>(
+    method: 'GET',
+    endpoint: endpoint,
     fromJson: fromJson,
   );
 }
@@ -85,6 +83,6 @@ Future<void> deleteRequest({
   await request<void>(
     method: 'DELETE',
     endpoint: endpoint,
-    fromJson: (_) {},
+    fromJson: (_) => null,
   );
 }

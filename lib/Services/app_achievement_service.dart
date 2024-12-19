@@ -1,10 +1,6 @@
-import '../Models/app_achievement.dart';
 import 'general/service.dart';
+import '../Models/app_achievement.dart';
 
 class AppAchievementService extends Service<AppAchievement> {
-  AppAchievementService() : super(
-    resource: 'appachievements',
-    fromJson: (json) => AppAchievement.from(json),
-    toJson  : (appAchievement) => appAchievement.toJson(),
-  );
+  AppAchievementService() : super(AppAchievement.endpoint, AppAchievement.from);
 }
