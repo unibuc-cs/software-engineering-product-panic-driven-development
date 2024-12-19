@@ -5,7 +5,12 @@ class Creator implements Model {
   int id;
   String name;
 
-  Creator({this.id = -1, required this.name});
+  Creator({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'creators';
 
   @override
   bool operator ==(Object other) {

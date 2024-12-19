@@ -50,6 +50,8 @@ class Game extends MediaType implements Model {
     this.HLTBVersusInSeconds = -1,
   });
 
+  static String get endpoint => 'games';
+
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {

@@ -15,6 +15,8 @@ class Movie extends MediaType implements Model {
     required this.durationInSeconds,
   });
 
+  static String get endpoint => 'movies';
+
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {

@@ -5,7 +5,12 @@ class Genre implements Model {
   int id;
   String name;
 
-  Genre({this.id = -1, required this.name});
+  Genre({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'genres';
 
   @override
   bool operator ==(Object other) {

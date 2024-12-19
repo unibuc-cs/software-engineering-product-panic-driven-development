@@ -9,11 +9,14 @@ class Note implements Model {
   DateTime creationDate = DateTime.now();
   DateTime modifiedDate = DateTime.now();
 
-  Note(
-      {this.id = -1,
-      required this.mediaId,
-      required this.userId,
-      required this.content});
+  Note({
+    this.id = -1,
+    required this.mediaId,
+    required this.userId,
+    required this.content
+  });
+
+  static String get endpoint => 'notes';
 
   @override
   bool operator ==(Object other) {

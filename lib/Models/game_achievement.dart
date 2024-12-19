@@ -7,11 +7,14 @@ class GameAchievement implements Model {
   String name;
   String description;
 
-  GameAchievement(
-      {this.id = -1,
-      required this.gameId,
-      required this.name,
-      required this.description});
+  GameAchievement({
+    this.id = -1,
+    required this.gameId,
+    required this.name,
+    required this.description
+  });
+
+  static String get endpoint => 'gameachievements';
 
   @override
   bool operator ==(Object other) {

@@ -1,6 +1,6 @@
 import 'model.dart';
 
-class Media {
+class Media implements Model {
   // Data
   int id;
   String originalName;
@@ -10,14 +10,17 @@ class Media {
   int communityScore;
   String mediaType;
 
-  Media(
-      {this.id = -1,
-      required this.originalName,
-      required this.description,
-      required this.releaseDate,
-      required this.criticScore,
-      required this.communityScore,
-      required this.mediaType});
+  Media({
+    this.id = -1,
+    required this.originalName,
+    required this.description,
+    required this.releaseDate,
+    required this.criticScore,
+    required this.communityScore,
+    required this.mediaType
+  });
+
+  static String get endpoint => 'medias';
 
   @override
   bool operator ==(Object other) {

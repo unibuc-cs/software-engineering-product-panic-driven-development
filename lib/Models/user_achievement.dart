@@ -6,10 +6,13 @@ class UserAchievement implements Model {
   int achievementId;
   DateTime unlockDate;
 
-  UserAchievement(
-      {required this.userId,
-      required this.achievementId,
-      required this.unlockDate});
+  UserAchievement({
+    required this.userId,
+    required this.achievementId,
+    required this.unlockDate
+  });
+
+  static String get endpoint => 'usersachievements';
 
   @override
   bool operator ==(Object other) {

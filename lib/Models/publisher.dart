@@ -5,7 +5,12 @@ class Publisher implements Model {
   int id;
   String name;
 
-  Publisher({this.id = -1, required this.name});
+  Publisher({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'publishers';
 
   @override
   bool operator ==(Object other) {

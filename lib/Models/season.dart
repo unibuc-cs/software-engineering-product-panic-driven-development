@@ -14,6 +14,8 @@ class Season implements Model {
     required this.coverImage,
   });
 
+  static String get endpoint => 'seasons';
+
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {

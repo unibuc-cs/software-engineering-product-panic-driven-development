@@ -16,20 +16,23 @@ class MediaUser implements Model {
   int gameTime;
   int bookReadPages;
 
-  MediaUser(
-      {required this.mediaId,
-      required this.userId,
-      required this.name,
-      required this.userScore,
-      required this.addedDate,
-      required this.coverImage,
-      required this.status,
-      required this.series,
-      required this.icon,
-      required this.backgroundImage,
-      required this.lastInteracted,
-      this.gameTime = 0,
-      this.bookReadPages = 0});
+  MediaUser({
+    required this.mediaId,
+    required this.userId,
+    required this.name,
+    required this.userScore,
+    required this.addedDate,
+    required this.coverImage,
+    required this.status,
+    required this.series,
+    required this.icon,
+    required this.backgroundImage,
+    required this.lastInteracted,
+    this.gameTime = 0,
+    this.bookReadPages = 0
+  });
+
+  static String get endpoint => 'mediausers';
 
   @override
   bool operator ==(Object other) {

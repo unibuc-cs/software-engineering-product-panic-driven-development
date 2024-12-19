@@ -15,6 +15,8 @@ class Manga extends MediaType implements Model {
     required this.totalPages,
   });
 
+  static String get endpoint => 'manga';
+
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {

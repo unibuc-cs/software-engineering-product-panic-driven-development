@@ -17,6 +17,8 @@ class Book extends MediaType implements Model {
     required this.format,
   });
 
+  static String get endpoint => 'books';
+
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {

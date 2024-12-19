@@ -5,7 +5,12 @@ class MediaPublisher implements Model {
   int mediaId;
   int publisherId;
 
-  MediaPublisher({required this.mediaId, required this.publisherId});
+  MediaPublisher({
+    required this.mediaId,
+    required this.publisherId
+  });
+
+  static String get endpoint => 'mediapublishers';
 
   @override
   bool operator ==(Object other) {

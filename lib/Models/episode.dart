@@ -17,6 +17,8 @@ class Episode extends MediaType implements Model {
     required this.durationInSeconds,
   });
 
+  static String get endpoint => 'episodes';
+
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {

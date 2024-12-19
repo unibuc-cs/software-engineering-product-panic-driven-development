@@ -5,7 +5,12 @@ class Tag implements Model {
   int id;
   String name;
 
-  Tag({this.id = -1, required this.name});
+  Tag({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'tags';
 
   @override
   bool operator ==(Object other) {

@@ -5,7 +5,12 @@ class MediaRetailer implements Model {
   int mediaId;
   int retailerId;
 
-  MediaRetailer({required this.mediaId, required this.retailerId});
+  MediaRetailer({
+    required this.mediaId,
+    required this.retailerId
+  });
+
+  static String get endpoint => 'mediaretailers';
 
   @override
   bool operator ==(Object other) {

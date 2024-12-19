@@ -13,6 +13,8 @@ class Anime extends MediaType implements Model {
     required this.language,
   });
 
+  static String get endpoint => 'anime';
+
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {

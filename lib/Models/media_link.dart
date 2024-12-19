@@ -5,7 +5,12 @@ class MediaLink implements Model {
   int mediaId;
   int linkId;
 
-  MediaLink({required this.mediaId, required this.linkId});
+  MediaLink({
+    required this.mediaId,
+    required this.linkId
+  });
+
+  static String get endpoint => 'medialinks';
 
   @override
   bool operator ==(Object other) {

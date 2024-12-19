@@ -6,8 +6,14 @@ class MediaUserGenre implements Model {
   int userId;
   int genreId;
 
-  MediaUserGenre(
-      {required this.mediaId, required this.userId, required this.genreId});
+  MediaUserGenre({
+    required
+    this.mediaId,
+    required this.userId,
+    required this.genreId
+  });
+
+  static String get endpoint => 'mediausergenres';
 
   @override
   bool operator ==(Object other) {

@@ -6,7 +6,13 @@ class Link implements Model {
   String name;
   String href;
 
-  Link({this.id = -1, required this.name, required this.href});
+  Link({
+    this.id = -1,
+    required this.name,
+    required this.href
+  });
+
+  static String get endpoint => 'links';
 
   @override
   bool operator ==(Object other) {

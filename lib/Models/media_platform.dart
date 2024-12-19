@@ -5,7 +5,12 @@ class MediaPlatform implements Model {
   int mediaId;
   int platformId;
 
-  MediaPlatform({required this.mediaId, required this.platformId});
+  MediaPlatform({
+    required this.mediaId,
+    required this.platformId
+  });
+
+  static String get endpoint => 'mediaplatforms';
 
   @override
   bool operator ==(Object other) {

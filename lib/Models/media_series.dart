@@ -6,7 +6,13 @@ class MediaSeries implements Model {
   int seriesId;
   int index;
 
-  MediaSeries({required this.mediaId, required this.seriesId, required this.index});
+  MediaSeries({
+    required this.mediaId,
+    required this.seriesId,
+    required this.index
+  });
+
+  static String get endpoint => 'mediaseries';
 
   @override
   bool operator ==(Object other) {

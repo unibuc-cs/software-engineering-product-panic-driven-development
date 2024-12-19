@@ -5,7 +5,12 @@ class MediaCreator implements Model {
   int mediaId;
   int creatorId;
 
-  MediaCreator({required this.mediaId, required this.creatorId});
+  MediaCreator({
+    required this.mediaId,
+    required this.creatorId
+  });
+
+  static String get endpoint => 'mediacreators';
 
   @override
   bool operator ==(Object other) {

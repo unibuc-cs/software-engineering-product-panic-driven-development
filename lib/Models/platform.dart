@@ -5,7 +5,12 @@ class Platform implements Model {
   int id;
   String name;
 
-  Platform({this.id = -1, required this.name});
+  Platform({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'platforms';
 
   @override
   bool operator ==(Object other) {

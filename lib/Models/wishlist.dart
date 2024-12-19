@@ -14,18 +14,21 @@ class Wishlist implements Model {
   String backgroundImage;
   DateTime lastInteracted;
 
-  Wishlist(
-      {required this.mediaId,
-      required this.userId,
-      required this.name,
-      required this.userScore,
-      required this.addedDate,
-      required this.coverImage,
-      required this.status,
-      required this.series,
-      required this.icon,
-      required this.backgroundImage,
-      required this.lastInteracted});
+  Wishlist({
+    required this.mediaId,
+    required this.userId,
+    required this.name,
+    required this.userScore,
+    required this.addedDate,
+    required this.coverImage,
+    required this.status,
+    required this.series,
+    required this.icon,
+    required this.backgroundImage,
+    required this.lastInteracted
+  });
+
+  static String get endpoint => 'wishlists';
 
   @override
   bool operator ==(Object other) {

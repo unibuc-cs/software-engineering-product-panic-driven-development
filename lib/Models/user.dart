@@ -5,9 +5,12 @@ class User implements Model {
   int id;
   int idAuth;
 
-  User(
-      {this.id = -1,
-      this.idAuth = -1});
+  User({
+    this.id = -1,
+    this.idAuth = -1
+  });
+
+  static String get endpoint => 'users';
 
   @override
   bool operator ==(Object other) {

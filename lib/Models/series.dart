@@ -5,7 +5,12 @@ class Series implements Model {
   int id;
   String name;
 
-  Series({this.id = -1, required this.name});
+  Series({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'series';
 
   @override
   bool operator ==(Object other) {

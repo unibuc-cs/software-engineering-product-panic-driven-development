@@ -7,11 +7,14 @@ class AppAchievement implements Model {
   String description;
   int xp;
 
-  AppAchievement(
-      {this.id = -1,
-      required this.name,
-      required this.description,
-      this.xp = 100});
+  AppAchievement({
+    this.id = -1,
+    required this.name,
+    required this.description,
+    this.xp = 100
+  });
+
+  static String get endpoint => 'appachievements';
 
   @override
   bool operator ==(Object other) {

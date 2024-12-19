@@ -5,7 +5,12 @@ class Retailer implements Model {
   int id;
   String name;
 
-  Retailer({this.id = -1, required this.name});
+  Retailer({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'retailers';
 
   @override
   bool operator ==(Object other) {

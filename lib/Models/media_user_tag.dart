@@ -6,8 +6,13 @@ class MediaUserTag implements Model {
   int userId;
   int tagId;
 
-  MediaUserTag(
-      {required this.mediaId, required this.userId, required this.tagId});
+  MediaUserTag({
+    required this.mediaId,
+    required this.userId,
+    required this.tagId
+  });
+
+  static String get endpoint => 'mediausertags';
 
   @override
   bool operator ==(Object other) {
