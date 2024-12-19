@@ -5,6 +5,6 @@ class MediaRetailerService extends Service<MediaRetailer> {
   MediaRetailerService() : super(
     resource: 'mediaretailers',
     fromJson: (json) => MediaRetailer.from(json),
-    toJson  : (mediaRetailer) => mediaRetailer.toSupa(),
+    toJson  : (mediaRetailer) => mediaRetailer.toJson(),
   );
 }

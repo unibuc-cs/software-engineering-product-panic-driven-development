@@ -6,7 +6,7 @@ import '../../lib/Services/media_series_service.dart';
 
 void main() async {
   Map<String, dynamic> series = {
-    'name': 'Harry Potter'
+    'name': 'Assassin\'s creed' 
   };
   MediaSeries dummy = MediaSeries(
     mediaId : 1,
@@ -21,6 +21,6 @@ void main() async {
     service  : MediaSeriesService(),
     dummyItem: dummy,
     tables   : ["media", "series"],
-    toJson   : (mediaSeries) => mediaSeries.toSupa(),
+    toJson   : (mediaSeries) => mediaSeries.toJson(),
   );
 }

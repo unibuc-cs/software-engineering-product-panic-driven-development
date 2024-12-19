@@ -5,6 +5,6 @@ class TagService extends Service<Tag> {
   TagService() : super(
     resource: 'tags',
     fromJson: (json) => Tag.from(json),
-    toJson: (tag) => tag.toSupa(),
+    toJson: (tag) => tag.toJson(),
   );
 }

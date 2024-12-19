@@ -25,6 +25,6 @@ void main() async {
     service    : MediaService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (media) => media.toSupa(),
+    toJson     : (media) => media.toJson(),
   );
 }

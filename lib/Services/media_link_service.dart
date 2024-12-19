@@ -5,6 +5,6 @@ class MediaLinkService extends Service<MediaLink> {
   MediaLinkService() : super(
     resource: 'medialinks',
     fromJson: (json) => MediaLink.from(json),
-    toJson  : (mediaLink) => mediaLink.toSupa(),
+    toJson  : (mediaLink) => mediaLink.toJson(),
   );
 }

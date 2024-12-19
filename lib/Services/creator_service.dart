@@ -5,6 +5,6 @@ class CreatorService extends Service<Creator> {
   CreatorService() : super(
     resource: 'creators',
     fromJson: (json) => Creator.from(json),
-    toJson  : (creator) => creator.toSupa(),
+    toJson  : (creator) => creator.toJson(),
   );
 }

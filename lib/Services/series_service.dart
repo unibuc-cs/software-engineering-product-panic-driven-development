@@ -5,6 +5,6 @@ class SeriesService extends Service<Series> {
   SeriesService() : super(
     resource: 'series',
     fromJson: (json) => Series.from(json),
-    toJson  : (series) => series.toSupa(),
+    toJson  : (series) => series.toJson(),
   );
 }

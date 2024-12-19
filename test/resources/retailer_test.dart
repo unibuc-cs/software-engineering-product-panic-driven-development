@@ -15,6 +15,6 @@ void main() async {
     service    : RetailerService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (retailer) => retailer.toSupa(),
+    toJson     : (retailer) => retailer.toJson(),
   );
 }

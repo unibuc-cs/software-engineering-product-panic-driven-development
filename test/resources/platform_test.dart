@@ -15,7 +15,7 @@ void main() async {
     service    : PlatformService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    itemName   : "PS4",
-    toJson     : (platform) => platform.toSupa(),
+    itemName   : dummy.name,
+    toJson     : (platform) => platform.toJson(),
   );
 }

@@ -16,6 +16,7 @@ dependencies:
   hive            : ^2.2.3
   pair            : ^0.1.2
   intl            : ^0.19.0
+  path            : ^1.9.0
   shelf           : ^1.4.1
   dotenv          : ^4.2.0
   numerus         : ^2.3.0
@@ -67,6 +68,7 @@ scripts:
   test:goodreads     : dart --define=LOCAL=true test/providers/goodreads_test.dart
   test:tmdb          : dart --define=LOCAL=true test/providers/tmdb_test.dart
   test:anilist       : dart --define=LOCAL=true test/providers/anilist_test.dart
+  test:providers     : dart test/providers/providers_test.dart
   test:appachievement: dart --define=LOCAL=true test/resources/app_achievement_test.dart
   test:book          : dart --define=LOCAL=true test/resources/book_test.dart
   test:creator       : dart --define=LOCAL=true test/resources/creator_test.dart
@@ -84,3 +86,4 @@ scripts:
   test:retailer      : dart --define=LOCAL=true test/resources/retailer_test.dart
   test:series        : dart --define=LOCAL=true test/resources/series_test.dart
   test:tag           : dart --define=LOCAL=true test/resources/tag_test.dart
+  test:resources     : dart test/resources/resources_test.dart

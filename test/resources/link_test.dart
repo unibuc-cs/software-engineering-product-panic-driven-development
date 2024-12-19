@@ -17,7 +17,7 @@ void main() async {
     service    : LinkService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    itemName   : "test",
-    toJson     : (link) => link.toSupa(),
+    itemName   : dummy.name,
+    toJson     : (link) => link.toJson(),
   );
 }

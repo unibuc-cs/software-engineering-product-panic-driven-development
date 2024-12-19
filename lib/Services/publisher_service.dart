@@ -5,7 +5,7 @@ class PublisherService extends Service<Publisher> {
   PublisherService() : super(
     resource: 'publishers',
     fromJson: (json) => Publisher.from(json),
-    toJson  : (publisher) => publisher.toSupa(),
+    toJson  : (publisher) => publisher.toJson(),
   );
 }
 

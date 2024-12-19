@@ -15,7 +15,7 @@ void main() async {
     service    : SeriesService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    itemName   : "Red rising",
-    toJson     : (series) => series.toSupa(),
+    itemName   : dummy.name,
+    toJson     : (series) => series.toJson(),
   );
 }

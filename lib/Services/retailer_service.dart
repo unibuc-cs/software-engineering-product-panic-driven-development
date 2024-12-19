@@ -5,7 +5,7 @@ class RetailerService extends Service<Retailer> {
   RetailerService() : super(
     resource: 'retailers',
     fromJson: (json) => Retailer.from(json),
-    toJson  : (retailer) => retailer.toSupa(),
+    toJson  : (retailer) => retailer.toJson(),
   );
 }
 

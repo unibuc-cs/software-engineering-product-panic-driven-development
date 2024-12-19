@@ -5,6 +5,6 @@ class MediaService extends Service<Media> {
   MediaService() : super(
     resource: 'medias',
     fromJson: (json) => Media.from(json),
-    toJson  : (media) => media.toSupa(),
+    toJson  : (media) => media.toJson(),
   );
 }

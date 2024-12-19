@@ -21,6 +21,6 @@ void main() async {
     service    : BookService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (book) => book.toSupa(),
+    toJson     : (book) => book.toJson(),
   );
 }

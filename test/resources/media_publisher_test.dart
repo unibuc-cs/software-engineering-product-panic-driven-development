@@ -20,6 +20,6 @@ void main() async {
     service  : MediaPublisherService(),
     dummyItem: dummy,
     tables   : ["media", "publisher"],
-    toJson   : (mediaPlatform) => mediaPlatform.toSupa(),
+    toJson   : (mediaPlatform) => mediaPlatform.toJson(),
   );
 }

@@ -32,10 +32,10 @@ void main() {
         'link': 'https://www.goodreads.com/book/show/42844155-harry-potter-and-the-sorcerer-s-stone?from_search=true&from_srp=true&qid=q78uVI5JCT&rank=1'
       });
       expect(book_info, isNotNull);
-      expect(book_info['author'], 'J.K. Rowling');
-      expect(book_info['release_date'], '1997-06-26');
-      expect(book_info['series'][0], contains('Harry Potter'));
-      expect(book_info['pages'], 333);
+      expect(book_info['creators'][0], 'J.K. Rowling');
+      expect(book_info['releasedate'], '1997-06-26');
+      expect(book_info['seriesname'][0], contains('Harry Potter'));
+      expect(book_info['totalpages'], 333);
     });
   });
 }

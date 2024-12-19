@@ -1,7 +1,8 @@
 import 'dart:core';
-import '../../lib/Services/general/service.dart';
+import '../../lib/models/model.dart';
+import '../../lib/services/general/service.dart';
 
-Future<int> getValidId<T>({
+Future<int> getValidId<T extends Model>({
   required Service<T> service,
   required Map<String, dynamic> backup
 }) async {

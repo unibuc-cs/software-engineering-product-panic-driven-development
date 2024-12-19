@@ -20,6 +20,6 @@ void main() async {
     service  : MediaRetailerService(),
     dummyItem: dummy,
     tables   : ["media", "retailer"],
-    toJson   : (mediaRetailer) => mediaRetailer.toSupa(),
+    toJson   : (mediaRetailer) => mediaRetailer.toJson(),
   );
 }

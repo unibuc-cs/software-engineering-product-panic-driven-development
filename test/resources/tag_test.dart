@@ -15,6 +15,6 @@ void main() async {
     service    : TagService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (tag) => tag.toSupa(),
+    toJson     : (tag) => tag.toJson(),
   );
 }

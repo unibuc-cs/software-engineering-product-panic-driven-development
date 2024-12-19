@@ -32,9 +32,9 @@ void main() {
           'id': 16498
         });
         expect(anime_info, isNotNull);
-        expect(anime_info['name'], contains('Attack on Titan'));
+        expect(anime_info['originalname'], contains('Attack on Titan'));
         expect(anime_info['episodes'], 25);
-        expect(anime_info['release_date'], contains('2013-04-07'));
+        expect(anime_info['releasedate'], contains('2013-04-07'));
         expect(anime_info['genres'][0], contains('Action'));
       });
     });
@@ -68,8 +68,8 @@ void main() {
           'id': 132182
         });
         expect(manga_info, isNotNull);
-        expect(manga_info['name'], contains('Blue Box'));
-        expect(manga_info['release_date'], contains('2021-04-12'));
+        expect(manga_info['originalname'], contains('Blue Box'));
+        expect(manga_info['releasedate'], contains('2021-04-12'));
         expect(manga_info['genres'][0], contains('Romance'));
       });
     });

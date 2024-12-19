@@ -20,6 +20,6 @@ void main() async {
     service  : MediaPlatformService(),
     dummyItem: dummy,
     tables   : ["media", "platform"],
-    toJson   : (mediaPlatform) => mediaPlatform.toSupa(),
+    toJson   : (mediaPlatform) => mediaPlatform.toJson(),
   );
 }

@@ -5,6 +5,6 @@ class LinkService extends Service<Link> {
   LinkService() : super(
     resource: 'links',
     fromJson: (json) => Link.from(json),
-    toJson  : (link) => link.toSupa(),
+    toJson  : (link) => link.toJson(),
   );
 }

@@ -15,7 +15,7 @@ void main() async {
     service    : PublisherService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    itemName   : "Team",
-    toJson     : (publisher) => publisher.toSupa(),
+    itemName   : dummy.name,
+    toJson     : (publisher) => publisher.toJson(),
   );
 }

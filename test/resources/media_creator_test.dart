@@ -20,6 +20,6 @@ void main() async {
     service   : MediaCreatorService(),
     dummyItem : dummy,
     tables    : ["media", "creator"],
-    toJson    : (link) => link.toSupa(),
+    toJson    : (link) => link.toJson(),
   );
 }

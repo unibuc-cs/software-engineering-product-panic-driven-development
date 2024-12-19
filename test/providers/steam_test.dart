@@ -47,7 +47,7 @@ Map<String, dynamic> getBestMatch(String gameName, List<Map<String, dynamic>> ga
 }
 
 final users = {
-  "SKT_Blackspell13": "76561199067194369",
+  // "SKT_Blackspell13": "76561199067194369",
   "The-Winner": "76561198840472293",
   "giulian62": "76561198335146669"
 };

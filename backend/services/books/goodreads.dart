@@ -132,7 +132,7 @@ class GoodReads extends Provider {
         "genres": genres,
         "format": jsonData["bookFormat"],
         "language": jsonData["inLanguage"],
-        "series_name": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
+        "seriesname": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
         "series": await instance._getBooksFromSeries(seriesElement?.querySelector("a")?.attributes['href'] ?? "")
       };
     }

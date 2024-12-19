@@ -15,7 +15,7 @@ void main() async {
     service    : CreatorService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    itemName   : "Team",
-    toJson     : (creator) => creator.toSupa(),
+    itemName   : dummy.name,
+    toJson     : (creator) => creator.toJson(),
   );
 }

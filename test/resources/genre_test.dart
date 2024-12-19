@@ -15,6 +15,6 @@ void main() async {
     service    : GenreService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (genre) => genre.toSupa(),
+    toJson     : (genre) => genre.toJson(),
   );
 }

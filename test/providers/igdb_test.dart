@@ -30,10 +30,10 @@ void main() {
         'id': 14593
       });
       expect(game_info, isNotNull);
-      expect(game_info['name'], contains('Hollow Knight'));
+      expect(game_info['originalname'], contains('Hollow Knight'));
       expect(game_info['url'], 'https://www.igdb.com/games/hollow-knight');
-      expect(game_info['developers'], contains('Team Cherry'));
-      expect(game_info['publishers'], contains('Team Cherry'));
+      expect(game_info['creators'][0], contains('Team Cherry'));
+      expect(game_info['publishers'][0], contains('Team Cherry'));
     });
   });
 }

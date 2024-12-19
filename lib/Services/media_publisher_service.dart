@@ -5,6 +5,6 @@ class MediaPublisherService extends Service<MediaPublisher> {
   MediaPublisherService() : super(
     resource: 'mediapublishers',
     fromJson: (json) => MediaPublisher.from(json),
-    toJson  : (mediaPublisher) => mediaPublisher.toSupa(),
+    toJson  : (mediaPublisher) => mediaPublisher.toJson(),
   );
 }

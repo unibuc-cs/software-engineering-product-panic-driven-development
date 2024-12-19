@@ -19,6 +19,6 @@ void main() async {
     service    : AppAchievementService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (appAchievement) => appAchievement.toSupa(),
+    toJson     : (appAchievement) => appAchievement.toJson(),
   );
 }

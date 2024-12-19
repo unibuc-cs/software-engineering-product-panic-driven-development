@@ -21,6 +21,6 @@ void main() async {
     service  : MediaLinkService(),
     dummyItem: dummy,
     tables   : ["media", "link"],
-    toJson   : (mediaLink) => mediaLink.toSupa(),
+    toJson   : (mediaLink) => mediaLink.toJson(),
   );
 }

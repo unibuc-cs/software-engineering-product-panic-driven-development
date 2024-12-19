@@ -31,10 +31,10 @@ void main() {
           'id': 671
         });
         expect(movie_info, isNotNull);
-        expect(movie_info['name'], contains('Harry Potter and the Philosopher\'s Stone'));
-        expect(movie_info['collection'], 'Harry Potter Collection');
-        expect(movie_info['release_date'], '2001-11-16');
-        expect(movie_info['producers'][0], contains('Warner Bros'));
+        expect(movie_info['originalname'], contains('Harry Potter and the Philosopher\'s Stone'));
+        expect(movie_info['series'], 'Harry Potter Collection');
+        expect(movie_info['releasedate'], '2001-11-16');
+        expect(movie_info['creators'][0], contains('Warner Bros'));
         expect(movie_info['duration'], 152);
       });
     });
@@ -69,10 +69,10 @@ void main() {
           'id': 2288
         });
         expect(series_info, isNotNull);
-        expect(series_info['name'], contains('Prison Break'));
+        expect(series_info['originalname'], contains('Prison Break'));
         expect(series_info['language'], 'en');
         expect(series_info['status'], 'Ended');
-        expect(series_info['producers'][0], contains('Adelstein-Parouse'));
+        expect(series_info['creators'][0], contains('Adelstein-Parouse'));
       });
     });
   });
