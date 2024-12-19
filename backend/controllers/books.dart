@@ -14,6 +14,17 @@ RouterPlus booksRouter() {
     return sendOk(books);
   });
 
+  router.get('/name', (Request req) async {
+    final queryParams = req.url.queryParameters;
+    final mediaId = int.parse(queryParams["query"] ?? "");
+    final book = await _supabase
+      .from('book')
+      .select()
+      .eq('mediaid', mediaId)
+      .single();
+    return sendOk(book);
+  });
+
   router.get('/<id>', (Request req, String id) async {
     final book = await _supabase
       .from('book')
@@ -34,16 +45,7 @@ RouterPlus booksRouter() {
 
     body['mediatype'] = 'book';
     final specificBodies = splitBody(body, mediaType: 'book');
-
-    validateBody(specificBodies['bookBody']!, fields:
-      [
-        'language',
-        'totalpages',
-        'format',
-      ]
-    );
-
-    final result = await createFromBody(specificBodies, _supabase, mediaType: 'book');
+    final result = await createFromBody(specificBodies, _supabase, mediaType: 'book', mediaTypePlural: 'books');
     return sendOk(result);
   });
 

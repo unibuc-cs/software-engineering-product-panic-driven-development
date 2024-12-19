@@ -15,6 +15,17 @@ RouterPlus mediasRouter() {
     return sendOk(serialize(media));
   });
 
+  router.get('/name', (Request req) async {
+    final queryParams = req.url.queryParameters;
+    final originalname = queryParams["query"] ?? "";
+    final media = await _supabase
+      .from('media')
+      .select()
+      .ilike('originalname', originalname)
+      .single();
+    return sendOk(media);
+  });
+
   router.get('/<id>', (Request req, String id) async {
     final media = await _supabase
       .from('media')
@@ -29,15 +40,6 @@ RouterPlus mediasRouter() {
     discardFromBody(body, fields:
       [
         "id",
-      ]
-    );
-
-    // TO DO: fix the releasedate format
-    validateBody(body, fields:
-      [
-        "originalname",
-        "description",
-        "mediatype",
       ]
     );
 

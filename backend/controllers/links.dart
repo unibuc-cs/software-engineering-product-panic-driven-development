@@ -16,11 +16,11 @@ RouterPlus linksRouter() {
 
   router.get('/name', (Request req) async {
     final queryParams = req.url.queryParameters;
-    final name = queryParams["query"] ?? "";
+    final href = queryParams["query"] ?? "";
     final link = await _supabase
       .from('link')
       .select()
-      .ilike('name', name)
+      .ilike('href', href)
       .single();
     return sendOk(link);
   });

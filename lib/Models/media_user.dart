@@ -15,6 +15,7 @@ class MediaUser implements Model {
   DateTime lastInteracted;
   int gameTime;
   int bookReadPages;
+  int nrEpisodesSeen;
 
   MediaUser({
     required this.mediaId,
@@ -29,7 +30,8 @@ class MediaUser implements Model {
     required this.backgroundImage,
     required this.lastInteracted,
     this.gameTime = 0,
-    this.bookReadPages = 0
+    this.bookReadPages = 0,
+    this.nrEpisodesSeen = 0
   });
 
   static String get endpoint => 'mediausers';
@@ -61,6 +63,7 @@ class MediaUser implements Model {
       'lastinteracted': lastInteracted,
       'gametime': gameTime,
       'bookreadpages': bookReadPages,
+      'nrepisodesseen': nrEpisodesSeen,
     };
   }
 
@@ -80,6 +83,7 @@ class MediaUser implements Model {
       lastInteracted: json['lastinteracted'],
       gameTime: json['gametime'],
       bookReadPages: json['bookreadpages'],
+      nrEpisodesSeen: json['nrepisodesseen'],
     );
   }
 

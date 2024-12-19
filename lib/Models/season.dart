@@ -5,13 +5,13 @@ class Season implements Model {
   int TVSeriesId;
   int id;
   String name;
-  String coverImage;
+  int nrEpisodes;
 
   Season({
     this.id = -1,
     required this.TVSeriesId,
     required this.name,
-    required this.coverImage,
+    this.nrEpisodes = 0,
   });
 
   static String get endpoint => 'seasons';
@@ -36,7 +36,7 @@ class Season implements Model {
     return {
       'tvseriesid': TVSeriesId,
       'name': name,
-      'coverimage': coverImage,
+      'nrepisodes': nrEpisodes,
     };
   }
 
@@ -46,7 +46,7 @@ class Season implements Model {
       id: json['id'],
       TVSeriesId: json['tvseriesid'],
       name: json['name'],
-      coverImage: json['coverimage'],
+      nrEpisodes: json['nrepisodes'],
     );
   }
 }

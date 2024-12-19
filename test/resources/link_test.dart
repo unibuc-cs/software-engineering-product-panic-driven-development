@@ -17,6 +17,6 @@ void main() async {
     service    : LinkService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    itemName   : dummy.name,
+    itemName   : dummy.href,
   );
 }

@@ -10,7 +10,7 @@ class Anime extends MediaType implements Model {
   Anime({
     this.id = -1,
     required this.mediaId,
-    required this.language,
+    this.language = "",
   });
 
   static String get endpoint => 'anime';

@@ -11,8 +11,8 @@ class Movie extends MediaType implements Model {
   Movie({
     this.id = -1,
     required this.mediaId,
-    required this.language,
-    required this.durationInSeconds,
+    this.language = "",
+    this.durationInSeconds = 0,
   });
 
   static String get endpoint => 'movies';

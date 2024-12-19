@@ -13,10 +13,10 @@ class Media implements Model {
   Media({
     this.id = -1,
     required this.originalName,
-    required this.description,
+    this.description = "",
     required this.releaseDate,
-    required this.criticScore,
-    required this.communityScore,
+    this.criticScore = 0,
+    this.communityScore = 0,
     required this.mediaType
   });
 
@@ -38,9 +38,9 @@ class Media implements Model {
     return {
       'originalname': originalName,
       'description': description,
-      'releasedate': releaseDate,
+      'releasedate': releaseDate.toIso8601String(),
       'criticscore': criticScore,
-      'comunityscore': communityScore,
+      'communityscore': communityScore,
       'mediatype': mediaType,
     };
   }
@@ -50,10 +50,10 @@ class Media implements Model {
     return Media(
       id: json['id'],
       originalName: json['originalname'],
-      description: json['description'],
-      releaseDate: json['releasedate'],
-      criticScore: json['criticscore'],
-      communityScore: json['comunityscore'],
+      description: json['description'] ?? "",
+      releaseDate: DateTime.parse(json['releasedate']),
+      criticScore: json['criticscore'] ?? 0,
+      communityScore: json['communityscore'] ?? 0,
       mediaType: json['mediatype'],
     );
   }

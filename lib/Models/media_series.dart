@@ -4,7 +4,7 @@ class MediaSeries implements Model {
   // Data
   int mediaId;
   int seriesId;
-  int index;
+  double index;
 
   MediaSeries({
     required this.mediaId,
@@ -39,7 +39,7 @@ class MediaSeries implements Model {
     return MediaSeries(
       mediaId: json['mediaid'],
       seriesId: json['seriesid'],
-      index: json['index'],
+      index: double.parse(json['index'].toString()),
     );
   }
 }

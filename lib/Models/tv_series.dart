@@ -10,7 +10,7 @@ class TVSeries extends MediaType implements Model {
   TVSeries({
     this.id = -1,
     required this.mediaId,
-    required this.language,
+    this.language = "",
   });
 
   static String get endpoint => 'tvseries';

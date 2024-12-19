@@ -123,7 +123,7 @@ class GoodReads extends Provider {
       return {
         "originalname": document.querySelector("h1.Text__title1")?.text.trim(),
         "creators": [document.querySelector("span.ContributorLink__name")?.text.trim()],
-        "links": bookUrl,
+        "links": [bookUrl],
         "communityscore": (double.parse(document.querySelector("div.RatingStatistics__rating")!.text.trim()) * 20).round().toString(),
         "releasedate": DateFormat("yyyy-MM-dd").format(parsedDate),
         "description": document.querySelector("span.Formatted")?.text.trim(),

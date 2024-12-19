@@ -14,14 +14,26 @@ Future<int> getValidId<T extends Model>({
 
 Future<void> runService<T extends Model>({
   required Service<T> service,
-  required T dummyItem,
+  required dynamic dummyItem,
   T? updatedItem,
   String? itemName,
   List<String>? tables
 }) async {
   List<int> ids = [];
+  
   try {
-    final data = await service.create(dummyItem);
+    Map<String, dynamic> body = <String, dynamic>{};
+    if (dummyItem is T) {
+      body = dummyItem.toJson();
+    }
+    else if (dummyItem is Map<String, dynamic>) {
+      body = dummyItem;
+    }
+    else {
+      throw ArgumentError('The model must be either a Map or an instance of $T');
+    }
+
+    final data = await service.create(body);
     Map<String, dynamic> dataMap = data.toJson();
     print('Created ${dataMap}');
     if (tables != null) {

@@ -96,13 +96,13 @@ Map<String, Map<String, dynamic>> splitBody(
       'icon',
       'backgroundimage',
     ],
+    'genresBody': ['genres'],
     'creatorsBody': ['creators'],
     'publishersBody': ['publishers'],
     'platformsBody': ['platforms'],
     'linksBody': ['links'],
     'seriesBody': ['seriesname'],
     'mediaseriesBody': ['series'],
-    'genresBody': ['genres'],
   };
 
   final result = <String, Map<String, dynamic>>{};
@@ -114,65 +114,205 @@ Map<String, Map<String, dynamic>> splitBody(
   return result;
 }
 
+Map<String, dynamic> createAttributes(
+  String tableName,
+  dynamic entry
+) {
+  final result = <String, dynamic> {};
+
+  if (tableName == 'link') {
+    result['name'] = entry
+      .replaceAll('http://', '')
+      .replaceAll('https://', '')
+      .split('/')[0]; // TO DO: more complex mapping later
+    result['href'] = entry;
+  }
+  else { // creator, publisher, platform
+      result['name'] = entry;
+  }
+
+  return result;
+}
+
+Future<Map<String, dynamic>> doCreateTable(
+  Map<String, dynamic> body,
+  String tableName,
+  String tableEndpoint,
+  int mediaId,
+  Future<Map<String, dynamic>> Function(dynamic, dynamic) postRequest,
+  Future<Map<String, dynamic>> Function(dynamic, dynamic) getByNameRequest
+) async {
+  final result = <String, dynamic> {};
+
+  result[tableEndpoint] = [];
+  result['media$tableEndpoint'] = [];
+  dynamic entries = body[tableEndpoint];
+  for (var entry in entries) {
+    Map<String, dynamic> entryBody = <String, dynamic>{};
+    final attributes = createAttributes(tableName, entry);
+    try {
+      entryBody = await getByNameRequest(tableEndpoint, attributes['href'] ?? attributes['name']);
+    }
+    catch (_) {
+      entryBody = await postRequest(
+        attributes,
+        tableEndpoint,
+      );
+      result[tableEndpoint].add(entryBody);
+    }
+    finally {
+      final response = await postRequest(
+        {
+          'mediaid': mediaId,
+          '${tableName}id': entryBody['id'],
+        },
+        'media$tableEndpoint',
+      );
+      result['media$tableEndpoint'].add(response);
+    }
+  }
+
+  return result;
+}
+
 Future<Map<String, dynamic>> createFromBody(
   Map<String, Map<String, dynamic>> body,
   final supabase,
-  {required String mediaType}
+  {required String mediaType,
+  required String mediaTypePlural}
 ) async {
   final axios = Config().axios;
   Map<String, dynamic> result = <String, dynamic>{};
 
-  Future<Map<String, dynamic>> postRequest(body, table) async => await makePostRequest(body, table, axios);
-  Future<Map<String, dynamic>> getByNameRequest(table, name) async => await makeGetByNameRequest(table, name, axios);
+  Future<Map<String, dynamic>> postRequest(body, table) async => 
+    await makePostRequest(body, table, axios);
+  Future<Map<String, dynamic>> getByNameRequest(table, name) async => 
+    await makeGetByNameRequest(table, name, axios);
+  Future<Map<String, dynamic>> createTable(body, tableName, tableEndpoint, mediaId) async =>
+    await doCreateTable(body, tableName, tableEndpoint, mediaId, postRequest, getByNameRequest);
 
   // Create media from body
   result['media'] = await postRequest(body['mediaBody']!, 'medias');
 
   // Create mediaType from body
   body['${mediaType}Body']?['mediaid'] = result['media']?['id'];
-  result[mediaType] = await supabase
+  Map<String, dynamic> partialResult = await supabase
     .from(mediaType)
     .insert(body['${mediaType}Body']!)
     .select()
     .single();
+  partialResult.forEach((key, value) => result[key] = value);
 
   // TO DO: create mediauser from body
+  
+  // TO DO: Create mediausergenres from body
 
-  // Create creators and mediacreators from body
-  result['creators'] = [];
-  dynamic creators = body['creatorsBody']?['creators'];
-  for (var creator in creators) {
-    Map<String, dynamic> creatorBody = <String, dynamic>{};
-    try {
-      creatorBody = await getByNameRequest('creators', creator);
+  // Create X=creators/publishers/platforms/links/series and mediaX from body
+  final mapToPlural = {
+    'creator'  : 'creators',
+    'publisher': 'publishers',
+    'platform' : 'platforms',
+    'link'     : 'links',
+  };
+  for (MapEntry<String, dynamic> entry in mapToPlural.entries) {
+    final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);
+    result[entry.value] = response[entry.value];
+    result['media${entry.value}'] = response['media${entry.value}'];
+    if (result[entry.value].isEmpty) {
+      result.remove(entry.value);
     }
-    catch (_) {
-      creatorBody = await postRequest(
-        {
-          'name': creator,
-        },
-        'creators'
-      );
-    }
-    await postRequest(
-      {
-        'mediaid': result['media']['id'],
-        'creatorid': creatorBody['id'],
-      },
-      'mediacreators'
-    );
-    result['creators'].add(creatorBody);
   }
 
-  // TO DO: Create publishers from body
+  if (body['seriesBody'] == null) {
+    return result;
+  }
+  
+  // Create series and mediaseries from body
+  final aux = [];
+  result['series'] = [];
+  for (var entry in body['seriesBody']?['seriesname']) {
+    Map<String, dynamic> entryBody = <String, dynamic>{};
+    final attributes = createAttributes('series', entry);
+    try {
+      entryBody = await getByNameRequest('series', attributes['name']);
+      aux.add(entryBody);
+    }
+    catch (_) {
+      entryBody = await postRequest(
+        attributes,
+        'series',
+      );
+      aux.add(entryBody);
+      result['series'].add(entryBody);
+    }
+  }
+  if (result['series'].isEmpty) {
+    result.remove('series');
+  }
 
-  // TO DO: Create platforms from body
 
-  // TO DO: Create links from body
+  // Check here in case of errors with the series
+  int mediaId = 0, seriesId = aux[0]['id'];
+  result['new_related_medias'] = [];
+  result['new_related_$mediaType'] = [];
+  result['mediaseries'] = [];
+  for (var entry in body['mediaseriesBody']?['series']) {
+    Map<String, dynamic> entryBody = <String, dynamic>{};
 
-  // TO DO: Create series from body
+    // Create media
+    try {
+      entryBody = await getByNameRequest('medias', entry['name']);
+    }
+    catch (_) {
+      entryBody = await postRequest(
+        {
+          'originalname': entry['name'],
+          'releasedate': DateTime.now().toIso8601String(),
+          'mediatype': mediaType,
+        }, 
+        'medias',
+      );
+      result['new_related_medias'].add(entryBody);
+    }
+    mediaId = entryBody['id'];
+    
+    // Create mediaType
+    try {
+      entryBody = await getByNameRequest(mediaTypePlural, mediaId.toString());
+    }
+    catch (_) {
+      entryBody = await supabase
+        .from(mediaType)
+        .insert({'mediaid' : mediaId})
+        .select()
+        .single();
+      result['new_related_$mediaType'].add(entryBody);
+    }
 
-  // TO DO: Create mediausergenres from body
+    // Create mediaseries
+    try {
+      entryBody = await postRequest(
+        {
+          'mediaid' : mediaId,
+          'seriesid': seriesId,
+          'index'   : entry['index'],
+        },
+        'mediaseries',
+      );
+      result['mediaseries'].add(entryBody);
+    }
+    catch (_) {}
+  }
+
+  if (result['new_related_medias'].isEmpty) {
+    result.remove('new_related_medias');
+  }
+  if (result['new_related_$mediaType'].isEmpty) {
+    result.remove('new_related_$mediaType');
+  }
+  if (result['mediaseries'].isEmpty) {
+    result.remove('mediaseries');
+  }
 
   return result;
 }
