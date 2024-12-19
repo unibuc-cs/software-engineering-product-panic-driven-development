@@ -1,6 +1,6 @@
 import 'dart:core';
-import 'generic_test.dart';
 import '../../lib/Models/book.dart';
+import '../general/resource_test.dart';
 import '../../lib/Services/book_service.dart';
 
 void main() async {
@@ -21,6 +21,5 @@ void main() async {
     service    : BookService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (book) => book.toJson(),
   );
 }

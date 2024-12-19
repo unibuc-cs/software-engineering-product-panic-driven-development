@@ -1,5 +1,5 @@
 import 'dart:core';
-import 'generic_test.dart';
+import '../general/resource_test.dart';
 import '../../lib/Models/app_achievement.dart';
 import '../../lib/Services/app_achievement_service.dart';
 
@@ -19,6 +19,5 @@ void main() async {
     service    : AppAchievementService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (appAchievement) => appAchievement.toJson(),
   );
 }

@@ -1,5 +1,5 @@
 import 'dart:core';
-import 'generic_test.dart';
+import '../general/resource_test.dart';
 import '../../lib/Models/media_retailer.dart';
 import '../../lib/Services/retailer_service.dart';
 import '../../lib/Services/media_retailer_service.dart';
@@ -20,6 +20,5 @@ void main() async {
     service  : MediaRetailerService(),
     dummyItem: dummy,
     tables   : ["media", "retailer"],
-    toJson   : (mediaRetailer) => mediaRetailer.toJson(),
   );
 }

@@ -1,5 +1,5 @@
 import 'dart:core';
-import 'generic_test.dart';
+import '../general/resource_test.dart';
 import '../../lib/Models/media_creator.dart';
 import '../../lib/Services/creator_service.dart';
 import '../../lib/Services/media_creator_service.dart';
@@ -20,6 +20,5 @@ void main() async {
     service   : MediaCreatorService(),
     dummyItem : dummy,
     tables    : ["media", "creator"],
-    toJson    : (link) => link.toJson(),
   );
 }

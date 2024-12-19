@@ -1,6 +1,6 @@
 import 'dart:core';
-import 'generic_test.dart';
 import '../../lib/Models/link.dart';
+import '../general/resource_test.dart';
 import '../../lib/Services/link_service.dart';
 
 void main() async {
@@ -18,6 +18,5 @@ void main() async {
     dummyItem  : dummy,
     updatedItem: updated,
     itemName   : dummy.name,
-    toJson     : (link) => link.toJson(),
   );
 }

@@ -1,6 +1,6 @@
 import 'dart:core';
-import '../../lib/models/model.dart';
-import '../../lib/services/general/service.dart';
+import '../../lib/Models/model.dart';
+import '../../lib/Services/general/service.dart';
 
 Future<int> getValidId<T extends Model>({
   required Service<T> service,
@@ -12,18 +12,17 @@ Future<int> getValidId<T extends Model>({
     : itemList[0].id;
 }
 
-Future<void> runService<T>({
+Future<void> runService<T extends Model>({
   required Service<T> service,
   required T dummyItem,
   T? updatedItem,
-  required Map<String, dynamic> Function(T) toJson,
   String? itemName,
   List<String>? tables
 }) async {
   List<int> ids = [];
   try {
     final data = await service.create(dummyItem);
-    Map<String, dynamic> dataMap = toJson(data);
+    Map<String, dynamic> dataMap = data.toJson();
     print('Created ${dataMap}');
     if (tables != null) {
       ids = tables
@@ -46,7 +45,7 @@ Future<void> runService<T>({
     final data = await service.readAll();
     print('Got all\n[');
     data.forEach((item) {
-      print('  ${toJson(item)}');
+      print('  ${item.toJson()}');
     });
     print(']');
   }
@@ -56,7 +55,7 @@ Future<void> runService<T>({
 
   try {
     final data = await service.readById(ids);
-    print('Got ${toJson(data)} by $idDescription');
+    print('Got ${data.toJson()} by $idDescription');
   }
   catch (e) {
     print('GetById error: $e');
@@ -65,7 +64,7 @@ Future<void> runService<T>({
   if (itemName != null) {
     try {
       final data = await service.readByName(itemName);
-      print('Got ${toJson(data)} by name ${itemName}');
+      print('Got ${data.toJson()} by name ${itemName}');
     }
     catch (e) {
       print('GetByName error: $e');
@@ -75,7 +74,7 @@ Future<void> runService<T>({
   if (updatedItem != null) {
     try {
       final data = await service.update(ids, updatedItem);
-      print('Updated ${toJson(data)} for $idDescription');
+      print('Updated ${data.toJson()} for $idDescription');
     }
     catch (e) {
       print('Update error: $e');

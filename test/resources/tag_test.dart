@@ -1,6 +1,6 @@
 import 'dart:core';
-import 'generic_test.dart';
 import '../../lib/Models/tag.dart';
+import '../general/resource_test.dart';
 import '../../lib/Services/tag_service.dart';
 
 void main() async {
@@ -15,6 +15,5 @@ void main() async {
     service    : TagService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (tag) => tag.toJson(),
   );
 }

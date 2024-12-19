@@ -1,5 +1,5 @@
 import 'dart:core';
-import 'generic_test.dart';
+import '../general/resource_test.dart';
 import '../../lib/Models/media.dart';
 import '../../lib/Services/media_service.dart';
 
@@ -25,6 +25,5 @@ void main() async {
     service    : MediaService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (media) => media.toJson(),
   );
 }

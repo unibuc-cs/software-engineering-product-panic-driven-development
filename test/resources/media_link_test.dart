@@ -1,5 +1,5 @@
 import 'dart:core';
-import 'generic_test.dart';
+import '../general/resource_test.dart';
 import '../../lib/Models/media_link.dart';
 import '../../lib/Services/link_service.dart';
 import '../../lib/Services/media_link_service.dart';
@@ -21,6 +21,5 @@ void main() async {
     service  : MediaLinkService(),
     dummyItem: dummy,
     tables   : ["media", "link"],
-    toJson   : (mediaLink) => mediaLink.toJson(),
   );
 }

@@ -1,6 +1,6 @@
 import 'dart:core';
-import 'generic_test.dart';
 import '../../lib/Models/genre.dart';
+import '../general/resource_test.dart';
 import '../../lib/Services/genre_service.dart';
 
 void main() async {
@@ -15,6 +15,5 @@ void main() async {
     service    : GenreService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (genre) => genre.toJson(),
   );
 }

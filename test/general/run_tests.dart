@@ -3,8 +3,10 @@ import 'package:path/path.dart';
 import '../../backend/helpers/utils.dart';
 
 void runTests({
-  required List<String> excluded
+  List<String>? excluded
 }) {
+  excluded ??= [];
+  excluded.add("run_tests");
   final files = Directory(Platform.script.toFilePath())
     .parent
     .listSync()
@@ -33,6 +35,6 @@ void runTests({
         print(line);
       }
     }
-    print('${blueColored('~' * 70)}\n');
+    print('${greyColored('~' * 70)}\n');
   }
 }

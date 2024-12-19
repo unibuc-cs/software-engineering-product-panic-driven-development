@@ -1,5 +1,5 @@
 import 'dart:core';
-import 'generic_test.dart';
+import '../general/resource_test.dart';
 import '../../lib/Models/platform.dart';
 import '../../lib/Services/platform_service.dart';
 
@@ -16,6 +16,5 @@ void main() async {
     dummyItem  : dummy,
     updatedItem: updated,
     itemName   : dummy.name,
-    toJson     : (platform) => platform.toJson(),
   );
 }

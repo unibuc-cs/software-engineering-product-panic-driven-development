@@ -1,6 +1,6 @@
 import 'dart:core';
-import 'generic_test.dart';
 import '../../lib/Models/series.dart';
+import '../general/resource_test.dart';
 import '../../lib/Services/series_service.dart';
 
 void main() async {
@@ -16,6 +16,5 @@ void main() async {
     dummyItem  : dummy,
     updatedItem: updated,
     itemName   : dummy.name,
-    toJson     : (series) => series.toJson(),
   );
 }

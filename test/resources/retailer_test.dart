@@ -1,5 +1,5 @@
 import 'dart:core';
-import 'generic_test.dart';
+import '../general/resource_test.dart';
 import '../../lib/Models/retailer.dart';
 import '../../lib/Services/retailer_service.dart';
 
@@ -15,6 +15,5 @@ void main() async {
     service    : RetailerService(),
     dummyItem  : dummy,
     updatedItem: updated,
-    toJson     : (retailer) => retailer.toJson(),
   );
 }
