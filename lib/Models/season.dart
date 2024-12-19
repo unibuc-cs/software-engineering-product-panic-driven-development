@@ -1,4 +1,6 @@
-class Season {
+import 'model.dart';
+
+class Season implements Model {
   // Data
   int TVSeriesId;
   int id;
@@ -27,20 +29,22 @@ class Season {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "tvseriesid": TVSeriesId,
-      "name": name,
-      "coverimage": coverImage,
+      'tvseriesid': TVSeriesId,
+      'name': name,
+      'coverimage': coverImage,
     };
   }
 
+  @override
   factory Season.from(Map<String, dynamic> json) {
     return Season(
-      id: json["id"],
-      TVSeriesId: json["tvseriesid"],
-      name: json["name"],
-      coverImage: json["coverimage"],
+      id: json['id'],
+      TVSeriesId: json['tvseriesid'],
+      name: json['name'],
+      coverImage: json['coverimage'],
     );
   }
 }

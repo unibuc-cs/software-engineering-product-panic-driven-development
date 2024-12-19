@@ -1,6 +1,7 @@
-import "media_type.dart";
+import 'model.dart';
+import 'media_type.dart';
 
-class TVSeries extends MediaType {
+class TVSeries extends MediaType implements Model {
   // Data
   int mediaId;
   int id;
@@ -28,18 +29,20 @@ class TVSeries extends MediaType {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "language": language,
+      'mediaid': mediaId,
+      'language': language,
     };
   }
 
+  @override
   factory TVSeries.from(Map<String, dynamic> json) {
     return TVSeries(
-      id: json["id"],
-      mediaId: json["mediaid"],
-      language: json["language"],
+      id: json['id'],
+      mediaId: json['mediaid'],
+      language: json['language'],
     );
   }
 }

@@ -1,4 +1,6 @@
-class Retailer {
+import 'model.dart';
+
+class Retailer implements Model {
   // Data
   int id;
   String name;
@@ -16,16 +18,18 @@ class Retailer {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "name": name,
+      'name': name,
     };
   }
 
+  @override
   factory Retailer.from(Map<String, dynamic> json) {
     return Retailer(
-      id: json["id"],
-      name: json["name"],
+      id: json['id'],
+      name: json['name'],
     );
   }
 }

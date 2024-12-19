@@ -1,4 +1,6 @@
-class MediaUser {
+import 'model.dart';
+
+class MediaUser implements Model {
   // Data
   int mediaId;
   int userId;
@@ -40,47 +42,49 @@ class MediaUser {
   @override
   int get hashCode => Object.hash(mediaId, userId);
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "userid": userId,
-      "name": name,
-      "userscore": userScore,
-      "addeddate": addedDate,
-      "coverimage": coverImage,
-      "status": status,
-      "series": series,
-      "icon": icon,
-      "backgroundimage": backgroundImage,
-      "lastinteracted": lastInteracted,
-      "gametime": gameTime,
-      "bookreadpages": bookReadPages,
+      'mediaid': mediaId,
+      'userid': userId,
+      'name': name,
+      'userscore': userScore,
+      'addeddate': addedDate,
+      'coverimage': coverImage,
+      'status': status,
+      'series': series,
+      'icon': icon,
+      'backgroundimage': backgroundImage,
+      'lastinteracted': lastInteracted,
+      'gametime': gameTime,
+      'bookreadpages': bookReadPages,
     };
   }
 
+  @override
   factory MediaUser.from(Map<String, dynamic> json) {
     return MediaUser(
-      mediaId: json["mediaid"],
-      userId: json["userid"],
-      name: json["name"],
-      userScore: json["userscore"],
-      addedDate: json["addeddate"],
-      coverImage: json["coverimage"],
-      status: json["status"],
-      series: json["series"],
-      icon: json["icon"],
-      backgroundImage: json["backgroundimage"],
-      lastInteracted: json["lastinteracted"],
-      gameTime: json["gametime"],
-      bookReadPages: json["bookreadpages"],
+      mediaId: json['mediaid'],
+      userId: json['userid'],
+      name: json['name'],
+      userScore: json['userscore'],
+      addedDate: json['addeddate'],
+      coverImage: json['coverimage'],
+      status: json['status'],
+      series: json['series'],
+      icon: json['icon'],
+      backgroundImage: json['backgroundimage'],
+      lastInteracted: json['lastinteracted'],
+      gameTime: json['gametime'],
+      bookReadPages: json['bookreadpages'],
     );
   }
 
   // TODO: Endpoint this
   // static Future<List<Media>> getUserMedia(int userId, String mediaType) async {
   //   List<Media> ans = List.empty();
-  //   var ids = await Supabase.instance.client.from("mediauser").select("mediaid").eq("userid", userId);
-  //   for(var json in await Supabase.instance.client.from("media").select().inFilter("mediaid", ids).eq("mediatype", mediaType)) {
+  //   var ids = await Supabase.instance.client.from('mediauser').select('mediaid').eq('userid', userId);
+  //   for(var json in await Supabase.instance.client.from('media').select().inFilter('mediaid', ids).eq('mediatype', mediaType)) {
   //     ans.add(Media.from(json));
   //   }
   //   return ans;

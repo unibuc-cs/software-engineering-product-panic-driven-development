@@ -1,4 +1,6 @@
-class Link {
+import 'model.dart';
+
+class Link implements Model {
   // Data
   int id;
   String name;
@@ -17,18 +19,20 @@ class Link {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "name": name,
-      "href": href,
+      'name': name,
+      'href': href,
     };
   }
 
+  @override
   factory Link.from(Map<String, dynamic> json) {
     return Link(
-      id: json["id"],
-      name: json["name"],
-      href: json["href"],
+      id: json['id'],
+      name: json['name'],
+      href: json['href'],
     );
   }
 }

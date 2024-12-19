@@ -1,4 +1,6 @@
-class Genre {
+import 'model.dart';
+
+class Genre implements Model {
   // Data
   int id;
   String name;
@@ -16,19 +18,21 @@ class Genre {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "name": name,
+      'name': name,
     };
   }
 
+  @override
   factory Genre.from(Map<String, dynamic> json) {
     return Genre(
-      id: json["id"],
-      name: json["name"],
+      id: json['id'],
+      name: json['name'],
     );
   }
-  
+
   // TODO: Endpoint this
   // static Future<List<Genre>> getAllGenres() async {
   //   return (await Supabase.instance.client.from("genre").select()).map(Genre.from).toList();

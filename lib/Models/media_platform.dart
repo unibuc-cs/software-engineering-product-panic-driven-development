@@ -1,4 +1,6 @@
-class MediaPlatform {
+import 'model.dart';
+
+class MediaPlatform implements Model {
   // Data
   int mediaId;
   int platformId;
@@ -17,17 +19,19 @@ class MediaPlatform {
   @override
   int get hashCode => Object.hash(mediaId, platformId);
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "platformid": platformId,
+      'mediaid': mediaId,
+      'platformid': platformId,
     };
   }
 
+  @override
   factory MediaPlatform.from(Map<String, dynamic> json) {
     return MediaPlatform(
-      mediaId: json["mediaid"],
-      platformId: json["platformid"],
+      mediaId: json['mediaid'],
+      platformId: json['platformid'],
     );
   }
 }

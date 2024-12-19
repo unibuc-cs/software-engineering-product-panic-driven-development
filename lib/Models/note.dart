@@ -1,4 +1,6 @@
-class Note {
+import 'model.dart';
+
+class Note implements Model {
   // Data
   int id;
   int mediaId;
@@ -24,25 +26,27 @@ class Note {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "userid": userId,
-      "content": content,
-      "creationdate": creationDate,
-      "modifieddate": modifiedDate,
+      'mediaid': mediaId,
+      'userid': userId,
+      'content': content,
+      'creationdate': creationDate,
+      'modifieddate': modifiedDate,
     };
   }
 
+  @override
   factory Note.from(Map<String, dynamic> json) {
     Note note = Note(
-      id: json["id"],
-      mediaId: json["mediaid"],
-      userId: json["userid"],
-      content: json["content"],
+      id: json['id'],
+      mediaId: json['mediaid'],
+      userId: json['userid'],
+      content: json['content'],
     );
-    note.creationDate = json["creationdate"];
-    note.modifiedDate = json["modifieddate"];
+    note.creationDate = json['creationdate'];
+    note.modifiedDate = json['modifieddate'];
     return note;
   }
 
@@ -51,10 +55,10 @@ class Note {
   //   return (await Supabase
   //     .instance
   //     .client
-  //     .from("note")
+  //     .from('note')
   //     .select()
-  //     .eq("userid", userId)
-  //     .eq("mediaid", mediaId)
+  //     .eq('userid', userId)
+  //     .eq('mediaid', mediaId)
   //   ).map(Note.from)
   //    .toList();
   // }

@@ -1,4 +1,6 @@
-class MediaCreator {
+import 'model.dart';
+
+class MediaCreator implements Model {
   // Data
   int mediaId;
   int creatorId;
@@ -17,17 +19,19 @@ class MediaCreator {
   @override
   int get hashCode => Object.hash(mediaId, creatorId);
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "creatorid": creatorId,
+      'mediaid': mediaId,
+      'creatorid': creatorId,
     };
   }
 
+  @override
   factory MediaCreator.from(Map<String, dynamic> json) {
     return MediaCreator(
-      mediaId: json["mediaid"],
-      creatorId: json["creatorid"],
+      mediaId: json['mediaid'],
+      creatorId: json['creatorid'],
     );
   }
 }

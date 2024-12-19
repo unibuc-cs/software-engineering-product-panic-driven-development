@@ -1,4 +1,6 @@
-class Publisher {
+import 'model.dart';
+
+class Publisher implements Model {
   // Data
   int id;
   String name;
@@ -16,22 +18,24 @@ class Publisher {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "name": name,
+      'name': name,
     };
   }
 
+  @override
   factory Publisher.from(Map<String, dynamic> json) {
     return Publisher(
-      id: json["id"],
-      name: json["name"],
+      id: json['id'],
+      name: json['name'],
     );
   }
 
   // TODO: Endpoint this
   // static Future<Publisher?> tryGet(String name) async {
-  //   var list = await Supabase.instance.client.from("publisher").select().eq("name", name);
+  //   var list = await Supabase.instance.client.from('publisher').select().eq('name', name);
 
   //   if (list.isEmpty) {
   //     return null;

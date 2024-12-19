@@ -1,4 +1,6 @@
-class MediaRetailer {
+import 'model.dart';
+
+class MediaRetailer implements Model {
   // Data
   int mediaId;
   int retailerId;
@@ -17,17 +19,19 @@ class MediaRetailer {
   @override
   int get hashCode => Object.hash(mediaId, retailerId);
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "retailerid": retailerId,
+      'mediaid': mediaId,
+      'retailerid': retailerId,
     };
   }
 
+  @override
   factory MediaRetailer.from(Map<String, dynamic> json) {
     return MediaRetailer(
-      mediaId: json["mediaid"],
-      retailerId: json["retailerid"],
+      mediaId: json['mediaid'],
+      retailerId: json['retailerid'],
     );
   }
 }

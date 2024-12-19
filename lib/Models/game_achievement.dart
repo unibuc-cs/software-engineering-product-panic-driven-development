@@ -1,4 +1,6 @@
-class GameAchievement {
+import 'model.dart';
+
+class GameAchievement implements Model {
   // Data
   int id;
   int gameId;
@@ -22,20 +24,22 @@ class GameAchievement {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "gameid": gameId,
-      "name": name,
-      "description": description,
+      'gameid': gameId,
+      'name': name,
+      'description': description,
     };
   }
 
+  @override
   factory GameAchievement.from(Map<String, dynamic> json) {
     return GameAchievement(
-      id: json["id"],
-      gameId: json["gameid"],
-      name: json["name"],
-      description: json["description"],
+      id: json['id'],
+      gameId: json['gameid'],
+      name: json['name'],
+      description: json['description'],
     );
   }
 }

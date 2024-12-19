@@ -1,6 +1,7 @@
-import "media_type.dart";
+import 'model.dart';
+import 'media_type.dart';
 
-class Episode extends MediaType {
+class Episode extends MediaType implements Model {
   // Data
   int mediaId;
   int TVSeriesId;
@@ -32,22 +33,24 @@ class Episode extends MediaType {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "tvseriesid": TVSeriesId,
-      "seasonid": seasonId,
-      "durationinseconds": durationInSeconds,
+      'mediaid': mediaId,
+      'tvseriesid': TVSeriesId,
+      'seasonid': seasonId,
+      'durationinseconds': durationInSeconds,
     };
   }
 
+  @override
   factory Episode.from(Map<String, dynamic> json) {
     return Episode(
-      id: json["id"],
-      mediaId: json["mediaid"],
-      TVSeriesId: json["tvseriesid"],
-      seasonId: json["seasonid"],
-      durationInSeconds: json["durationinseconds"],
+      id: json['id'],
+      mediaId: json['mediaid'],
+      TVSeriesId: json['tvseriesid'],
+      seasonId: json['seasonid'],
+      durationInSeconds: json['durationinseconds'],
     );
   }
 }

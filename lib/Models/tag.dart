@@ -1,4 +1,6 @@
-class Tag {
+import 'model.dart';
+
+class Tag implements Model {
   // Data
   int id;
   String name;
@@ -16,21 +18,23 @@ class Tag {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "name": name,
+      'name': name,
     };
   }
 
+  @override
   factory Tag.from(Map<String, dynamic> json) {
     return Tag(
-      id: json["id"],
-      name: json["name"],
+      id: json['id'],
+      name: json['name'],
     );
   }
 
   // TODO: Endpoint this
   // static Future<List<Tag>> getAllTags() async {
-  //   return (await Supabase.instance.client.from("tag").select()).map(Tag.from).toList();
+  //   return (await Supabase.instance.client.from('tag').select()).map(Tag.from).toList();
   // }
 }

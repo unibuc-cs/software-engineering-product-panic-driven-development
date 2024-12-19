@@ -1,3 +1,5 @@
+import 'model.dart';
+
 class Media {
   // Data
   int id;
@@ -28,26 +30,28 @@ class Media {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "originalname": originalName,
-      "description": description,
-      "releasedate": releaseDate,
-      "criticscore": criticScore,
-      "comunityscore": communityScore,
-      "mediatype": mediaType,
+      'originalname': originalName,
+      'description': description,
+      'releasedate': releaseDate,
+      'criticscore': criticScore,
+      'comunityscore': communityScore,
+      'mediatype': mediaType,
     };
   }
 
+  @override
   factory Media.from(Map<String, dynamic> json) {
     return Media(
-      id: json["id"],
-      originalName: json["originalname"],
-      description: json["description"],
-      releaseDate: json["releasedate"],
-      criticScore: json["criticscore"],
-      communityScore: json["comunityscore"],
-      mediaType: json["mediatype"],
+      id: json['id'],
+      originalName: json['originalname'],
+      description: json['description'],
+      releaseDate: json['releasedate'],
+      criticScore: json['criticscore'],
+      communityScore: json['comunityscore'],
+      mediaType: json['mediatype'],
     );
   }
 
@@ -55,13 +59,13 @@ class Media {
   // Future<List<Publisher>> get publishers async {
   //   final supabase = Supabase.instance.client;
   //   List<dynamic> publisherIds = await supabase
-  //     .from("mediapublisher")
-  //     .select("publisherid")
-  //     .eq("mediaid", id);
+  //     .from('mediapublisher')
+  //     .select('publisherid')
+  //     .eq('mediaid', id);
   //   return (await supabase
-  //     .from("publisher")
+  //     .from('publisher')
   //     .select()
-  //     .inFilter("id", publisherIds))
+  //     .inFilter('id', publisherIds))
   //     .map(Publisher.from)
   //     .toList();
   // }
@@ -70,13 +74,13 @@ class Media {
   // Future<List<Creator>> get creators async {
   //   final supabase = Supabase.instance.client;
   //   List<dynamic> creatorsIds = await supabase
-  //     .from("mediacreator")
-  //     .select("creatorid")
-  //     .eq("mediaid", id);
+  //     .from('mediacreator')
+  //     .select('creatorid')
+  //     .eq('mediaid', id);
   //   return (await supabase
-  //     .from("creator")
+  //     .from('creator')
   //     .select()
-  //     .inFilter("id", creatorsIds))
+  //     .inFilter('id', creatorsIds))
   //     .map(Creator.from)
   //     .toList();
   // }
@@ -85,13 +89,13 @@ class Media {
   // Future<List<Platform>> get platforms async {
   //   final supabase = Supabase.instance.client;
   //   List<dynamic> platformsIds = await supabase
-  //     .from("mediaplatform")
-  //     .select("platformid")
-  //     .eq("mediaid", id);
+  //     .from('mediaplatform')
+  //     .select('platformid')
+  //     .eq('mediaid', id);
   //   return (await supabase
-  //     .from("platform")
+  //     .from('platform')
   //     .select()
-  //     .inFilter("id", platformsIds))
+  //     .inFilter('id', platformsIds))
   //     .map(Platform.from)
   //     .toList();
   // }

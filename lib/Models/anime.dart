@@ -1,6 +1,7 @@
-import "media_type.dart";
+import 'model.dart';
+import 'media_type.dart';
 
-class Anime extends MediaType {
+class Anime extends MediaType implements Model {
   // Data
   int mediaId;
   int id;
@@ -28,18 +29,20 @@ class Anime extends MediaType {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "language": language,
+      'mediaid': mediaId,
+      'language': language,
     };
   }
 
+  @override
   factory Anime.from(Map<String, dynamic> json) {
     return Anime(
-      id: json["id"],
-      mediaId: json["mediaid"],
-      language: json["language"],
+      id: json['id'],
+      mediaId: json['mediaid'],
+      language: json['language'],
     );
   }
 }

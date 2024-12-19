@@ -1,4 +1,6 @@
-class Wishlist {
+import 'model.dart';
+
+class Wishlist implements Model {
   // Data
   int mediaId;
   int userId;
@@ -36,35 +38,37 @@ class Wishlist {
   @override
   int get hashCode => Object.hash(mediaId, userId);
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "userid": userId,
-      "name": name,
-      "userscore": userScore,
-      "addeddate": addedDate,
-      "coverimage": coverImage,
-      "status": status,
-      "series": series,
-      "icon": icon,
-      "backgroundimage": backgroundImage,
-      "lastinteracted": lastInteracted,
+      'mediaid': mediaId,
+      'userid': userId,
+      'name': name,
+      'userscore': userScore,
+      'addeddate': addedDate,
+      'coverimage': coverImage,
+      'status': status,
+      'series': series,
+      'icon': icon,
+      'backgroundimage': backgroundImage,
+      'lastinteracted': lastInteracted,
     };
   }
 
+  @override
   factory Wishlist.from(Map<String, dynamic> json) {
     return Wishlist(
-      mediaId: json["mediaid"],
-      userId: json["userid"],
-      name: json["name"],
-      userScore: json["userscore"],
-      addedDate: json["addeddate"],
-      coverImage: json["coverimage"],
-      status: json["status"],
-      series: json["series"],
-      icon: json["icon"],
-      backgroundImage: json["backgroundimage"],
-      lastInteracted: json["lastinteracted"],
+      mediaId: json['mediaid'],
+      userId: json['userid'],
+      name: json['name'],
+      userScore: json['userscore'],
+      addedDate: json['addeddate'],
+      coverImage: json['coverimage'],
+      status: json['status'],
+      series: json['series'],
+      icon: json['icon'],
+      backgroundImage: json['backgroundimage'],
+      lastInteracted: json['lastinteracted'],
     );
   }
 
@@ -75,9 +79,9 @@ class Wishlist {
   //       await Supabase
   //         .instance
   //         .client
-  //         .from("media")
+  //         .from('media')
   //         .select()
-  //         .eq("mediaid", mediaId)
+  //         .eq('mediaid', mediaId)
   //         .single()
   //     );
   // }
