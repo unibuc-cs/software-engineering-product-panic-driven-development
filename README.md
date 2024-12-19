@@ -73,9 +73,14 @@ nodemon -x "dart run backend/main.dart" -e dart
 rps cli
 ```
 
-- Test all services with unit tests
+- Test all providers
 ```bash
-rps test
+rps test:providers
+```
+
+- Test all resources
+```
+rps test:resources
 ```
 
 - Test individual services with unit tests (replace {service} with igdb, hltb or pcgw)
