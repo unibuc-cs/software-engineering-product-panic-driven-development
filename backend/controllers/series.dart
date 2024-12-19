@@ -1,5 +1,5 @@
+import '../helpers/requests.dart';
 import '../helpers/responses.dart';
-import '../helpers/validators.dart';
 import '../helpers/db_connection.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
@@ -77,7 +77,7 @@ RouterPlus seriesRouter() {
       .from('mediaseries')
       .delete()
       .eq('seriesid', id);
-    
+
     await _supabase
       .from('series')
       .delete()

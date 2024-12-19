@@ -1,5 +1,5 @@
+import '../helpers/requests.dart';
 import '../helpers/responses.dart';
-import '../helpers/validators.dart';
 import '../helpers/db_connection.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
@@ -28,22 +28,22 @@ RouterPlus booksRouter() {
 
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    body["mediatype"] = "book";
-    final specificBodies = splitBody(body, mediaType: "book");
-    
-    validateBody(specificBodies["bookBody"]!, fields:
+    body['mediatype'] = 'book';
+    final specificBodies = splitBody(body, mediaType: 'book');
+
+    validateBody(specificBodies['bookBody']!, fields:
       [
-        "language",
-        "totalpages",
-        "format",
+        'language',
+        'totalpages',
+        'format',
       ]
     );
 
-    final result = await createFromBody(specificBodies, mediaType: "book");
+    final result = await createFromBody(specificBodies, _supabase, mediaType: 'book');
     return sendOk(result);
   });
 
@@ -51,8 +51,8 @@ RouterPlus booksRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
-        "mediaid",
+        'id',
+        'mediaid',
       ]
     );
 
