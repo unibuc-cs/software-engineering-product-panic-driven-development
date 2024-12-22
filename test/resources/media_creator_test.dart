@@ -1,8 +1,8 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/media_creator.dart';
-import '../../lib/Services/creator_service.dart';
-import '../../lib/Services/media_creator_service.dart';
+import 'package:mediamaster/Models/media_creator.dart';
+import 'package:mediamaster/Services/creator_service.dart';
+import 'package:mediamaster/Services/media_creator_service.dart';
 
 void main() async {
   Map<String, dynamic> creator = {
@@ -19,6 +19,6 @@ void main() async {
   await runService(
     service   : MediaCreatorService(),
     dummyItem : dummy,
-    tables    : ["media", "creator"],
+    tables    : ['media', 'creator'],
   );
 }

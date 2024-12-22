@@ -1,8 +1,8 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/media_platform.dart';
-import '../../lib/Services/platform_service.dart';
-import '../../lib/Services/media_platform_service.dart';
+import 'package:mediamaster/Models/media_platform.dart';
+import 'package:mediamaster/Services/platform_service.dart';
+import 'package:mediamaster/Services/media_platform_service.dart';
 
 void main() async {
   Map<String, dynamic> platform = {
@@ -19,6 +19,6 @@ void main() async {
   await runService(
     service  : MediaPlatformService(),
     dummyItem: dummy,
-    tables   : ["media", "platform"],
+    tables   : ['media', 'platform'],
   );
 }

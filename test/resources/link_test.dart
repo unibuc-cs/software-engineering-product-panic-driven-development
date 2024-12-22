@@ -1,7 +1,7 @@
 import 'dart:core';
-import '../../lib/Models/link.dart';
 import '../general/resource_test.dart';
-import '../../lib/Services/link_service.dart';
+import 'package:mediamaster/Models/link.dart';
+import 'package:mediamaster/Services/link_service.dart';
 
 void main() async {
   Link dummy = Link(

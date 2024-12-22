@@ -1,7 +1,7 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/retailer.dart';
-import '../../lib/Services/retailer_service.dart';
+import 'package:mediamaster/Models/retailer.dart';
+import 'package:mediamaster/Services/retailer_service.dart';
 
 void main() async {
   Retailer dummy = Retailer(

@@ -1,7 +1,7 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/platform.dart';
-import '../../lib/Services/platform_service.dart';
+import 'package:mediamaster/Models/platform.dart';
+import 'package:mediamaster/Services/platform_service.dart';
 
 void main() async {
   Platform dummy = Platform(

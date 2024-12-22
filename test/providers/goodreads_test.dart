@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import '../../lib/Services/provider_service.dart';
+import 'package:mediamaster/Services/provider_service.dart';
 
 void main() {
   group('Goodreads', () {

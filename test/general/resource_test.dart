@@ -1,6 +1,6 @@
 import 'dart:core';
-import '../../lib/Models/model.dart';
-import '../../lib/Services/general/service.dart';
+import 'package:mediamaster/Models/model.dart';
+import 'package:mediamaster/Services/general/service.dart';
 
 Future<int> getValidId<T extends Model>({
   required Service<T> service,
@@ -20,7 +20,7 @@ Future<void> runService<T extends Model>({
   List<String>? tables
 }) async {
   List<int> ids = [];
-  
+
   try {
     Map<String, dynamic> body = <String, dynamic>{};
     if (dummyItem is T) {
@@ -35,10 +35,10 @@ Future<void> runService<T extends Model>({
 
     final data = await service.create(body);
     Map<String, dynamic> dataMap = data.toJson();
-    print('Created ${dataMap}');
+    print('Created $dataMap');
     if (tables != null) {
       ids = tables
-        .map((table) => dataMap["${table}id"] as int)
+        .map((table) => dataMap['${table}id'] as int)
         .toList();
     }
     else {
@@ -51,14 +51,14 @@ Future<void> runService<T extends Model>({
 
   final idDescription = ids.length == 1
       ? 'id ${ids[0]}'
-      : 'ids ${ids.join(", ")}';
+      : 'ids ${ids.join(', ')}';
 
   try {
     final data = await service.readAll();
     print('Got all\n[');
-    data.forEach((item) {
+    for (var item in data) {
       print('  ${item.toJson()}');
-    });
+    }
     print(']');
   }
   catch (e) {
@@ -76,7 +76,7 @@ Future<void> runService<T extends Model>({
   if (itemName != null) {
     try {
       final data = await service.readByName(itemName);
-      print('Got ${data.toJson()} by name ${itemName}');
+      print('Got ${data.toJson()} by name $itemName');
     }
     catch (e) {
       print('GetByName error: $e');

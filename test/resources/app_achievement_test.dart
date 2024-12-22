@@ -1,7 +1,7 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/app_achievement.dart';
-import '../../lib/Services/app_achievement_service.dart';
+import 'package:mediamaster/Models/app_achievement.dart';
+import 'package:mediamaster/Services/app_achievement_service.dart';
 
 void main() async {
   AppAchievement dummy = AppAchievement(

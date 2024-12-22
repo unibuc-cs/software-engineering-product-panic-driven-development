@@ -1,7 +1,7 @@
 import 'dart:core';
-import '../../lib/Models/series.dart';
 import '../general/resource_test.dart';
-import '../../lib/Services/series_service.dart';
+import 'package:mediamaster/Models/series.dart';
+import 'package:mediamaster/Services/series_service.dart';
 
 void main() async {
   Series dummy = Series(

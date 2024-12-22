@@ -1,7 +1,7 @@
 import 'dart:core';
-import '../../lib/Models/tag.dart';
 import '../general/resource_test.dart';
-import '../../lib/Services/tag_service.dart';
+import 'package:mediamaster/Models/tag.dart';
+import 'package:mediamaster/Services/tag_service.dart';
 
 void main() async {
   Tag dummy = Tag(

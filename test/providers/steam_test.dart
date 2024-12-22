@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
-import '../../lib/Services/provider_service.dart';
+import 'package:mediamaster/Services/provider_service.dart';
 
 String encodeWithDateTime(Map<String, dynamic> data) {
   return const JsonEncoder.withIndent('  ').convert(data.map((key, value) {
@@ -19,11 +19,11 @@ Map<String, dynamic> getBestMatch(String gameName, List<Map<String, dynamic>> ga
   int bestMatchPercentage = 0;
   gameName = gameName.replaceAll(RegExp(r'\W'), '').toLowerCase();
   for (final game in gameOptions) {
-    if (!game.containsKey("name")) {
+    if (!game.containsKey('name')) {
       continue;
     }
-    String name = game["name"]
-      .replaceAll(RegExp(r"\(.*?\)"), "")
+    String name = game['name']
+      .replaceAll(RegExp(r'\(.*?\)'), '')
       .replaceAll(RegExp(r'\W'), '')
       .toLowerCase();
     int length = math.max(name.length, gameName.length), matchPercentage = 0;
@@ -47,24 +47,24 @@ Map<String, dynamic> getBestMatch(String gameName, List<Map<String, dynamic>> ga
 }
 
 final users = {
-  // "SKT_Blackspell13": "76561199067194369",
-  "The-Winner": "76561198840472293",
-  "giulian62": "76561198335146669"
+  'SKT_Blackspell13': '76561199067194369',
+  'The-Winner': '76561198840472293',
+  'giulian62': '76561198335146669'
 };
 
 Future<Map<String, dynamic>> getGames(String selectedUser) async {
-  final userId = users[selectedUser] ?? "";
-  final gamesList = (await getInfoSteam(userId))["games"];
+  final userId = users[selectedUser] ?? '';
+  final gamesList = (await getInfoSteam(userId))['games'];
   final futures = <Future<void>>[];
   Map<String, dynamic> games = {};
 
   for (var i = 0; i < gamesList.length; i++) {
     futures.add(Future.delayed(Duration(milliseconds: 275 * i), () async {
       final game = gamesList[i];
-      final name = (game["name"] ?? "")
-        .replaceAll(":", "")
-        .replaceAll(",", "")
-        .replaceAll("&", "and")
+      final name = (game['name'] ?? '')
+        .replaceAll(':', '')
+        .replaceAll(',', '')
+        .replaceAll('&', 'and')
         .split(RegExp(r'\s+'))
         .join(' ');
       final gameOptions = await getOptionsIGDB(name);
@@ -81,7 +81,7 @@ Future<Map<String, dynamic>> getInfoForGames(Map<String, dynamic> games) async {
   int delayTime = 0;
 
   for (var game in games.entries) {
-    if (game.value.containsKey("id")) {
+    if (game.value.containsKey('id')) {
       futures.add(Future.delayed(Duration(milliseconds: 2225 * delayTime), () async {
         gameInfo[game.key] = await getInfoIGDB(game.value);
       }));
@@ -96,9 +96,9 @@ Future<Map<String, dynamic>> getInfoForGames(Map<String, dynamic> games) async {
 Future<void> main() async {
   final Stopwatch stopwatch = Stopwatch()..start();
 
-  final games = await getGames("The-Winner");
-  final gamesInfo = await getInfoForGames(games);
+  final games = await getGames('The-Winner');
+  await getInfoForGames(games);
 
   stopwatch.stop();
-  print("Execution completed in ${stopwatch.elapsed.inSeconds} seconds.");
+  print('Execution completed in ${stopwatch.elapsed.inSeconds} seconds.');
 }

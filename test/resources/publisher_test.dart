@@ -1,7 +1,7 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/publisher.dart';
-import '../../lib/Services/publisher_service.dart';
+import 'package:mediamaster/Models/publisher.dart';
+import 'package:mediamaster/Services/publisher_service.dart';
 
 void main() async {
   Publisher dummy = Publisher(

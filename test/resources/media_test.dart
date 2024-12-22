@@ -1,7 +1,7 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/media.dart';
-import '../../lib/Services/media_service.dart';
+import 'package:mediamaster/Models/media.dart';
+import 'package:mediamaster/Services/media_service.dart';
 
 void main() async {
   Media dummy = Media(

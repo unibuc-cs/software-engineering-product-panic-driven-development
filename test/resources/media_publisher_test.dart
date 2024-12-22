@@ -1,8 +1,8 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/media_publisher.dart';
-import '../../lib/Services/publisher_service.dart';
-import '../../lib/Services/media_publisher_service.dart';
+import 'package:mediamaster/Models/media_publisher.dart';
+import 'package:mediamaster/Services/publisher_service.dart';
+import 'package:mediamaster/Services/media_publisher_service.dart';
 
 void main() async {
   Map<String, dynamic> publisher = {
@@ -19,6 +19,6 @@ void main() async {
   await runService(
     service  : MediaPublisherService(),
     dummyItem: dummy,
-    tables   : ["media", "publisher"],
+    tables   : ['media', 'publisher'],
   );
 }

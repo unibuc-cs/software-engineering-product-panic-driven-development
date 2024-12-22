@@ -1,8 +1,8 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/media_retailer.dart';
-import '../../lib/Services/retailer_service.dart';
-import '../../lib/Services/media_retailer_service.dart';
+import 'package:mediamaster/Models/media_retailer.dart';
+import 'package:mediamaster/Services/retailer_service.dart';
+import 'package:mediamaster/Services/media_retailer_service.dart';
 
 void main() async {
   Map<String, dynamic> retailer = {
@@ -19,6 +19,6 @@ void main() async {
   await runService(
     service  : MediaRetailerService(),
     dummyItem: dummy,
-    tables   : ["media", "retailer"],
+    tables   : ['media', 'retailer'],
   );
 }

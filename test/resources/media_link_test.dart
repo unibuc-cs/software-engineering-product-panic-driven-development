@@ -1,8 +1,8 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/media_link.dart';
-import '../../lib/Services/link_service.dart';
-import '../../lib/Services/media_link_service.dart';
+import 'package:mediamaster/Models/media_link.dart';
+import 'package:mediamaster/Services/link_service.dart';
+import 'package:mediamaster/Services/media_link_service.dart';
 
 void main() async {
   Map<String, dynamic> link = {
@@ -20,6 +20,6 @@ void main() async {
   await runService(
     service  : MediaLinkService(),
     dummyItem: dummy,
-    tables   : ["media", "link"],
+    tables   : ['media', 'link'],
   );
 }

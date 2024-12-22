@@ -1,7 +1,7 @@
 import 'dart:core';
 import '../general/resource_test.dart';
-import '../../lib/Models/creator.dart';
-import '../../lib/Services/creator_service.dart';
+import 'package:mediamaster/Models/creator.dart';
+import 'package:mediamaster/Services/creator_service.dart';
 
 void main() async {
   Creator dummy = Creator(
