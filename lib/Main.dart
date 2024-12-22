@@ -62,12 +62,13 @@ class HomeState extends State<Home> {
   final response = await Supabase.instance.client
       .from('publisher')
       .insert({'name': 'Test Publisher'});
-  
+
   if (response.error != null) {
     // Handle error
-    print("Error inserting publisher: ${response.error.message}");
-  } else {
-    print("Publisher inserted successfully.");
+    // print("Error inserting publisher: ${response.error.message}");
+  }
+  else {
+    // print("Publisher inserted successfully.");
   }
 }
 
@@ -122,7 +123,7 @@ class HomeState extends State<Home> {
               ),
               child: const Text('Log in'),
             ),
-              
+
           ],
         ),
       ),

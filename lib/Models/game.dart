@@ -32,16 +32,16 @@ class Game extends MediaType implements Model {
     required this.mediaId,
     this.parentGameId = -1,
     this.IGDBId = -1,
-    this.OSMinimum = "",
-    this.OSRecommended = "",
-    this.CPUMinimum = "",
-    this.CPURecommended = "",
-    this.RAMMinimum = "",
-    this.RAMRecommended = "",
-    this.HDDMinimum = "",
-    this.HDDRecommended = "",
-    this.GPUMinimum = "",
-    this.GPURecommended = "",
+    this.OSMinimum = '',
+    this.OSRecommended = '',
+    this.CPUMinimum = '',
+    this.CPURecommended = '',
+    this.RAMMinimum = '',
+    this.RAMRecommended = '',
+    this.HDDMinimum = '',
+    this.HDDRecommended = '',
+    this.GPUMinimum = '',
+    this.GPURecommended = '',
     this.HLTBMainInSeconds = -1,
     this.HLTBMainSideInSeconds = -1,
     this.HLTBCompletionistInSeconds = -1,
@@ -124,14 +124,14 @@ class Game extends MediaType implements Model {
 
   @override
   Future<Media> get media async {
-    _media ??= await MediaService().readById(mediaId);
+    _media ??= await MediaService().readById([mediaId]);
     return _media!;
   }
 
   Game? _parentGame;
 
   Future<Game?> get parentGame async {
-    _parentGame ??= await GameService().readById(parentGameId);
+    _parentGame ??= await GameService().readById([parentGameId]);
     return _parentGame;
   }
 }

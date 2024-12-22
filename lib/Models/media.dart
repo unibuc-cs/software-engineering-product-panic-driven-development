@@ -13,7 +13,7 @@ class Media implements Model {
   Media({
     this.id = -1,
     required this.originalName,
-    this.description = "",
+    this.description = '',
     required this.releaseDate,
     this.criticScore = 0,
     this.communityScore = 0,

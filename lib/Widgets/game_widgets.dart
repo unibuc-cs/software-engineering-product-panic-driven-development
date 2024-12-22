@@ -1,16 +1,16 @@
-import "dart:math";
-import "package:flutter/material.dart";
-import "package:flutter/services.dart";
-import "package:mediamaster/Services/genre_service.dart";
-import "package:mediamaster/Services/provider_service.dart";
-import "package:mediamaster/Services/tag_service.dart";
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:mediamaster/Services/genre_service.dart';
+import 'package:mediamaster/Services/provider_service.dart';
+import 'package:mediamaster/Services/tag_service.dart';
 
-import "../Models/tag.dart";
-import "../Models/game.dart";
-import "../Models/genre.dart";
-import "../Models/media_user_tag.dart";
-import "../Models/media_user_genre.dart";
-import "../UserSystem.dart";
+import '../Models/tag.dart';
+import '../Models/game.dart';
+import '../Models/genre.dart';
+import '../Models/media_user_tag.dart';
+import '../Models/media_user_genre.dart';
+import '../UserSystem.dart';
 
 int getMinTimeToBeat(Game game) {
   List<int> times = List.from([
@@ -28,9 +28,9 @@ int getMinTimeToBeat(Game game) {
 Widget renderHLTB(Game game) {
   String formatTime(int timeInSeconds) {
     if (timeInSeconds / (60 * 60) ==  timeInSeconds ~/ (60 * 60)) {
-      return "${timeInSeconds ~/ (60 * 60)} hour${timeInSeconds / (60 * 60) > 1 ? 's' : ''}";
+      return '${timeInSeconds ~/ (60 * 60)} hour${timeInSeconds / (60 * 60) > 1 ? 's' : ''}';
     }
-    return "${timeInSeconds / (60 * 60)} hour${timeInSeconds / (60 * 60) > 1 ? 's' : ''}";
+    return '${timeInSeconds / (60 * 60)} hour${timeInSeconds / (60 * 60) > 1 ? 's' : ''}';
   }
 
   Widget formatHLTBRow(String title, int timeInSeconds) {
@@ -70,32 +70,32 @@ Widget renderHLTB(Game game) {
     children: [
       if (game.HLTBMainInSeconds > 0)
         formatHLTBRow(
-          "Main",
+          'Main',
           game.HLTBMainInSeconds,
         ),
       if (game.HLTBMainSideInSeconds > 0)
         formatHLTBRow(
-          "Main + Side",
+          'Main + Side',
           game.HLTBMainSideInSeconds,
         ),
       if (game.HLTBCompletionistInSeconds > 0)
         formatHLTBRow(
-          "Completionist",
+          'Completionist',
           game.HLTBCompletionistInSeconds,
         ),
       if (game.HLTBAllStylesInSeconds > 0)
         formatHLTBRow(
-          "All styles",
+          'All styles',
           game.HLTBAllStylesInSeconds,
         ),
       if (game.HLTBCoopInSeconds > 0)
         formatHLTBRow(
-          "Co-op",
+          'Co-op',
           game.HLTBCoopInSeconds,
         ),
       if (game.HLTBVersusInSeconds > 0)
         formatHLTBRow(
-          "Versus",
+          'Versus',
           game.HLTBVersusInSeconds,
         ),
     ],
@@ -139,43 +139,43 @@ Widget renderPCGW(Game game) {
     mainAxisSize: MainAxisSize.min,
     children: [
       formatPCGWRow(
-        "OS minimum",
+        'OS minimum',
         game.OSMinimum,
       ),
       formatPCGWRow(
-        "OS recommended",
+        'OS recommended',
         game.OSRecommended,
       ),
       formatPCGWRow(
-        "CPU minimum",
+        'CPU minimum',
         game.CPUMinimum,
       ),
       formatPCGWRow(
-        "CPU recommended",
+        'CPU recommended',
         game.CPURecommended,
       ),
       formatPCGWRow(
-        "RAM minimum",
+        'RAM minimum',
         game.RAMMinimum,
       ),
       formatPCGWRow(
-        "RAM recommended",
+        'RAM recommended',
         game.RAMRecommended,
       ),
       formatPCGWRow(
-        "HDD minimum",
+        'HDD minimum',
         game.HDDMinimum,
       ),
       formatPCGWRow(
-        "HDD recommended",
+        'HDD recommended',
         game.HDDRecommended,
       ),
       formatPCGWRow(
-        "GPU minimum",
+        'GPU minimum',
         game.GPUMinimum,
       ),
       formatPCGWRow(
-        "GPU recommended",
+        'GPU recommended',
         game.GPURecommended,
       ),
     ],
@@ -215,7 +215,7 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
   // TODO: Endpoint this
   Set<int> mutIds = await MediaUserTag.getAllFor(game.mediaId, UserSystem().getCurrentUserId()); // TODO: Implement this so it returns the set of tag ids for which there exist a MediaUserTag with that tagId
   Set<int> mugIds = await MediaUserGenre.getAllFor(game.mediaId, UserSystem().getCurrentUserId()); // TODO: Similar to the one above but with Genre
-  
+
   // https://dart.dev/tools/diagnostic-messages?utm_source=dartdev&utm_medium=redir&utm_id=diagcode&utm_content=use_build_context_synchronously#use_build_context_synchronously
   // If we remove the following if there is a chance that there will be weird crashes and bugs and what not.
   if (context.mounted) {
@@ -256,11 +256,11 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
 
                                       if (value == true) {
                                         // TODO: Endpoint this
-                                        await Supabase.instance.client.from("mediausertag").insert(mut.toSupa());
+                                        await Supabase.instance.client.from('mediausertag').insert(mut.toSupa());
                                         mutIds.add(mut.tagId);
                                       } else {
                                         // TODO: Endpoint this
-                                        await Supabase.instance.client.from("mediausertag").delete().eq("userid", mut.userId).eq("mediaid", mut.mediaId).eq("tagid", mut.tagId);
+                                        await Supabase.instance.client.from('mediausertag').delete().eq('userid', mut.userId).eq('mediaid', mut.mediaId).eq('tagid', mut.tagId);
                                         mutIds.remove(mut.tagId);
                                       }
                                       resetState();
@@ -295,14 +295,14 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
                                         userId: UserSystem().currentUser!.id,
                                         genreId: genre.id,
                                       );
-                                      
+
                                       if (value == true) {
                                         // TODO: Endpoint this
-                                        await Supabase.instance.client.from("mediausergenre").insert(mug.toSupa());
+                                        await Supabase.instance.client.from('mediausergenre').insert(mug.toSupa());
                                         mugIds.add(mug.genreId);
                                       } else {
                                         // TODO: Endpoint this
-                                        await Supabase.instance.client.from("mediausergenre").delete().eq("userid", mug.userId).eq("mediaid", mug.mediaId).eq("genreid", mug.genreId);
+                                        await Supabase.instance.client.from('mediausergenre').delete().eq('userid', mug.userId).eq('mediaid', mug.mediaId).eq('genreid', mug.genreId);
                                         mugIds.remove(mug.genreId);
                                       }
                                       resetState();
@@ -452,7 +452,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
           child: const Column(
             children: [
               Text(
-                "Play",
+                'Play',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 24.0,
@@ -460,7 +460,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
                 textAlign: TextAlign.center,
               ),
               Text(
-                "(currently unnavailable)",
+                '(currently unnavailable)',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 12.0,

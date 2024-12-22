@@ -1,10 +1,10 @@
-import "package:flutter/material.dart";
-import "package:mediamaster/Models/game.dart";
-import "package:mediamaster/Models/media.dart";
-import "package:mediamaster/Models/media_type.dart";
-import "package:mediamaster/Models/media_user.dart";
-import "package:mediamaster/UserSystem.dart";
-import "package:mediamaster/Widgets/game_widgets.dart";
+import 'package:flutter/material.dart';
+import 'package:mediamaster/Models/game.dart';
+import 'package:mediamaster/Models/media.dart';
+import 'package:mediamaster/Models/media_type.dart';
+import 'package:mediamaster/Models/media_user.dart';
+import 'package:mediamaster/UserSystem.dart';
+import 'package:mediamaster/Widgets/game_widgets.dart';
 
 // TODO: Make this more general
 // Auxilliary function for general list widgets (publishers, creators, ...)
@@ -75,41 +75,41 @@ Widget getListWidget(String title, List<String> items) {
 
 Widget getReleaseDateWidget(Media media) {
   if (media.releaseDate == DateTime(1800)) {
-    return getListWidget('Release Date', List.of(["N/A"]));
+    return getListWidget('Release Date', List.of(['N/A']));
   }
   return getListWidget('Release Date', List.of([media.releaseDate.toString().substring(0, 10)]));
 }
 
 Future<Widget> getPublishersWidget(Media media) async {
   var pubs = (await media.publishers).map((pub) => pub.name).toList();
-  return getListWidget('Publisher${pubs.length <= 1 ? "" : "s"}', pubs.isEmpty ? List.of(["N/A"]) : pubs);
+  return getListWidget('Publisher${pubs.length <= 1 ? '' : 's'}', pubs.isEmpty ? List.of(['N/A']) : pubs);
 }
 
 Future<Widget> getCreatorsWidget(Media media) async{
   var crts = (await media.creators).map((crt) => crt.name).toList();
-  return getListWidget('Creator${crts.length <= 1 ? "" : "s"}', crts.isEmpty ? List.of(["N/A"]) : crts);
+  return getListWidget('Creator${crts.length <= 1 ? '' : 's'}', crts.isEmpty ? List.of(['N/A']) : crts);
 }
 
 Future<Widget> getPlatformsWidget(Media media) async {
   var plts = (await media.platforms).map((plt) => plt.name).toList();
-  return getListWidget('Platform${plts.length <= 1 ? "" : "s"}', plts.isEmpty ? List.of(["N/A"]) : plts);
+  return getListWidget('Platform${plts.length <= 1 ? '' : 's'}', plts.isEmpty ? List.of(['N/A']) : plts);
 }
 
 Widget getRatingsWidget(Media media) {
-  String criticScoreString = "Critic score: ";
+  String criticScoreString = 'Critic score: ';
   if (media.criticScore != 0) {
     criticScoreString += media.criticScore.toString();
   }
   else {
-    criticScoreString += "N/A";
+    criticScoreString += 'N/A';
   }
 
-  String communityScoreString = "Community score: ";
+  String communityScoreString = 'Community score: ';
   if (media.communityScore != 0) {
     communityScoreString += media.communityScore.toString();
   }
   else {
-    communityScoreString += "N/A";
+    communityScoreString += 'N/A';
   }
 
   return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
@@ -118,13 +118,13 @@ Widget getRatingsWidget(Media media) {
 Future<MediaUser> getCustomizations(Media media) async {
   // TODO: Get the current user's id.
   int userId=UserSystem().getCurrentUserId();
-  return MediaUser.from(await Supabase.instance.client.from("mediauser").select().eq("mediaid", id).eq("userid", userId).single());
+  return MediaUser.from(await Supabase.instance.client.from('mediauser').select().eq('mediaid', id).eq('userid', userId).single());
 }
 
 Future<Widget> displayMedia(Media media, Widget additionalButtons, Widget notesWidget) async {
   MediaUser customizations = await getCustomizations(media);
-  String imageUrl = "https://${customizations.backgroundImage}";
-  String coverUrl = "https://${customizations.coverImage}";
+  String imageUrl = 'https://${customizations.backgroundImage}';
+  String coverUrl = 'https://${customizations.coverImage}';
 
   return SizedBox.expand(
     child: Container(
@@ -220,5 +220,5 @@ Future<Widget> getAdditionalButtons<MT extends MediaType>(MT mt, BuildContext co
   if (MT == Game) {
     return getAdditionalButtonsForGame(mt as Game, context, resetState);
   }
-  throw UnimplementedError("getAdditionalButtons was not defined for this type");
+  throw UnimplementedError('getAdditionalButtons was not defined for this type');
 }

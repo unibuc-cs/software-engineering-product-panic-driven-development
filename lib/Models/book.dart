@@ -12,9 +12,9 @@ class Book extends MediaType implements Model {
   Book({
     this.id = -1,
     required this.mediaId,
-    this.language = "",
+    this.language = '',
     this.totalPages = 0,
-    this.format = "",
+    this.format = '',
   });
 
   static String get endpoint => 'books';
@@ -50,9 +50,9 @@ class Book extends MediaType implements Model {
     return Book(
       id: json['id'],
       mediaId: json['mediaid'],
-      language: json['language'] ?? "",
+      language: json['language'] ?? '',
       totalPages: json['totalpages'] ?? 0,
-      format: json['format'] ?? "",
+      format: json['format'] ?? '',
     );
   }
 }
