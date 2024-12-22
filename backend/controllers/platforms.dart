@@ -5,10 +5,10 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus platformsRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final platforms = await _supabase
+    final platforms = await supabase
       .from('platform')
       .select();
     return sendOk(platforms);
@@ -16,8 +16,8 @@ RouterPlus platformsRouter() {
 
   router.get('/name', (Request req) async {
     final queryParams = req.url.queryParameters;
-    final name = queryParams["query"] ?? "";
-    final platform = await _supabase
+    final name = queryParams['query'] ?? '';
+    final platform = await supabase
       .from('platform')
       .select()
       .ilike('name', name)
@@ -26,7 +26,7 @@ RouterPlus platformsRouter() {
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final platform = await _supabase
+    final platform = await supabase
       .from('platform')
       .select()
       .eq('id', id)
@@ -38,16 +38,16 @@ RouterPlus platformsRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
     validateBody(body, fields:
       [
-        "name",
+        'name',
       ]
     );
 
-    final plaform = await _supabase
+    final plaform = await supabase
       .from('platform')
       .insert(body)
       .select()
@@ -59,11 +59,11 @@ RouterPlus platformsRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final platform = await _supabase
+    final platform = await supabase
       .from('platform')
       .update(body)
       .eq('id', id)
@@ -73,12 +73,12 @@ RouterPlus platformsRouter() {
   });
 
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
+    await supabase
       .from('mediaplatform')
       .delete()
       .eq('platformid', id);
 
-    await _supabase
+    await supabase
       .from('platform')
       .delete()
       .eq('id', id);

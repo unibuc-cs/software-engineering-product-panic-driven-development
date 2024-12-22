@@ -9,12 +9,12 @@ import 'package:html/parser.dart' show parse;
 
 class GoodReads extends Provider {
   // Members
-  late final _headers;
+  late final Map<String, String> _headers;
 
   // Private constructor
   GoodReads._() {
     _headers = {
-      "User-Agent": config.goodreadsAgents
+      'User-Agent': config.goodreadsAgents
     };
   }
 
@@ -33,32 +33,32 @@ class GoodReads extends Provider {
       );
 
       if (response.statusCode != 200) {
-        return Document.html("");
+        return Document.html('');
       }
 
       return parse(response.body);
     }
     catch (e) {
-      return Document.html("");
+      return Document.html('');
     }
   }
 
   Future<List<Map<String, dynamic>>> _getBookOptions(String bookName) async {
     try {
-      final document = await _getDocument("https://www.goodreads.com/search?q=$bookName");
+      final document = await _getDocument('https://www.goodreads.com/search?q=$bookName');
 
-      if (document == Document.html("")) {
-        return [{"error": "No books found"}];
+      if (document == Document.html('')) {
+        return [{'error': 'No books found'}];
       }
 
       return document
-         .querySelectorAll("tr[itemtype='http://schema.org/Book']")
+         .querySelectorAll('tr[itemtype="http://schema.org/Book"]')
          .map((book) {
-            final titleElement = book.querySelector("a.bookTitle");
+            final titleElement = book.querySelector('a.bookTitle');
             if (titleElement != null) {
               return {
-                "name": titleElement.text.split("(")[0].trim(),
-                "link": "https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}"
+                'name': titleElement.text.split('(')[0].trim(),
+                'link': 'https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}'
               };
             }
           })
@@ -67,7 +67,7 @@ class GoodReads extends Provider {
          .toList();
     }
     catch (e) {
-      return [{"error": e.toString()}];
+      return [{'error': e.toString()}];
     }
   }
 
@@ -75,7 +75,7 @@ class GoodReads extends Provider {
     try {
       final document = await _getDocument(seriesUrl);
 
-      if (document == Document.html("")) {
+      if (document == Document.html('')) {
         return [];
       }
 
@@ -85,13 +85,13 @@ class GoodReads extends Provider {
           .querySelectorAll('div.listWithDividers__item')
           .map((element) async {
               return {
-                "name": element.querySelector('span[itemprop="name"]')?.text.trim() ?? 'Unknown Title',
-                "index": element.querySelector('h3[class="gr-h3 gr-h3--noBottomMargin"]')?.text.split("Book")[1].trim()
+                'name': element.querySelector('span[itemprop="name"]')?.text.trim() ?? 'Unknown Title',
+                'index': element.querySelector('h3[class="gr-h3 gr-h3--noBottomMargin"]')?.text.split('Book')[1].trim()
               };
             })
         )
       )
-      .where((book) => !(book["index"]?.contains("-") ?? false))
+      .where((book) => !(book['index']?.contains('-') ?? false))
       .toList();
     }
     catch (e) {
@@ -104,40 +104,40 @@ class GoodReads extends Provider {
     try {
       final document = await _getDocument(bookUrl);
 
-      if (document == Document.html("")) {
-        return {"error": "No books found"};
+      if (document == Document.html('')) {
+        return {'error': 'No books found'};
       }
 
-      final jsonData = json.decode(document.querySelector("script[type='application/ld+json']")?.text ?? "{}");
-      final seriesElement = document.querySelector("div.BookPageTitleSection__title")?.querySelector("h3");
+      final jsonData = json.decode(document.querySelector('script[type="application/ld+json"]')?.text ?? '{}');
+      final seriesElement = document.querySelector('div.BookPageTitleSection__title')?.querySelector('h3');
 
       // Date example: July 21, 2007
-      final releaseDate = document.querySelector("p[data-testid='publicationInfo']")?.text
-                                  .trim().split("First published ").last ?? "";
-      final parsedDate = DateFormat("MMMM d, y").parse(releaseDate);
+      final releaseDate = document.querySelector('p[data-testid="publicationInfo"]')?.text
+                                  .trim().split('First published ').last ?? '';
+      final parsedDate = DateFormat('MMMM d, y').parse(releaseDate);
 
-      final genres = document.querySelectorAll("span.BookPageMetadataSection__genreButton a")
+      final genres = document.querySelectorAll('span.BookPageMetadataSection__genreButton a')
         .map((element) => element.text.trim())
         .toList();
 
       return {
-        "originalname": document.querySelector("h1.Text__title1")?.text.trim(),
-        "creators": [document.querySelector("span.ContributorLink__name")?.text.trim()],
-        "links": [bookUrl],
-        "communityscore": (double.parse(document.querySelector("div.RatingStatistics__rating")!.text.trim()) * 20).round().toString(),
-        "releasedate": DateFormat("yyyy-MM-dd").format(parsedDate),
-        "description": document.querySelector("span.Formatted")?.text.trim(),
-        "totalpages": jsonData["numberOfPages"],
-        "coverimage": jsonData["image"],
-        "genres": genres,
-        "format": jsonData["bookFormat"],
-        "language": jsonData["inLanguage"],
-        "seriesname": seriesElement?.querySelectorAll("a").map((a) => a.text.split("#")[0].trim()).toList() ?? [],
-        "series": await instance._getBooksFromSeries(seriesElement?.querySelector("a")?.attributes['href'] ?? "")
+        'originalname': document.querySelector('h1.Text__title1')?.text.trim(),
+        'creators': [document.querySelector('span.ContributorLink__name')?.text.trim()],
+        'links': [bookUrl],
+        'communityscore': (double.parse(document.querySelector('div.RatingStatistics__rating')!.text.trim()) * 20).round().toString(),
+        'releasedate': DateFormat('yyyy-MM-dd').format(parsedDate),
+        'description': document.querySelector('span.Formatted')?.text.trim(),
+        'totalpages': jsonData['numberOfPages'],
+        'coverimage': jsonData['image'],
+        'genres': genres,
+        'format': jsonData['bookFormat'],
+        'language': jsonData['inLanguage'],
+        'seriesname': seriesElement?.querySelectorAll('a').map((a) => a.text.split('#')[0].trim()).toList() ?? [],
+        'series': await instance._getBooksFromSeries(seriesElement?.querySelector('a')?.attributes['href'] ?? '')
       };
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
@@ -159,15 +159,15 @@ class GoodReads extends Provider {
       final page = await browser.newPage();
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
-        if (['image', 'stylesheet', 'font'].contains(request.resourceType)) {
+        final resourceType = request.resourceType?.toString() ?? '';
+        if (['image', 'stylesheet', 'font'].any((type) => resourceType.endsWith(type))) {
           request.abort();
-        }
-        else {
+        } else {
           request.continueRequest();
         }
       });
 
-      await page.goto(bookUrl, wait: Until.networkIdle);
+      await page.goto(bookUrl, wait: Until.networkIdle, timeout: Duration(milliseconds: 60000));
       await page.waitForSelector('.BookCard__clickCardTarget');
 
       final recommendedBooks = await page.evaluate('''
@@ -191,7 +191,7 @@ class GoodReads extends Provider {
           .toList();
     }
     catch (e) {
-      return [{"error": e.toString()}];
+      return [{'error': e.toString()}];
     }
     finally {
       await browser.close();
@@ -216,6 +216,6 @@ class GoodReads extends Provider {
 
   @override
   String getKey() {
-    return "link";
+    return 'link';
   }
 }

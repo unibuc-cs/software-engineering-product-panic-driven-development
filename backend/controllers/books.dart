@@ -5,10 +5,10 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus booksRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final books = await _supabase
+    final books = await supabase
       .from('book')
       .select();
     return sendOk(books);
@@ -16,8 +16,8 @@ RouterPlus booksRouter() {
 
   router.get('/name', (Request req) async {
     final queryParams = req.url.queryParameters;
-    final mediaId = int.parse(queryParams["query"] ?? "");
-    final book = await _supabase
+    final mediaId = int.parse(queryParams['query'] ?? '');
+    final book = await supabase
       .from('book')
       .select()
       .eq('mediaid', mediaId)
@@ -26,7 +26,7 @@ RouterPlus booksRouter() {
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final book = await _supabase
+    final book = await supabase
       .from('book')
       .select()
       .eq('id', id)
@@ -45,7 +45,7 @@ RouterPlus booksRouter() {
 
     body['mediatype'] = 'book';
     final specificBodies = splitBody(body, mediaType: 'book');
-    final result = await createFromBody(specificBodies, _supabase, mediaType: 'book', mediaTypePlural: 'books');
+    final result = await createFromBody(specificBodies, supabase, mediaType: 'book', mediaTypePlural: 'books');
     return sendOk(result);
   });
 
@@ -58,7 +58,7 @@ RouterPlus booksRouter() {
       ]
     );
 
-    final book = await _supabase
+    final book = await supabase
       .from('book')
       .update(body)
       .eq('id', id)

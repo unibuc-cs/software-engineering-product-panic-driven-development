@@ -5,10 +5,10 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus seriesRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final series = await _supabase
+    final series = await supabase
       .from('series')
       .select();
     return sendOk(series);
@@ -16,8 +16,8 @@ RouterPlus seriesRouter() {
 
   router.get('/name', (Request req) async {
     final queryParams = req.url.queryParameters;
-    final name = queryParams["query"] ?? "";
-    final series = await _supabase
+    final name = queryParams['query'] ?? '';
+    final series = await supabase
       .from('series')
       .select()
       .ilike('name', name)
@@ -26,7 +26,7 @@ RouterPlus seriesRouter() {
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final series = await _supabase
+    final series = await supabase
       .from('series')
       .select()
       .eq('id', id)
@@ -38,16 +38,16 @@ RouterPlus seriesRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
     validateBody(body, fields:
       [
-        "name",
+        'name',
       ]
     );
 
-    final series = await _supabase
+    final series = await supabase
       .from('series')
       .insert(body)
       .select()
@@ -59,11 +59,11 @@ RouterPlus seriesRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final series = await _supabase
+    final series = await supabase
       .from('series')
       .update(body)
       .eq('id', id)
@@ -73,12 +73,12 @@ RouterPlus seriesRouter() {
   });
 
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
+    await supabase
       .from('mediaseries')
       .delete()
       .eq('seriesid', id);
 
-    await _supabase
+    await supabase
       .from('series')
       .delete()
       .eq('id', id);

@@ -5,17 +5,17 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus appAchievementsRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final appAchievements = await _supabase
+    final appAchievements = await supabase
       .from('appachievement')
       .select();
     return sendOk(appAchievements);
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final appAchievement = await _supabase
+    final appAchievement = await supabase
       .from('appachievement')
       .select()
       .eq('id',id)
@@ -27,22 +27,22 @@ RouterPlus appAchievementsRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
     validateBody(body, fields:
       [
-        "name",
-        "description",
+        'name',
+        'description',
       ]
     );
     populateBody(body, defaultFields:
       {
-        "xp": 100,
+        'xp': 100,
       }
     );
 
-    final appAchievement = await _supabase
+    final appAchievement = await supabase
       .from('appachievement')
       .insert(body)
       .select()
@@ -54,11 +54,11 @@ RouterPlus appAchievementsRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final appAchievement = await _supabase
+    final appAchievement = await supabase
       .from('appachievement')
       .update(body)
       .eq('id',id)
@@ -68,7 +68,7 @@ RouterPlus appAchievementsRouter() {
   });
 
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
+    await supabase
       .from('appachievement')
       .delete()
       .eq('id', id);

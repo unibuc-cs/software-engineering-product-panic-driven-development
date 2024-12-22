@@ -34,23 +34,23 @@ Future<Map<String,dynamic>> makeGetByNameRequest(
 }
 
 void discardFromBody(Map<String, dynamic> body, {required List<String> fields}) {
-  fields.forEach((field) {
+  for (String field in fields) {
     body.remove(field);
-  });
+  }
 }
 
 void validateBody(
   Map<String, dynamic> body,
   {required List<String> fields}
 ) {
-  fields.forEach((field) {
+  for (String field in fields) {
     if (body[field] == null) {
       throw Exception('$field is required');
     }
     else if (body[field].runtimeType == String && body[field] == '') {
       throw Exception('$field cannot be empty');
     }
-  });
+  }
 }
 
 void populateBody(
@@ -69,12 +69,12 @@ Map<String, dynamic> extractFromBody(
   {required List<String> fields}
 ) {
   final extracted = <String, dynamic>{};
-  fields.forEach((field) {
+  for (String field in fields) {
     if (body[field] != null) {
       extracted[field] = body[field];
       body.remove(field);
     }
-  });
+  }
   return extracted;
 }
 
@@ -184,9 +184,9 @@ Future<Map<String, dynamic>> createFromBody(
   final axios = Config().axios;
   Map<String, dynamic> result = <String, dynamic>{};
 
-  Future<Map<String, dynamic>> postRequest(body, table) async => 
+  Future<Map<String, dynamic>> postRequest(body, table) async =>
     await makePostRequest(body, table, axios);
-  Future<Map<String, dynamic>> getByNameRequest(table, name) async => 
+  Future<Map<String, dynamic>> getByNameRequest(table, name) async =>
     await makeGetByNameRequest(table, name, axios);
   Future<Map<String, dynamic>> createTable(body, tableName, tableEndpoint, mediaId) async =>
     await doCreateTable(body, tableName, tableEndpoint, mediaId, postRequest, getByNameRequest);
@@ -204,7 +204,7 @@ Future<Map<String, dynamic>> createFromBody(
   partialResult.forEach((key, value) => result[key] = value);
 
   // TO DO: create mediauser from body
-  
+
   // TO DO: Create mediausergenres from body
 
   // Create X=creators/publishers/platforms/links/series and mediaX from body
@@ -226,7 +226,7 @@ Future<Map<String, dynamic>> createFromBody(
   if (body['seriesBody'] == null) {
     return result;
   }
-  
+
   // Create series and mediaseries from body
   final aux = [];
   result['series'] = [];
@@ -269,13 +269,13 @@ Future<Map<String, dynamic>> createFromBody(
           'originalname': entry['name'],
           'releasedate': DateTime.now().toIso8601String(),
           'mediatype': mediaType,
-        }, 
+        },
         'medias',
       );
       result['new_related_medias'].add(entryBody);
     }
     mediaId = entryBody['id'];
-    
+
     // Create mediaType
     try {
       entryBody = await getByNameRequest(mediaTypePlural, mediaId.toString());

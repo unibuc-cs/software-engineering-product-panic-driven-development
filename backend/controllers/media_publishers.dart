@@ -6,17 +6,17 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus mediaPublishersRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final mediaPublishers = await _supabase
+    final mediaPublishers = await supabase
       .from('mediapublisher')
       .select();
     return sendOk(mediaPublishers);
   });
 
   router.get('/<mediaId>/<publisherId>', (Request req, String mediaId, String publisherId) async {
-    final mediaPublisher = await _supabase
+    final mediaPublisher = await supabase
       .from('mediapublisher')
       .select()
       .eq('mediaid', mediaId)
@@ -29,14 +29,14 @@ RouterPlus mediaPublishersRouter() {
     final body = await req.body.asJson;
     validateBody(body, fields:
       [
-        "mediaid",
-        "publisherid",
+        'mediaid',
+        'publisherid',
       ]
     );
-    await validateExistence(body["mediaid"], 'media', _supabase);
-    await validateExistence(body["publisherid"], 'publisher', _supabase);
+    await validateExistence(body['mediaid'], 'media', supabase);
+    await validateExistence(body['publisherid'], 'publisher', supabase);
 
-    final mediaPublisher = await _supabase
+    final mediaPublisher = await supabase
       .from('mediapublisher')
       .insert(body)
       .select()
@@ -46,10 +46,10 @@ RouterPlus mediaPublishersRouter() {
 
   router.put('/<mediaId>/<publisherId>', (Request req, String mediaId, String publisherId) async {
     final body = await req.body.asJson;
-    await validateExistence(body["mediaid"], 'media', _supabase);
-    await validateExistence(body["publisherid"], 'publisher', _supabase);
+    await validateExistence(body['mediaid'], 'media', supabase);
+    await validateExistence(body['publisherid'], 'publisher', supabase);
 
-    final mediaPublisher = await _supabase
+    final mediaPublisher = await supabase
       .from('mediapublisher')
       .update(body)
       .eq('mediaid', mediaId)
@@ -60,7 +60,7 @@ RouterPlus mediaPublishersRouter() {
   });
 
   router.delete('/<mediaId>/<publisherId>', (Request req, String mediaId, String publisherId) async {
-    await _supabase
+    await supabase
       .from('mediapublisher')
       .delete()
       .eq('mediaid', mediaId)

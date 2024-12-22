@@ -5,17 +5,17 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus genresRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final genres = await _supabase
+    final genres = await supabase
       .from('genre')
       .select();
     return sendOk(genres);
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final genre = await _supabase
+    final genre = await supabase
       .from('genre')
       .select()
       .eq('id',id)
@@ -27,16 +27,16 @@ RouterPlus genresRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
     validateBody(body, fields:
       [
-        "name",
+        'name',
       ]
     );
 
-    final genre = await _supabase
+    final genre = await supabase
       .from('genre')
       .insert(body)
       .select()
@@ -48,11 +48,11 @@ RouterPlus genresRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final genre = await _supabase
+    final genre = await supabase
       .from('genre')
       .update(body)
       .eq('id',id)
@@ -62,7 +62,7 @@ RouterPlus genresRouter() {
   });
 
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
+    await supabase
       .from('genre')
       .delete()
       .eq('id', id);

@@ -10,17 +10,17 @@ import 'games/howlongtobeat.dart';
 class Dummy extends Provider {
   @override
   Future<List<Map<String, dynamic>>> getOptions(String query) async {
-    return [{"error": "No provider found"}];
+    return [{'error': 'No provider found'}];
   }
 
   @override
   Future<Map<String, dynamic>> getInfo(String item) async {
-    return {"error": "No provider found"};
+    return {'error': 'No provider found'};
   }
 
   @override
   Future<List<Map<String, dynamic>>> getRecommendations(String item) async {
-    return [{"error": "No provider found"}];
+    return [{'error': 'No provider found'}];
   }
 }
 
@@ -28,18 +28,18 @@ class Manager {
   late Provider provider;
 
   static final _providers = {
-    "pcgamingwiki": PcGamingWiki.instance,
-    "howlongtobeat": HowLongToBeat.instance,
-    "steam": Steam.instance,
-    "goodreads": GoodReads.instance,
-    "tmdbmovie": Tmdb(mediaType: "movie"),
-    "tmdbseries": Tmdb(mediaType: "tv"),
-    "anilistanime": Anilist(mediaType: "ANIME"),
-    "anilistmanga": Anilist(mediaType: "MANGA"),
+    'pcgamingwiki': PcGamingWiki.instance,
+    'howlongtobeat': HowLongToBeat.instance,
+    'steam': Steam.instance,
+    'goodreads': GoodReads.instance,
+    'tmdbmovie': Tmdb(mediaType: 'movie'),
+    'tmdbseries': Tmdb(mediaType: 'tv'),
+    'anilistanime': Anilist(mediaType: 'ANIME'),
+    'anilistmanga': Anilist(mediaType: 'MANGA'),
   };
 
   Manager(String name) {
-    if (name.toLowerCase() == "igdb") {
+    if (name.toLowerCase() == 'igdb') {
       // we need a new IGDB instance every time, because it handles internal state
       provider = IGDB();
     }
@@ -51,17 +51,14 @@ class Manager {
   Provider? getProvider() => provider;
 
   Future<List<Map<String, dynamic>>> getOptions(String query) async {
-    return await provider.getOptions(query) ??
-           [{"error": "Something went wrong" }];
+    return await provider.getOptions(query);
   }
 
   Future<Map<String, dynamic>> getInfo(String item) async {
-    return await provider.getInfo(item) ??
-           {"error": "Something went wrong" };
+    return await provider.getInfo(item);
   }
 
   Future<List<Map<String, dynamic>>> getRecommendations(String item) async {
-    return await provider.getRecommendations(item) ??
-           [{"error": "Something went wrong" }];
+    return await provider.getRecommendations(item);
   }
 }

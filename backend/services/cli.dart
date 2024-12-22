@@ -19,11 +19,11 @@ String encodeWithDateTime(Map<String, dynamic> data) {
 int getUserInput(List<Map<String, dynamic>> options) {
   try {
     console.clearScreen();
-    print("Choose an option:");
+    print('Choose an option:');
     for (int i = 0; i < options.length; ++i) {
-      print("[${i + 1}] ${options[i]['name']}");
+      print('[${i + 1}] ${options[i]['name']}');
     }
-    stdout.write("\nEnter the number of the game: ");
+    stdout.write('\nEnter the number of the game: ');
     final choice = stdin.readLineSync();
     console.clearScreen();
 
@@ -44,73 +44,73 @@ int getUserInput(List<Map<String, dynamic>> options) {
 
 Future<void> main() async {
   console.clearScreen();
-  String query = "Hollow Knight";
+  String query = 'Hollow Knight';
   bool running = true;
   while (running) {
-    print("Choose an option:");
-    print("[1] IGDB (Games)");
-    print("[2] PcGamingWiki (Game System Requirements)");
-    print("[3] HowLongToBeat (Game Times)");
-    print("[4] Goodreads (Books)");
-    print("[5] TMDB (Movies)");
-    print("[6] TMDB (TV Series)");
-    print("[7] Anilist (Anime)");
-    print("[8] Anilist (Manga)");
-    print("[9] Change query (Current: $query)");
-    print("[0] Exit");
-    stdout.write("\nEnter your choice: ");
-    var choice = stdin.readLineSync() ?? "";
+    print('Choose an option:');
+    print('[1] IGDB (Games)');
+    print('[2] PcGamingWiki (Game System Requirements)');
+    print('[3] HowLongToBeat (Game Times)');
+    print('[4] Goodreads (Books)');
+    print('[5] TMDB (Movies)');
+    print('[6] TMDB (TV Series)');
+    print('[7] Anilist (Anime)');
+    print('[8] Anilist (Manga)');
+    print('[9] Change query (Current: $query)');
+    print('[0] Exit');
+    stdout.write('\nEnter your choice: ');
+    var choice = stdin.readLineSync() ?? '';
     console.clearScreen();
-    String providerName = "igdb";
+    String providerName = 'igdb';
     switch (choice) {
-      case "1":
-        providerName = "igdb";
+      case '1':
+        providerName = 'igdb';
         break;
-      case "2":
-        providerName = "pcgamingwiki";
+      case '2':
+        providerName = 'pcgamingwiki';
         break;
-      case "3":
-        providerName = "howlongtobeat";
+      case '3':
+        providerName = 'howlongtobeat';
         break;
-      case "4":
-        providerName = "goodreads";
+      case '4':
+        providerName = 'goodreads';
         break;
-      case "5":
-        providerName = "tmdbmovies";
+      case '5':
+        providerName = 'tmdbmovies';
         break;
-      case "6":
-        providerName = "tmdbseries";
+      case '6':
+        providerName = 'tmdbseries';
         break;
-      case "7":
-        providerName = "anilistanime";
+      case '7':
+        providerName = 'anilistanime';
         break;
-      case "8":
-        providerName = "anilistmanga";
+      case '8':
+        providerName = 'anilistmanga';
         break;
-      case "9":
-        stdout.write("New query: ");
-        query = stdin.readLineSync() ?? "";
+      case '9':
+        stdout.write('New query: ');
+        query = stdin.readLineSync() ?? '';
         break;
-      case "0":
+      case '0':
         running = false;
         break;
       default:
-        print("Invalid choice.");
+        print('Invalid choice.');
         break;
     }
 
     final providerManager = Manager(providerName);
-    if (running && choice != "9") {
+    if (running && choice != '9') {
       final options = await providerManager.getOptions(query);
       final index = getUserInput(options);
       if (index != 0) {
         final choice = options[index - 1];
-        final id = choice[providerManager.getProvider()?.getKey() ?? ""].toString();
+        final id = choice[providerManager.getProvider()?.getKey() ?? ''].toString();
         final answer = await providerManager.getInfo(id);
         print(choice['name']);
         print(encodeWithDateTime(answer));
       }
-      stdout.write("\nPress Enter to continue...");
+      stdout.write('\nPress Enter to continue...');
       stdin.readLineSync();
     }
     console.clearScreen();

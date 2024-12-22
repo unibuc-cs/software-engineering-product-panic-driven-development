@@ -5,14 +5,14 @@ import 'package:http/http.dart' as http;
 
 class Tmdb extends Provider {
   // Members
-  late final _headers;
-  String _mediaType = "";
+  late final Map<String, String> _headers;
+  late final String _mediaType;
 
   // Public constructor
   Tmdb({required String mediaType}) : _mediaType = mediaType {
      _headers = {
-      "accept": "application/json",
-      "Authorization": "Bearer ${config.tmdbToken}"
+      'accept': 'application/json',
+      'Authorization': 'Bearer ${config.tmdbToken}'
     };
   }
 
@@ -38,33 +38,33 @@ class Tmdb extends Provider {
   Future<List<Map<String, dynamic>>> _getMediaOptions(String name) async {
     try {
       final params = {
-        "query": Uri.encodeQueryComponent(name)
+        'query': Uri.encodeQueryComponent(name)
       };
-      final url = "https://api.themoviedb.org/3/search/$_mediaType";
+      final url = 'https://api.themoviedb.org/3/search/$_mediaType';
       final response = await _getResponse(params, url);
 
       if (response.isEmpty) {
         return [];
       }
 
-      return (response["results"] as List).map((media) {
+      return (response['results'] as List).map((media) {
         return {
-          "id": media["id"],
-          "name": media[_mediaType == "movie" ? "title" : "name"]
+          'id': media['id'],
+          'name': media[_mediaType == 'movie' ? 'title' : 'name']
         };
       }).toList();
     }
     catch (e) {
-      return [{ "error": e.toString() }];
+      return [{'error': e.toString()}];
     }
   }
 
   Future<Map<String, dynamic>> _getMediaById(String id) async {
     try {
       final params = {
-        "language": Uri.encodeQueryComponent("en-US")
+        'language': Uri.encodeQueryComponent('en-US')
       };
-      final url = "https://api.themoviedb.org/3/$_mediaType/$id";
+      final url = 'https://api.themoviedb.org/3/$_mediaType/$id';
       final response = await _getResponse(params, url);
 
       if (response.isEmpty) {
@@ -74,23 +74,23 @@ class Tmdb extends Provider {
       return response;
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
   Map<String, dynamic> _sharedInfo(Map<String, dynamic> media) {
     // Image url: https://image.tmdb.org/t/p/original
     return {
-      "originalname": media[_mediaType == "movie" ? "title" : "name"],
-      "description": media["overview"],
-      "language": media["original_language"],
-      "artworks": media["backdrop_path"],
-      "coverimage": media["poster_path"],
-      "creators": media["production_companies"].map((dynamic producer) {
-        return producer["name"];
+      'originalname': media[_mediaType == 'movie' ? 'title' : 'name'],
+      'description': media['overview'],
+      'language': media['original_language'],
+      'artworks': media['backdrop_path'],
+      'coverimage': media['poster_path'],
+      'creators': media['production_companies'].map((dynamic producer) {
+        return producer['name'];
       }).toList(),
-      "status": media["status"],
-      "communityscore": media["vote_average"]
+      'status': media['status'],
+      'communityscore': media['vote_average']
     };
   }
 
@@ -99,21 +99,21 @@ class Tmdb extends Provider {
       final movie = await _getMediaById(movieId);
 
       if (movie.isEmpty) {
-        return {"error": "Movie not found"};
+        return {'error': 'Movie not found'};
       }
-      if (movie.containsKey("error")) {
+      if (movie.containsKey('error')) {
         return movie;
       }
 
       return {
         ..._sharedInfo(movie),
-        "series": (movie["belongs_to_collection"] as Map<String, dynamic>?)?["name"] ?? null,
-        "releasedate": movie["release_date"],
-        "duration": movie["runtime"]
+        'series': (movie['belongs_to_collection'] as Map<String, dynamic>?)?['name'],
+        'releasedate': movie['release_date'],
+        'duration': movie['runtime']
       };
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
@@ -122,9 +122,9 @@ class Tmdb extends Provider {
       final series = await _getMediaById(seriesId);
 
       if (series.isEmpty) {
-        return {"error": "Series not found"};
+        return {'error': 'Series not found'};
       }
-      if (series.containsKey("error")) {
+      if (series.containsKey('error')) {
         return series;
       }
 
@@ -133,31 +133,31 @@ class Tmdb extends Provider {
       };
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
    Future<List<Map<String, dynamic>>> _getMediaRecommendations(String id) async {
     try {
       final params = {
-        "language": Uri.encodeQueryComponent("en-US"),
+        'language': Uri.encodeQueryComponent('en-US'),
       };
-      final url = "https://api.themoviedb.org/3/$_mediaType/$id/recommendations";
+      final url = 'https://api.themoviedb.org/3/$_mediaType/$id/recommendations';
       final response = await _getResponse(params, url);
 
       if (response.isEmpty) {
         return [];
       }
 
-      return (response["results"] as List).map((media) {
+      return (response['results'] as List).map((media) {
         return {
-          "id": media["id"],
-          "name": media[_mediaType == "movie" ? "title" : "name"]
+          'id': media['id'],
+          'name': media[_mediaType == 'movie' ? 'title' : 'name']
         };
       }).toList();
     }
     catch (e) {
-      return [{"error": e.toString()}];
+      return [{'error': e.toString()}];
     }
   }
 

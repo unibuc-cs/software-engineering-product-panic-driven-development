@@ -5,10 +5,10 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus creatorsRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final creators = await _supabase
+    final creators = await supabase
       .from('creator')
       .select();
     return sendOk(creators);
@@ -16,8 +16,8 @@ RouterPlus creatorsRouter() {
 
   router.get('/name', (Request req) async {
     final queryParams = req.url.queryParameters;
-    final name = queryParams["query"] ?? "";
-    final creator = await _supabase
+    final name = queryParams['query'] ?? '';
+    final creator = await supabase
       .from('creator')
       .select()
       .ilike('name', name)
@@ -26,7 +26,7 @@ RouterPlus creatorsRouter() {
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final creator = await _supabase
+    final creator = await supabase
       .from('creator')
       .select()
       .eq('id', id)
@@ -38,16 +38,16 @@ RouterPlus creatorsRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
     validateBody(body, fields:
       [
-        "name",
+        'name',
       ]
     );
 
-    final creator = await _supabase
+    final creator = await supabase
       .from('creator')
       .insert(body)
       .select()
@@ -59,11 +59,11 @@ RouterPlus creatorsRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final creator = await _supabase
+    final creator = await supabase
       .from('creator')
       .update(body)
       .eq('id', id)
@@ -73,12 +73,12 @@ RouterPlus creatorsRouter() {
   });
 
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
+    await supabase
       .from('mediacreator')
       .delete()
       .eq('creatorid', id);
 
-    await _supabase
+    await supabase
       .from('creator')
       .delete()
       .eq('id', id);

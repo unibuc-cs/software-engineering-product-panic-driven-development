@@ -5,17 +5,17 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus tagsRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final tags = await _supabase
+    final tags = await supabase
       .from('tag')
       .select();
     return sendOk(tags);
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final tag = await _supabase
+    final tag = await supabase
       .from('tag')
       .select()
       .eq('id',id)
@@ -27,16 +27,16 @@ RouterPlus tagsRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
     validateBody(body, fields:
       [
-        "name",
+        'name',
       ]
     );
 
-    final tag = await _supabase
+    final tag = await supabase
       .from('tag')
       .insert(body)
       .select()
@@ -48,11 +48,11 @@ RouterPlus tagsRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final tag = await _supabase
+    final tag = await supabase
       .from('tag')
       .update(body)
       .eq('id',id)
@@ -62,7 +62,7 @@ RouterPlus tagsRouter() {
   });
 
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
+    await supabase
       .from('tag')
       .delete()
       .eq('id', id);

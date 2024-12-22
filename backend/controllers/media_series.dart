@@ -6,17 +6,17 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus mediaSeriesRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final mediaSeries = await _supabase
+    final mediaSeries = await supabase
       .from('mediaseries')
       .select();
     return sendOk(mediaSeries);
   });
 
   router.get('/<mediaId>/<seriesId>', (Request req, String mediaId, String seriesId) async {
-    final mediaSeries = await _supabase
+    final mediaSeries = await supabase
       .from('mediaseries')
       .select()
       .eq('mediaid', mediaId)
@@ -29,15 +29,15 @@ RouterPlus mediaSeriesRouter() {
     final body = await req.body.asJson;
     validateBody(body, fields:
       [
-        "mediaid",
-        "seriesid",
-        "index",
+        'mediaid',
+        'seriesid',
+        'index',
       ]
     );
-    await validateExistence(body["mediaid"], 'media', _supabase);
-    await validateExistence(body["seriesid"], 'series', _supabase);
+    await validateExistence(body['mediaid'], 'media', supabase);
+    await validateExistence(body['seriesid'], 'series', supabase);
 
-    final mediaSeries = await _supabase
+    final mediaSeries = await supabase
       .from('mediaseries')
       .insert(body)
       .select()
@@ -47,10 +47,10 @@ RouterPlus mediaSeriesRouter() {
 
   router.put('/<mediaId>/<seriesId>', (Request req, String mediaId, String seriesId) async {
     final body = await req.body.asJson;
-    await validateExistence(body["mediaid"], 'media', _supabase);
-    await validateExistence(body["seriesid"], 'series', _supabase);
+    await validateExistence(body['mediaid'], 'media', supabase);
+    await validateExistence(body['seriesid'], 'series', supabase);
 
-    final mediaSeries = await _supabase
+    final mediaSeries = await supabase
       .from('mediaseries')
       .update(body)
       .eq('mediaid', mediaId)
@@ -61,7 +61,7 @@ RouterPlus mediaSeriesRouter() {
   });
 
   router.delete('/<mediaId>/<seriesId>', (Request req, String mediaId, String seriesId) async {
-    await _supabase
+    await supabase
       .from('mediaseries')
       .delete()
       .eq('mediaid', mediaId)

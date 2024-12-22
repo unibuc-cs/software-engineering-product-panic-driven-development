@@ -24,23 +24,23 @@ import 'package:shelf_plus/shelf_plus.dart';
 RouterPlus apiRouter() {
   final router = Router(notFoundHandler: unknownEndpoint).plus;
 
-  router.mount('/tags', tagsRouter());
-  router.mount('/books', booksRouter());
-  router.mount('/links', linksRouter());
-  router.mount('/genres', genresRouter());
-  router.mount('/medias', mediasRouter());
-  router.mount('/series', seriesRouter());
-  router.mount('/creators', creatorsRouter());
-  router.mount('/platforms', platformsRouter());
-  router.mount('/retailers', retailersRouter());
-  router.mount('/publishers', publishersRouter());
-  router.mount('/medialinks', mediaLinksRouter());
-  router.mount('/mediaseries', mediaSeriesRouter());
-  router.mount('/mediacreators', mediaCreatorsRouter());
-  router.mount('/mediaplatforms', mediaPlatformsRouter());
-  router.mount('/mediaretailers', mediaRetailersRouter());
-  router.mount('/mediapublishers', mediaPublishersRouter());
-  router.mount('/appachievements', appAchievementsRouter());
+  router.mount('/tags', tagsRouter().call);
+  router.mount('/books', booksRouter().call);
+  router.mount('/links', linksRouter().call);
+  router.mount('/genres', genresRouter().call);
+  router.mount('/medias', mediasRouter().call);
+  router.mount('/series', seriesRouter().call);
+  router.mount('/creators', creatorsRouter().call);
+  router.mount('/platforms', platformsRouter().call);
+  router.mount('/retailers', retailersRouter().call);
+  router.mount('/publishers', publishersRouter().call);
+  router.mount('/medialinks', mediaLinksRouter().call);
+  router.mount('/mediaseries', mediaSeriesRouter().call);
+  router.mount('/mediacreators', mediaCreatorsRouter().call);
+  router.mount('/mediaplatforms', mediaPlatformsRouter().call);
+  router.mount('/mediaretailers', mediaRetailersRouter().call);
+  router.mount('/mediapublishers', mediaPublishersRouter().call);
+  router.mount('/appachievements', appAchievementsRouter().call);
 
   router.get('/health', (Request request) {
     return sendOk('Server is healthy!');

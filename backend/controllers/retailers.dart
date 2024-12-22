@@ -5,17 +5,17 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus retailersRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final retailers = await _supabase
+    final retailers = await supabase
       .from('retailer')
       .select();
     return sendOk(retailers);
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final retailer = await _supabase
+    final retailer = await supabase
       .from('retailer')
       .select()
       .eq('id', id)
@@ -27,16 +27,16 @@ RouterPlus retailersRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
     validateBody(body, fields:
       [
-        "name",
+        'name',
       ]
     );
 
-    final retailer = await _supabase
+    final retailer = await supabase
       .from('retailer')
       .insert(body)
       .select()
@@ -48,11 +48,11 @@ RouterPlus retailersRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final retailer = await _supabase
+    final retailer = await supabase
       .from('retailer')
       .update(body)
       .eq('id', id)
@@ -62,12 +62,12 @@ RouterPlus retailersRouter() {
   });
 
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
+    await supabase
       .from('mediaretailer')
       .delete()
       .eq('retailerid', id);
 
-    await _supabase
+    await supabase
       .from('retailer')
       .delete()
       .eq('id', id);

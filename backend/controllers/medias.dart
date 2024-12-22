@@ -6,10 +6,10 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus mediasRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final media = await _supabase
+    final media = await supabase
       .from('media')
       .select();
     return sendOk(serialize(media));
@@ -17,8 +17,8 @@ RouterPlus mediasRouter() {
 
   router.get('/name', (Request req) async {
     final queryParams = req.url.queryParameters;
-    final originalname = queryParams["query"] ?? "";
-    final media = await _supabase
+    final originalname = queryParams['query'] ?? '';
+    final media = await supabase
       .from('media')
       .select()
       .ilike('originalname', originalname)
@@ -27,7 +27,7 @@ RouterPlus mediasRouter() {
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final media = await _supabase
+    final media = await supabase
       .from('media')
       .select()
       .eq('id', id)
@@ -39,11 +39,11 @@ RouterPlus mediasRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final media = await _supabase
+    final media = await supabase
       .from('media')
       .insert(body)
       .select()
@@ -55,12 +55,12 @@ RouterPlus mediasRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
-        "mediatype",
+        'id',
+        'mediatype',
       ]
     );
 
-    final media = await _supabase
+    final media = await supabase
       .from('media')
       .update(body)
       .eq('id', id)

@@ -6,29 +6,29 @@ import 'package:http/http.dart' as http;
 class Anilist extends Provider {
   // Members
   final _headers = {
-    "Content-Type": "application/json"
+    'Content-Type': 'application/json'
   };
   final _replaceItems = {
-    "<br><br>": " ",
-    "<br>": " "
+    '<br><br>': ' ',
+    '<br>': ' '
   };
   final _removeItems = [
-    "<i>",
-    "</i>",
-    "\n",
-    "\r"
+    '<i>',
+    '</i>',
+    '\n',
+    '\r'
   ];
-  final _url = Uri.parse("https://graphql.anilist.co/");
-  String _mediaType = "";
+  final _url = Uri.parse('https://graphql.anilist.co/');
+  late final String _mediaType;
 
   // Public constructor
   Anilist({required String mediaType}) : _mediaType = mediaType;
 
   // Private methods
   String _removeBadItems(String input) {
-    _removeItems.forEach((item) {
-      input = input.replaceAll(item, "");
-    });
+    for (String item in _removeItems) {
+      input = input.replaceAll(item, '');
+    }
     _replaceItems.forEach((key, value) {
       input = input.replaceAll(key, value);
     });
@@ -40,14 +40,14 @@ class Anilist extends Provider {
       final response = await http.post(
         _url,
         headers: _headers,
-        body: json.encode({"query": query}),
+        body: json.encode({'query': query}),
       );
 
       if (response.statusCode != 200) {
         return {};
       }
 
-      return json.decode(response.body)["data"];
+      return json.decode(response.body)['data'];
     }
     catch (e) {
       return {};
@@ -72,19 +72,19 @@ class Anilist extends Provider {
       final response = await _getResponse(query);
 
       if (response.isEmpty) {
-        return [{"error": "No media found"}];
+        return [{'error': 'No media found'}];
       }
 
-      return (response["Page"]["media"] as List).map((media) {
+      return (response['Page']['media'] as List).map((media) {
         return {
-          "id": media["id"],
+          'id': media['id'],
           // Prefer the English title, fallback to the Japanese one
-          "name": _removeBadItems(media["title"]["english"] ?? media["title"]["romaji"])
+          'name': _removeBadItems(media['title']['english'] ?? media['title']['romaji'])
         };
       }).toList();
     }
     catch (e) {
-      return [{"error": e.toString()}];
+      return [{'error': e.toString()}];
     }
   }
 
@@ -124,85 +124,85 @@ class Anilist extends Provider {
         return {};
       }
 
-      return response["Media"];
+      return response['Media'];
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
   Map<String, dynamic> _sharedInfo(Map<String, dynamic> media) {
     String formatTwoDigits(int value) {
-      return value.toString().padLeft(2, "0");
+      return value.toString().padLeft(2, '0');
     }
 
     return {
-      "id": media["id"],
-      "originalname": _removeBadItems(media["title"]["english"] ?? media["title"]["romaji"]),
-      "description": _removeBadItems(media["description"] ?? ""),
-      "releasedate": DateTime.parse(
+      'id': media['id'],
+      'originalname': _removeBadItems(media['title']['english'] ?? media['title']['romaji']),
+      'description': _removeBadItems(media['description'] ?? ''),
+      'releasedate': DateTime.parse(
         '${media["startDate"]["year"]}-'
         '${formatTwoDigits(media["startDate"]["month"] ?? 1)}-'
         '${formatTwoDigits(media["startDate"]["day"] ?? 1)}'
       ),
-      "genres": media["genres"],
-      "coverimage": media["coverImage"]["large"],
-      "communityscore": media["meanScore"],
-      "criticscore": media["averageScore"],
-      "status": media["status"],
-      "links": media["externalLinks"].map((link) => link["url"]).toList()
+      'genres': media['genres'],
+      'coverimage': media['coverImage']['large'],
+      'communityscore': media['meanScore'],
+      'criticscore': media['averageScore'],
+      'status': media['status'],
+      'links': media['externalLinks'].map((link) => link['url']).toList()
     };
   }
 
   Future<Map<String, dynamic>> _getAnimeInfo(String animeId) async {
     try {
       final animeCustomFields = [
-        "episodes",
-        "duration"
+        'episodes',
+        'duration'
       ];
       final anime = await _getMediaById(animeId, animeCustomFields);
 
       if (anime.isEmpty) {
-        return {"error": "No anime found"};
+        return {'error': 'No anime found'};
       }
-      if (anime.containsKey("error")) {
+      if (anime.containsKey('error')) {
         return anime;
       }
 
       return {
         ..._sharedInfo(anime),
-        "episodes": anime["episodes"],
-        "duration": anime["duration"]
+        'episodes': anime['episodes'],
+        'duration': anime['duration']
       };
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
   Future<Map<String, dynamic>> _getMangaInfo(String mangaId) async {
     try {
       final mangaCustomFields = [
-        "chapters",
-        "volumes"
+        'chapters',
+        'volumes'
       ];
       final manga = await _getMediaById(mangaId, mangaCustomFields);
 
       if (manga.isEmpty) {
-        return {"error": "No manga found"};
+        return {'error': 'No manga found'};
       }
-      if (manga.containsKey("error")) {
+      if (manga.containsKey('error')) {
         return manga;
       }
 
       return {
         ..._sharedInfo(manga),
-        "chapters": manga["chapters"],
-        "volumes": manga["volumes"]
+        'chapters': manga['chapters'],
+        'volumes': manga['volumes']
       };
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
@@ -232,24 +232,24 @@ class Anilist extends Provider {
       final response = await _getResponse(query);
 
       if (response.isEmpty) {
-        return [{"error": "No recommendations found"}];
+        return [{'error': 'No recommendations found'}];
       }
 
-      final recommendations = response["Media"]["recommendations"]["edges"];
+      final recommendations = response['Media']['recommendations']['edges'];
       if (recommendations == null || recommendations.isEmpty) {
-        return [{"error": "No recommendations found"}];
+        return [{'error': 'No recommendations found'}];
       }
 
       return (recommendations as List).map((edge) {
-        final recommendation = edge["node"]["mediaRecommendation"];
+        final recommendation = edge['node']['mediaRecommendation'];
         return {
-          "id": recommendation["id"],
-          "name": _removeBadItems(recommendation["title"]["english"] ?? recommendation["title"]["romaji"])
+          'id': recommendation['id'],
+          'name': _removeBadItems(recommendation['title']['english'] ?? recommendation['title']['romaji'])
         };
       }).toList();
     }
     catch (e) {
-      return [{"error": e.toString()}];
+      return [{'error': e.toString()}];
     }
   }
 
@@ -261,7 +261,7 @@ class Anilist extends Provider {
 
   @override
   Future<Map<String, dynamic>> getInfo(String id) async {
-    if (_mediaType == "ANIME") {
+    if (_mediaType == 'ANIME') {
       return _getAnimeInfo(id);
     }
     else {

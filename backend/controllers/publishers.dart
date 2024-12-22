@@ -5,10 +5,10 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus publishersRouter() {
   final router = Router().plus;
-  final _supabase = SupabaseClientSingleton.client;
+  final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final publishers = await _supabase
+    final publishers = await supabase
       .from('publisher')
       .select();
     return sendOk(publishers);
@@ -16,8 +16,8 @@ RouterPlus publishersRouter() {
 
   router.get('/name', (Request req) async {
     final queryParams = req.url.queryParameters;
-    final name = queryParams["query"] ?? "";
-    final publisher = await _supabase
+    final name = queryParams['query'] ?? '';
+    final publisher = await supabase
       .from('publisher')
       .select()
       .ilike('name', name)
@@ -26,7 +26,7 @@ RouterPlus publishersRouter() {
   });
 
   router.get('/<id>', (Request req, String id) async {
-    final publisher = await _supabase
+    final publisher = await supabase
       .from('publisher')
       .select()
       .eq('id', id)
@@ -38,16 +38,16 @@ RouterPlus publishersRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
     validateBody(body, fields:
       [
-        "name",
+        'name',
       ]
     );
 
-    final publisher = await _supabase
+    final publisher = await supabase
       .from('publisher')
       .insert(body)
       .select()
@@ -59,11 +59,11 @@ RouterPlus publishersRouter() {
     dynamic body = await req.body.asJson;
     discardFromBody(body, fields:
       [
-        "id",
+        'id',
       ]
     );
 
-    final publisher = await _supabase
+    final publisher = await supabase
       .from('publisher')
       .update(body)
       .eq('id', id)
@@ -73,12 +73,12 @@ RouterPlus publishersRouter() {
   });
 
   router.delete('/<id>', (Request req, String id) async {
-    await _supabase
+    await supabase
       .from('mediapublisher')
       .delete()
       .eq('publisherid', id);
 
-    await _supabase
+    await supabase
       .from('publisher')
       .delete()
       .eq('id', id);

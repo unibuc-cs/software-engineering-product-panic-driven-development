@@ -1,6 +1,6 @@
-Future<void> validateExistence(dynamic id, String table, dynamic _supabase) async {
+Future<void> validateExistence(dynamic id, String table, dynamic supabase) async {
   try {
-    await _supabase
+    await supabase
       .from(table)
       .select()
       .eq('id', id)

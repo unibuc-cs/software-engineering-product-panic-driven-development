@@ -10,18 +10,18 @@ class HowLongToBeat extends Provider {
   // classes for HLTB game time elements
   // example: <li class="GameStats_short__tSJ6I time_70"><h4>Co-Op</h4><h5>1448 Hours</h5></li>
   final _querySelectors = [
-    ".GameStats_short__tSJ6I",
-    ".GameStats_long__h3afN",
-    ".GameStats_full__jz7k7"
+    '.GameStats_short__tSJ6I',
+    '.GameStats_long__h3afN',
+    '.GameStats_full__jz7k7'
   ];
 
   // HLTB links to ignore
   // example: https://howlongtobeat.com/game/5203/reviews/latest/1
   final _badLinks = [
-    "forum",
-    "reviews",
-    "lists",
-    "completions"
+    'forum',
+    'reviews',
+    'lists',
+    'completions'
   ];
 
   // Private constructor
@@ -39,13 +39,13 @@ class HowLongToBeat extends Provider {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode != 200) {
-        return Document.html("");
+        return Document.html('');
       }
 
       return parse(response.body);
     }
     catch (e) {
-      return Document.html("");
+      return Document.html('');
     }
   }
 
@@ -59,30 +59,30 @@ class HowLongToBeat extends Provider {
         for (var timeElement in timeElements) {
           // Split the text after the first digit, and include it in the second one
           // Single-Player68½ Hours - 274 Hours -> Singleplayer and 68½ - 274 Hours
-          final label = timeElement.text.split(RegExp(r"\d"))[0].trim();
+          final label = timeElement.text.split(RegExp(r'\d'))[0].trim();
           final time = timeElement.text.substring(label.length).trim();
 
-          if (time.contains("-") || label.isEmpty || time.isEmpty) {
+          if (time.contains('-') || label.isEmpty || time.isEmpty) {
             continue;
           }
 
-          times[label] = time.replaceAll("½", ".5");
+          times[label] = time.replaceAll('½', '.5');
         }
       }
       return times;
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
   Future<List<String>> _getLinks(String gameName) async {
     try {
-      final encodedGameName = Uri.encodeQueryComponent("how long to beat $gameName");
+      final encodedGameName = Uri.encodeQueryComponent('how long to beat $gameName');
 
-      final document = await _getDocument("https://www.google.com/search?q=$encodedGameName");
+      final document = await _getDocument('https://www.google.com/search?q=$encodedGameName');
 
-      if (document == Document.html("")) {
+      if (document == Document.html('')) {
         return [];
       }
 
@@ -92,15 +92,15 @@ class HowLongToBeat extends Provider {
       var linkSet = <String>{};
 
       for (var item in linkList) {
-        String link = item.attributes["href"].toString();
+        String link = item.attributes['href'].toString();
 
         // Remove google and bad howlongtobeat links
-        if (link.contains("www.google") || _badLinks.any((element) => link.contains(element))) {
+        if (link.contains('www.google') || _badLinks.any((element) => link.contains(element))) {
           continue;
         }
 
         // /url?q=https://howlongtobeat.com/game/[id]&[other_stuff] -> https://howlongtobeat.com/game/[id]
-        link = link.split("/url?q=").last.split("&").first;
+        link = link.split('/url?q=').last.split('&').first;
         linkSet.add(link);
       }
 
@@ -117,12 +117,12 @@ class HowLongToBeat extends Provider {
       final options = <Map<String, dynamic>>[];
       final fetches = links.map((link) async {
         final document = await _getDocument(link);
-        if (document != Document.html("")) {
-          final actualGameName = document.querySelector(".GameHeader_profile_header__q_PID")?.text;
+        if (document != Document.html('')) {
+          final actualGameName = document.querySelector('.GameHeader_profile_header__q_PID')?.text;
           if (actualGameName != null) {
             options.add({
-              "name": actualGameName,
-              "link": link
+              'name': actualGameName,
+              'link': link
             });
           }
         }
@@ -132,7 +132,7 @@ class HowLongToBeat extends Provider {
       return options;
     }
     catch (e) {
-      return [{"error": e.toString()}];
+      return [{'error': e.toString()}];
     }
   }
 
@@ -141,14 +141,14 @@ class HowLongToBeat extends Provider {
     {
       final document = await _getDocument(gameLink);
 
-      if (document == Document.html("")) {
-        return {"error": "$gameLink is a bad query"};
+      if (document == Document.html('')) {
+        return {'error': '$gameLink is a bad query'};
       }
 
       return await _gameTimes(document);
     }
     catch (e) {
-      return {"error": e.toString()};
+      return {'error': e.toString()};
     }
   }
 
@@ -164,12 +164,12 @@ class HowLongToBeat extends Provider {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRecommendations(String) async {
+  Future<List<Map<String, dynamic>>> getRecommendations(String _) async {
     return [];
   }
 
   @override
   String getKey() {
-    return "link";
+    return 'link';
   }
 }
