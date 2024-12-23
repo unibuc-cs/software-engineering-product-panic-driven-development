@@ -18,7 +18,7 @@ RouterPlus appAchievementsRouter() {
     final appAchievement = await supabase
       .from('appachievement')
       .select()
-      .eq('id',id)
+      .eq('id', id)
       .single();
     return sendOk(appAchievement);
   });
@@ -61,7 +61,7 @@ RouterPlus appAchievementsRouter() {
     final appAchievement = await supabase
       .from('appachievement')
       .update(body)
-      .eq('id',id)
+      .eq('id', id)
       .select()
       .single();
     return sendOk(appAchievement);

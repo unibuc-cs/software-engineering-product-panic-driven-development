@@ -50,7 +50,7 @@ class Media implements Model {
     return Media(
       id: json['id'],
       originalName: json['originalname'],
-      description: json['description'] ?? "",
+      description: json['description'] ?? '',
       releaseDate: DateTime.parse(json['releasedate']),
       criticScore: json['criticscore'] ?? 0,
       communityScore: json['communityscore'] ?? 0,

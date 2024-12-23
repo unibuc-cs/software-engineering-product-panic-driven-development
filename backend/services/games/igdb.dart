@@ -446,17 +446,17 @@ class IGDB extends Provider {
 
       if (game['collections'] != null) {
         await _getCollections(_accessToken, game);
-        game['series'] = _collections;
+        game['seriesname'] = _collections;
         game.remove('collections');
       }
 
       if (game['franchises'] != null) {
         await _getFranchises(_accessToken, game);
-        if (game['series'] != null) {
-          game['series'] += _franchises;
+        if (game['seriesname'] != null) {
+          game['seriesname'] += _franchises;
         }
         else {
-          game['series'] = _franchises;
+          game['seriesname'] = _franchises;
         }
       }
 

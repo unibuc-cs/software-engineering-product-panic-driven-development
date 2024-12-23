@@ -1,0 +1,18 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3007/api/seasons/5
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "tvseriesid": 1,
+    "name": "test12313"
+  }
+}

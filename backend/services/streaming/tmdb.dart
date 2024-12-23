@@ -90,7 +90,7 @@ class Tmdb extends Provider {
         return producer['name'];
       }).toList(),
       'status': media['status'],
-      'communityscore': media['vote_average']
+      'communityscore': (media['vote_average']*10).round(),
     };
   }
 
@@ -107,9 +107,9 @@ class Tmdb extends Provider {
 
       return {
         ..._sharedInfo(movie),
-        'series': (movie['belongs_to_collection'] as Map<String, dynamic>?)?['name'],
+        'seriesname': [(movie['belongs_to_collection'] as Map<String, dynamic>?)?['name']],
         'releasedate': movie['release_date'],
-        'duration': movie['runtime']
+        'durationinseconds': movie['runtime']*60,
       };
     }
     catch (e) {
@@ -130,6 +130,7 @@ class Tmdb extends Provider {
 
       return {
         ..._sharedInfo(series),
+        'releasedate': series['first_air_date'],
       };
     }
     catch (e) {

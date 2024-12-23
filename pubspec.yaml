@@ -52,39 +52,46 @@ flutter:
   uses-material-design: true
 
 scripts:
-  restore            : flutter clean && flutter pub get
-  app                : flutter run -d windows
-  app:dev            : flutter run -d windows --release
-  app:local          : flutter run --dart-define=LOCAL=true -d windows
-  lint               : flutter analyze
-  server             : dart run --define=LOCAL=true backend/main.dart
-  server:dev         : dart run --define=RELOAD=true --define=LOCAL=true --enable-vm-service backend/main.dart
-  server:node        : nodemon -x "dart run --define=LOCAL=true backend/main.dart" -e dart
-  deploy             : fly deploy
-  cli                : dart backend/providers/cli.dart
-  test:steam         : dart --define=LOCAL=true test/providers/steam_test.dart
-  test:igdb          : dart --define=LOCAL=true test/providers/igdb_test.dart
-  test:hltb          : dart --define=LOCAL=true test/providers/hltb_test.dart
-  test:pcgw          : dart --define=LOCAL=true test/providers/pcgw_test.dart
-  test:goodreads     : dart --define=LOCAL=true test/providers/goodreads_test.dart
-  test:tmdb          : dart --define=LOCAL=true test/providers/tmdb_test.dart
-  test:anilist       : dart --define=LOCAL=true test/providers/anilist_test.dart
-  test:providers     : dart test/providers/run_tests.dart
-  test:appachievement: dart --define=LOCAL=true test/resources/app_achievement_test.dart
-  test:book          : dart --define=LOCAL=true test/resources/book_test.dart
-  test:creator       : dart --define=LOCAL=true test/resources/creator_test.dart
-  test:genre         : dart --define=LOCAL=true test/resources/genre_test.dart
-  test:link          : dart --define=LOCAL=true test/resources/link_test.dart
-  test:media         : dart --define=LOCAL=true test/resources/media_test.dart
-  test:mediacreator  : dart --define=LOCAL=true test/resources/media_creator_test.dart
-  test:medialink     : dart --define=LOCAL=true test/resources/media_link_test.dart
-  test:mediaplatform : dart --define=LOCAL=true test/resources/media_platform_test.dart
-  test:mediapublisher: dart --define=LOCAL=true test/resources/media_publisher_test.dart
-  test:mediaretailer : dart --define=LOCAL=true test/resources/media_retailer_test.dart
-  test:mediaseries   : dart --define=LOCAL=true test/resources/media_series_test.dart
-  test:platform      : dart --define=LOCAL=true test/resources/platform_test.dart
-  test:publisher     : dart --define=LOCAL=true test/resources/publisher_test.dart
-  test:retailer      : dart --define=LOCAL=true test/resources/retailer_test.dart
-  test:series        : dart --define=LOCAL=true test/resources/series_test.dart
-  test:tag           : dart --define=LOCAL=true test/resources/tag_test.dart
-  test:resources     : dart test/resources/run_tests.dart
+  restore             : flutter clean && flutter pub get
+  app                 : flutter run -d windows
+  app:dev             : flutter run -d windows --release
+  app:local           : flutter run --dart-define=LOCAL=true -d windows
+  lint                : flutter analyze
+  server              : dart run --define=LOCAL=true backend/main.dart
+  server:dev          : dart run --define=RELOAD=true --define=LOCAL=true --enable-vm-service backend/main.dart
+  server:node         : nodemon -x "dart run --define=LOCAL=true backend/main.dart" -e dart
+  deploy              : fly deploy
+  cli                 : dart backend/providers/cli.dart
+  test:steam          : dart --define=LOCAL=true test/providers/steam_test.dart
+  test:igdb           : dart --define=LOCAL=true test/providers/igdb_test.dart
+  test:hltb           : dart --define=LOCAL=true test/providers/hltb_test.dart
+  test:pcgw           : dart --define=LOCAL=true test/providers/pcgw_test.dart
+  test:goodreads      : dart --define=LOCAL=true test/providers/goodreads_test.dart
+  test:tmdb           : dart --define=LOCAL=true test/providers/tmdb_test.dart
+  test:anilist        : dart --define=LOCAL=true test/providers/anilist_test.dart
+  test:providers      : dart test/providers/run_tests.dart
+  test:anime          : dart --define=LOCAL=true test/resources/anime_test.dart
+  test:appachievement : dart --define=LOCAL=true test/resources/app_achievement_test.dart
+  test:book           : dart --define=LOCAL=true test/resources/book_test.dart
+  test:creator        : dart --define=LOCAL=true test/resources/creator_test.dart
+  test:game           : dart --define=LOCAL=true test/resources/game_test.dart
+  test:gameachievement: dart --define=LOCAL=true test/resources/game_achievement_test.dart
+  test:genre          : dart --define=LOCAL=true test/resources/genre_test.dart
+  test:link           : dart --define=LOCAL=true test/resources/link_test.dart
+  test:manga          : dart --define=LOCAL=true test/resources/manga_test.dart
+  test:media          : dart --define=LOCAL=true test/resources/media_test.dart
+  test:mediacreator   : dart --define=LOCAL=true test/resources/media_creator_test.dart
+  test:medialink      : dart --define=LOCAL=true test/resources/media_link_test.dart
+  test:mediaplatform  : dart --define=LOCAL=true test/resources/media_platform_test.dart
+  test:mediapublisher : dart --define=LOCAL=true test/resources/media_publisher_test.dart
+  test:mediaretailer  : dart --define=LOCAL=true test/resources/media_retailer_test.dart
+  test:mediaseries    : dart --define=LOCAL=true test/resources/media_series_test.dart
+  test:movie          : dart --define=LOCAL=true test/resources/movie_test.dart
+  test:platform       : dart --define=LOCAL=true test/resources/platform_test.dart
+  test:publisher      : dart --define=LOCAL=true test/resources/publisher_test.dart
+  test:retailer       : dart --define=LOCAL=true test/resources/retailer_test.dart
+  test:season         : dart --define=LOCAL=true test/resources/season_test.dart
+  test:series         : dart --define=LOCAL=true test/resources/series_test.dart
+  test:tag            : dart --define=LOCAL=true test/resources/tag_test.dart
+  test:tv_series      : dart --define=LOCAL=true test/resources/tv_series_test.dart
+  test:resources      : dart test/resources/run_tests.dart

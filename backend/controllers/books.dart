@@ -42,6 +42,16 @@ RouterPlus booksRouter() {
         'id',
       ]
     );
+    populateBody(body, defaultFields:
+      {
+        'creators': [],
+        'publishers': [],
+        'platforms': [],
+        'links': [],
+        'seriesname': [],
+        'series': [],
+      },
+    );
 
     body['mediatype'] = 'book';
     final specificBodies = splitBody(body, mediaType: 'book');

@@ -197,8 +197,8 @@ class Anilist extends Provider {
 
       return {
         ..._sharedInfo(manga),
-        'chapters': manga['chapters'],
-        'volumes': manga['volumes']
+        'nrchapters': manga['chapters'],
+        'nrvolumes': manga['volumes']
       };
     }
     catch (e) {
