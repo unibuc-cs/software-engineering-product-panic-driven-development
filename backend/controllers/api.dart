@@ -1,3 +1,4 @@
+import 'auth.dart';
 import 'tags.dart';
 import 'books.dart';
 import 'links.dart';
@@ -18,16 +19,18 @@ import 'media_publishers.dart';
 import '../helpers/utils.dart';
 import '../services/manager.dart';
 import '../helpers/responses.dart';
+import '../helpers/middleware.dart';
 import '../helpers/validators.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus apiRouter() {
   final router = Router(notFoundHandler: unknownEndpoint).plus;
 
+  router.mount('/auth', authRouter().call);
   router.mount('/tags', tagsRouter().call);
   router.mount('/books', booksRouter().call);
   router.mount('/links', linksRouter().call);
-  router.mount('/genres', genresRouter().call);
+  router.mount('/genres', requireAuth(genresRouter().call));
   router.mount('/medias', mediasRouter().call);
   router.mount('/series', seriesRouter().call);
   router.mount('/creators', creatorsRouter().call);

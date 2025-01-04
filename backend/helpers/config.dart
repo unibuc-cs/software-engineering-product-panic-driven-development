@@ -49,6 +49,10 @@ class Config {
     return getEnv('ANON_KEY_SUPABASE') ?? '';
   }
 
+  String get supabaseServiceKey {
+    return getEnv('SERVICE_KEY_SUPABASE') ?? '';
+  }
+
   String get steamKey {
     return getEnv('API_KEY_STEAM') ?? '';
   }

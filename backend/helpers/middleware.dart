@@ -1,6 +1,16 @@
 import 'utils.dart';
 import 'responses.dart';
+import 'db_connection.dart';
 import 'package:shelf/shelf.dart';
+
+Handler requireAuth(innerHandler) {
+  return (Request request) async {
+    if (request.method != 'GET' && SupabaseClientSingleton.userId == null) {
+      return sendUnauthorized('Unauthorized');
+    }
+    return await innerHandler(request);
+  };
+}
 
 Handler logger(innerHandler) {
   return (Request request) async {

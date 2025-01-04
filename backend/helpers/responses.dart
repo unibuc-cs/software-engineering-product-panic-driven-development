@@ -25,6 +25,12 @@ Response sendResponse(dynamic data, String status) {
         body: errBody,
         headers: headersJson
       );
+    case '401':
+      return Response(
+        401,
+        body: errBody,
+        headers: headersJson
+      );
     case '404':
       return Response.notFound(
         errBody,
@@ -41,6 +47,7 @@ Response sendOk(data) => sendResponse(data, '200');
 Response sendCreated(data) => sendResponse(data, '201');
 Response sendNoContent() => sendResponse('', '204');
 Response sendBadRequest(data) => sendResponse(data, '400');
+Response sendUnauthorized(data) => sendResponse(data, '401');
 Response sendNotFound(data) => sendResponse(data, '404');
 Response sendInternalError(data) => sendResponse(data, '500');
 Response unknownEndpoint(Request req) => sendNotFound('Endpoint not found');
