@@ -15,5 +15,6 @@ void main() async {
     service    : GenreService(),
     dummyItem  : dummy,
     updatedItem: updated,
+    authNeeded : true,
   );
 }

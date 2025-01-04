@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'package:mediamaster/Models/model.dart';
+import 'package:mediamaster/Services/auth_service.dart';
 import 'package:mediamaster/Services/general/service.dart';
 
 Future<int> getValidId<T extends Model>({
@@ -17,9 +18,46 @@ Future<void> runService<T extends Model>({
   required dynamic dummyItem,
   T? updatedItem,
   String? itemName,
-  List<String>? tables
+  List<String>? tables,
+  bool authNeeded = false
 }) async {
+  final AuthService authService = AuthService();
   List<int> ids = [];
+
+  if (authNeeded) {
+    final Map<String, String> dummyUser = {
+      'name': 'John Doe',
+      'email': 'test@gmail.com',
+      'password': '123456',
+    };
+    try {
+      final response = await authService.signup(
+        name: dummyUser['name']!,
+        email: dummyUser['email']!,
+        password: dummyUser['password']!,
+      );
+      print('Dummy user created');
+    }
+    catch (e) {
+      if (!e.toString().contains('a user with this email address has already been registered')) {
+        print('Signup error: $e');
+        return;
+      }
+      print('Dummy user already exists');
+    }
+
+    try {
+      await authService.login(
+        email: dummyUser['email']!,
+        password: dummyUser['password']!,
+      );
+      print('Logged in');
+    }
+    catch (e) {
+      print('Login error: $e');
+      return;
+    }
+  }
 
   try {
     Map<String, dynamic> body = <String, dynamic>{};
@@ -99,5 +137,10 @@ Future<void> runService<T extends Model>({
   }
   catch (e) {
     print('Delete error: $e');
+  }
+
+  if (authNeeded) {
+    authService.logout();
+    print('Logged out');
   }
 }
