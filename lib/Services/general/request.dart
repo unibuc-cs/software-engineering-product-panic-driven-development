@@ -3,6 +3,12 @@ import 'config.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+String getErrMsg(String? body, String fallbackMsg) {
+  return (body != null && body!.isNotEmpty && body!.contains('error'))
+    ? body.split('{"error":"')[1].split('"}')[0]
+    : fallbackMsg;
+}
+
 Future<T> request<T>({
   required String method,
   required String endpoint,
@@ -15,19 +21,27 @@ Future<T> request<T>({
 
   if (methodUpper == 'POST') {
     response = await axios.post(endpoint, body, headers: headers);
-    errMsg = 'Failed to create data at $endpoint: ${response.statusCode}';
+    errMsg = getErrMsg(
+      response?.body,
+      'Failed to create data at $endpoint: ${response.statusCode}'
+    );
   }
   else if (methodUpper == 'PUT') {
     response = await axios.put(endpoint, body, headers: headers);
-    errMsg = 'Failed to update data at $endpoint: ${response.statusCode}';
+    errMsg = getErrMsg(
+      response?.body,
+      'Failed to update data at $endpoint: ${response.statusCode}'
+    );
   }
   else if (methodUpper == 'GET') {
     response = await axios.get(endpoint);
-    errMsg = 'Failed to load data from $endpoint: ${response.statusCode}';
+    errMsg = getErrMsg(
+      response?.body,
+      'Failed to read data at $endpoint: ${response.statusCode}'
+    );
   }
   else if (methodUpper == 'DELETE') {
     response = await axios.delete(endpoint);
-    errMsg = 'Failed to delete data at $endpoint: ${response.statusCode}';
     return Future.value(null);
   }
   else {
@@ -36,6 +50,9 @@ Future<T> request<T>({
 
   if (response.statusCode < 200 || response.statusCode > 299) {
     throw Exception(errMsg);
+  }
+  if (response.body.isEmpty) {
+    return fromJson({});
   }
   return fromJson(jsonDecode(response.body));
 }
