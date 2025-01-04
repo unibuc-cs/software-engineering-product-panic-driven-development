@@ -1,0 +1,19 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3007/api/gameachievements/3
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "gameid": 1,
+    "name": "Finally finishing...",
+    "description": "Completed 5000 games"
+  }
+}

@@ -46,7 +46,7 @@ class Season implements Model {
       id: json['id'],
       TVSeriesId: json['tvseriesid'],
       name: json['name'],
-      nrEpisodes: json['nrepisodes'],
+      nrEpisodes: json['nrepisodes'] ?? 0,
     );
   }
 }

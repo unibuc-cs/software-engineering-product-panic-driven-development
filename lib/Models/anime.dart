@@ -44,7 +44,7 @@ class Anime extends MediaType implements Model {
     return Anime(
       id: json['id'],
       mediaId: json['mediaid'],
-      language: json['language'],
+      language: json['language'] ?? '',
     );
   }
 }

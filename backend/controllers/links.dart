@@ -16,7 +16,7 @@ RouterPlus linksRouter() {
 
   router.get('/name', (Request req) async {
     final queryParams = req.url.queryParameters;
-    final href = queryParams['query'] ?? '';
+    final href = Uri.parse(queryParams['query'] ?? '').toString();
     final link = await supabase
       .from('link')
       .select()

@@ -1,13 +1,19 @@
 import 'auth.dart';
 import 'tags.dart';
+import 'anime.dart';
 import 'books.dart';
+import 'games.dart';
 import 'links.dart';
+import 'manga.dart';
 import 'genres.dart';
 import 'medias.dart';
+import 'movies.dart';
 import 'series.dart';
+import 'seasons.dart';
 import 'creators.dart';
 import 'platforms.dart';
 import 'retailers.dart';
+import 'tv_series.dart';
 import 'publishers.dart';
 import 'media_links.dart';
 import 'media_series.dart';
@@ -17,6 +23,7 @@ import 'media_platforms.dart';
 import 'app_achievements.dart';
 import 'media_publishers.dart';
 import '../helpers/utils.dart';
+import 'game_achievements.dart';
 import '../services/manager.dart';
 import '../helpers/responses.dart';
 import '../helpers/middleware.dart';
@@ -28,12 +35,18 @@ RouterPlus apiRouter() {
 
   router.mount('/auth', authRouter().call);
   router.mount('/tags', tagsRouter().call);
+  router.mount('/anime', animeRouter().call);
   router.mount('/books', booksRouter().call);
+  router.mount('/games', gamesRouter().call);
   router.mount('/links', linksRouter().call);
   router.mount('/genres', requireAuth(genresRouter().call));
+  router.mount('/manga', mangaRouter().call);
   router.mount('/medias', mediasRouter().call);
+  router.mount('/movies', moviesRouter().call);
   router.mount('/series', seriesRouter().call);
+  router.mount('/seasons', seasonsRouter().call);
   router.mount('/creators', creatorsRouter().call);
+  router.mount('/tvseries', TVSeriesRouter().call);
   router.mount('/platforms', platformsRouter().call);
   router.mount('/retailers', retailersRouter().call);
   router.mount('/publishers', publishersRouter().call);
@@ -44,6 +57,7 @@ RouterPlus apiRouter() {
   router.mount('/mediaretailers', mediaRetailersRouter().call);
   router.mount('/mediapublishers', mediaPublishersRouter().call);
   router.mount('/appachievements', appAchievementsRouter().call);
+  router.mount('/gameachievements', gameAchievementsRouter().call);
 
   router.get('/health', (Request request) {
     return sendOk('Server is healthy!');

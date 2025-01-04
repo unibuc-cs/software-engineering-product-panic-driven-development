@@ -7,12 +7,14 @@ class Manga extends MediaType implements Model {
   int id;
   String language;
   int totalPages;
+  int nrChapters;
 
   Manga({
     this.id = -1,
     required this.mediaId,
-    required this.language,
-    required this.totalPages,
+    this.language = '',
+    this.totalPages = 0,
+    this.nrChapters = 0,
   });
 
   static String get endpoint => 'manga';
@@ -39,6 +41,7 @@ class Manga extends MediaType implements Model {
       'mediaid': mediaId,
       'language': language,
       'totalpages': totalPages,
+      'nrchapters': nrChapters,
     };
   }
 
@@ -47,8 +50,9 @@ class Manga extends MediaType implements Model {
     return Manga(
       id: json['id'],
       mediaId: json['mediaid'],
-      language: json['language'],
-      totalPages: json['totalpages'],
+      language: json['language'] ?? '',
+      totalPages: json['totalpages'] ?? 0,
+      nrChapters: json['nrchapters'] ?? 0,
     );
   }
 }

@@ -94,7 +94,7 @@ Map<String, Map<String, dynamic>> splitBody(
     'mediauserBody': [
       'coverimage',
       'icon',
-      'backgroundimage',
+      'backgroundimage', // the user chooses from the artworks provided by the api and the backend only receives one image
     ],
     'genresBody': ['genres'],
     'creatorsBody': ['creators'],
@@ -221,6 +221,9 @@ Future<Map<String, dynamic>> createFromBody(
     if (result[entry.value].isEmpty) {
       result.remove(entry.value);
     }
+    if (result['media${entry.value}'].isEmpty) {
+      result.remove('media${entry.value}');
+    }
   }
 
   if (body['seriesBody'] == null) {
@@ -249,7 +252,10 @@ Future<Map<String, dynamic>> createFromBody(
   if (result['series'].isEmpty) {
     result.remove('series');
   }
-
+  
+  if(body['mediaseriesBody']?['series'].length == 0) {
+    return result;
+  }
 
   // Check here in case of errors with the series
   int mediaId = 0, seriesId = aux[0]['id'];

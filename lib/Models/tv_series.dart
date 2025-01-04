@@ -10,7 +10,7 @@ class TVSeries extends MediaType implements Model {
   TVSeries({
     this.id = -1,
     required this.mediaId,
-    this.language = "",
+    this.language = '',
   });
 
   static String get endpoint => 'tvseries';
@@ -44,7 +44,7 @@ class TVSeries extends MediaType implements Model {
     return TVSeries(
       id: json['id'],
       mediaId: json['mediaid'],
-      language: json['language'],
+      language: json['language'] ?? '',
     );
   }
 }
