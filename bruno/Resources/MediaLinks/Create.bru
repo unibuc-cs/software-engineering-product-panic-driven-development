@@ -1,0 +1,18 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{URL}}/medialinks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 8,
+    "linkid": 5
+  }
+}

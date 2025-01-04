@@ -1,0 +1,15 @@
+meta {
+  name: ReadName
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{URL}}/links/name?query=www.goodreads.com
+  body: none
+  auth: none
+}
+
+params:query {
+  query: www.goodreads.com
+}

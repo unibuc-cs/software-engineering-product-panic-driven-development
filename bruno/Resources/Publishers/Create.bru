@@ -1,0 +1,17 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{URL}}/publishers
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Team"
+  }
+}

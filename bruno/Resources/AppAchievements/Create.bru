@@ -1,0 +1,18 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{URL}}/appachievements
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Only starting...",
+    "description": "Completed 5 games"
+  }
+}

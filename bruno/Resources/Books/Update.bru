@@ -1,0 +1,19 @@
+meta {
+  name: Update
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{URL}}/books/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 12,
+    "originallanguage": "english",
+    "totalpages": 100
+  }
+}
