@@ -3,7 +3,7 @@ import 'model.dart';
 class Wishlist implements Model {
   // Data
   int mediaId;
-  int userId;
+  String userId;
   String name;
   int userScore;
   DateTime addedDate;
@@ -18,13 +18,13 @@ class Wishlist implements Model {
     required this.mediaId,
     required this.userId,
     required this.name,
-    required this.userScore,
+    this.userScore = 0,
     required this.addedDate,
-    required this.coverImage,
-    required this.status,
-    required this.series,
-    required this.icon,
-    required this.backgroundImage,
+    this.coverImage = '',
+    this.status = '',
+    this.series = '',
+    this.icon = '',
+    this.backgroundImage = '',
     required this.lastInteracted
   });
 
@@ -48,13 +48,13 @@ class Wishlist implements Model {
       'userid': userId,
       'name': name,
       'userscore': userScore,
-      'addeddate': addedDate,
+      'addeddate': addedDate.toIso8601String(),
       'coverimage': coverImage,
       'status': status,
       'series': series,
       'icon': icon,
       'backgroundimage': backgroundImage,
-      'lastinteracted': lastInteracted,
+      'lastinteracted': lastInteracted.toIso8601String(),
     };
   }
 
@@ -64,14 +64,14 @@ class Wishlist implements Model {
       mediaId: json['mediaid'],
       userId: json['userid'],
       name: json['name'],
-      userScore: json['userscore'],
-      addedDate: json['addeddate'],
-      coverImage: json['coverimage'],
-      status: json['status'],
-      series: json['series'],
-      icon: json['icon'],
-      backgroundImage: json['backgroundimage'],
-      lastInteracted: json['lastinteracted'],
+      userScore: json['userscore'] ?? 0,
+      addedDate: DateTime.parse(json['addeddate']),
+      coverImage: json['coverimage'] ?? '',
+      status: json['status'] ?? '',
+      series: json['series'] ?? '',
+      icon: json['icon'] ?? '',
+      backgroundImage: json['backgroundimage'] ?? '',
+      lastInteracted: DateTime.parse(json['lastinteracted']),
     );
   }
 

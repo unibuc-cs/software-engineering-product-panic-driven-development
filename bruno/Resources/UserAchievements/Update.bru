@@ -1,0 +1,18 @@
+meta {
+  name: Update
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{URL}}/userachievements/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "achievementid": 1,
+    "unlockdate": "2025-01-08T19:12:01.132830"
+  }
+}

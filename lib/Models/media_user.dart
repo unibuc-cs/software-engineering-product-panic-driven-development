@@ -3,7 +3,7 @@ import 'model.dart';
 class MediaUser implements Model {
   // Data
   int mediaId;
-  int userId;
+  String userId;
   String name;
   int userScore;
   DateTime addedDate;
@@ -21,13 +21,13 @@ class MediaUser implements Model {
     required this.mediaId,
     required this.userId,
     required this.name,
-    required this.userScore,
+    this.userScore = 0,
     required this.addedDate,
-    required this.coverImage,
-    required this.status,
-    required this.series,
-    required this.icon,
-    required this.backgroundImage,
+    this.coverImage = '',
+    this.status = '',
+    this.series = '',
+    this.icon = '',
+    this.backgroundImage = '',
     required this.lastInteracted,
     this.gameTime = 0,
     this.bookReadPages = 0,
@@ -54,13 +54,13 @@ class MediaUser implements Model {
       'userid': userId,
       'name': name,
       'userscore': userScore,
-      'addeddate': addedDate,
+      'addeddate': addedDate.toIso8601String(),
       'coverimage': coverImage,
       'status': status,
       'series': series,
       'icon': icon,
       'backgroundimage': backgroundImage,
-      'lastinteracted': lastInteracted,
+      'lastinteracted': lastInteracted.toIso8601String(),
       'gametime': gameTime,
       'bookreadpages': bookReadPages,
       'nrepisodesseen': nrEpisodesSeen,
@@ -73,17 +73,17 @@ class MediaUser implements Model {
       mediaId: json['mediaid'],
       userId: json['userid'],
       name: json['name'],
-      userScore: json['userscore'],
-      addedDate: json['addeddate'],
-      coverImage: json['coverimage'],
-      status: json['status'],
-      series: json['series'],
-      icon: json['icon'],
-      backgroundImage: json['backgroundimage'],
-      lastInteracted: json['lastinteracted'],
-      gameTime: json['gametime'],
-      bookReadPages: json['bookreadpages'],
-      nrEpisodesSeen: json['nrepisodesseen'],
+      userScore: json['userscore'] ?? 0,
+      addedDate: DateTime.parse(json['addeddate']),
+      coverImage: json['coverimage'] ?? '',
+      status: json['status'] ?? '',
+      series: json['series'] ?? '',
+      icon: json['icon'] ?? '',
+      backgroundImage: json['backgroundimage'] ?? '',
+      lastInteracted: DateTime.parse(json['lastinteracted']),
+      gameTime: json['gametime'] ?? 0,
+      bookReadPages: json['bookreadpages'] ?? 0,
+      nrEpisodesSeen: json['nrepisodesseen'] ?? 0,
     );
   }
 

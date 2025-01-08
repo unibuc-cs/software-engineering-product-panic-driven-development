@@ -3,7 +3,7 @@ import 'model.dart';
 class MediaUserTag implements Model {
   // Data
   int mediaId;
-  int userId;
+  String userId;
   int tagId;
 
   MediaUserTag({

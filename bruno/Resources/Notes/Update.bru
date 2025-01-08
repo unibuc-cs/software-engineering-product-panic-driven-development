@@ -1,0 +1,20 @@
+meta {
+  name: Update
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{URL}}/notes/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 1,
+    "content": "alex12344",
+    "creationdate": "2025-01-08T19:17:01.132830",
+    "modifieddate": "2025-01-08T19:17:01.132830"
+  }
+}

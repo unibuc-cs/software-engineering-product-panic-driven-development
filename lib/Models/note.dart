@@ -2,18 +2,18 @@ import 'model.dart';
 
 class Note implements Model {
   // Data
-  int id;
   int mediaId;
-  int userId;
+  String userId;
   String content;
-  DateTime creationDate = DateTime.now();
-  DateTime modifiedDate = DateTime.now();
+  DateTime creationDate;
+  DateTime modifiedDate;
 
   Note({
-    this.id = -1,
     required this.mediaId,
     required this.userId,
-    required this.content
+    required this.content,
+    required this.creationDate,
+    required this.modifiedDate,
   });
 
   static String get endpoint => 'notes';
@@ -23,11 +23,11 @@ class Note implements Model {
     if (runtimeType != other.runtimeType) {
       return false;
     }
-    return id == (other as Note).id;
+    return mediaId == (other as Note).mediaId && userId == other.userId;
   }
-
+  
   @override
-  int get hashCode => id;
+  int get hashCode => Object.hash(mediaId, userId);
 
   @override
   Map<String, dynamic> toJson() {
@@ -35,22 +35,20 @@ class Note implements Model {
       'mediaid': mediaId,
       'userid': userId,
       'content': content,
-      'creationdate': creationDate,
-      'modifieddate': modifiedDate,
+      'creationdate': creationDate.toIso8601String(),
+      'modifieddate': modifiedDate.toIso8601String(),
     };
   }
 
   @override
   factory Note.from(Map<String, dynamic> json) {
-    Note note = Note(
-      id: json['id'],
+    return Note(
       mediaId: json['mediaid'],
       userId: json['userid'],
       content: json['content'],
+      creationDate: DateTime.parse(json['creationdate']),
+      modifiedDate: DateTime.parse(json['modifieddate']),
     );
-    note.creationDate = json['creationdate'];
-    note.modifiedDate = json['modifieddate'];
-    return note;
   }
 
   // TODO: Endpoint this

@@ -2,7 +2,7 @@ import 'model.dart';
 
 class UserAchievement implements Model {
   // Data
-  int userId;
+  String userId;
   int achievementId;
   DateTime unlockDate;
 
@@ -12,7 +12,7 @@ class UserAchievement implements Model {
     required this.unlockDate
   });
 
-  static String get endpoint => 'usersachievements';
+  static String get endpoint => 'userachievements';
 
   @override
   bool operator ==(Object other) {
@@ -31,7 +31,7 @@ class UserAchievement implements Model {
     return {
       'userid': userId,
       'achievementid': achievementId,
-      'unlockDate': unlockDate,
+      'unlockdate': unlockDate.toIso8601String(),
     };
   }
 
@@ -40,7 +40,7 @@ class UserAchievement implements Model {
     return UserAchievement(
       userId: json['userid'],
       achievementId: json['achievementid'],
-      unlockDate: json['unlockdate'],
+      unlockDate: DateTime.parse(json['unlockdate']),
     );
   }
 

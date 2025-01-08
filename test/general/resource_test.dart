@@ -76,6 +76,7 @@ Future<void> runService<T extends Model>({
     print('Created $dataMap');
     if (tables != null) {
       ids = tables
+        .where((table) => table != 'user')
         .map((table) => dataMap['${table}id'] as int)
         .toList();
     }

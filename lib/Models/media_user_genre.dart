@@ -3,12 +3,11 @@ import 'model.dart';
 class MediaUserGenre implements Model {
   // Data
   int mediaId;
-  int userId;
+  String userId;
   int genreId;
 
   MediaUserGenre({
-    required
-    this.mediaId,
+    required this.mediaId,
     required this.userId,
     required this.genreId
   });

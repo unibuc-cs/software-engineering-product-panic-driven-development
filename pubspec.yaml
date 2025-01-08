@@ -86,7 +86,11 @@ scripts:
   test:mediapublisher : dart --define=LOCAL=true test/resources/media_publisher_test.dart
   test:mediaretailer  : dart --define=LOCAL=true test/resources/media_retailer_test.dart
   test:mediaseries    : dart --define=LOCAL=true test/resources/media_series_test.dart
+  test:mediauser      : dart --define=LOCAL=true test/resources/media_user_test.dart
+  test:mediausergenre : dart --define=LOCAL=true test/resources/media_user_genre_test.dart
+  test:mediausertag   : dart --define=LOCAL=true test/resources/media_user_tag_test.dart
   test:movie          : dart --define=LOCAL=true test/resources/movie_test.dart
+  test:note           : dart --define=LOCAL=true test/resources/note_test.dart
   test:platform       : dart --define=LOCAL=true test/resources/platform_test.dart
   test:publisher      : dart --define=LOCAL=true test/resources/publisher_test.dart
   test:retailer       : dart --define=LOCAL=true test/resources/retailer_test.dart
@@ -94,4 +98,6 @@ scripts:
   test:series         : dart --define=LOCAL=true test/resources/series_test.dart
   test:tag            : dart --define=LOCAL=true test/resources/tag_test.dart
   test:tv_series      : dart --define=LOCAL=true test/resources/tv_series_test.dart
+  test:userachievement: dart --define=LOCAL=true test/resources/user_achievement_test.dart
+  test:wishlist       : dart --define=LOCAL=true test/resources/wishlist_test.dart
   test:resources      : dart test/resources/run_tests.dart
