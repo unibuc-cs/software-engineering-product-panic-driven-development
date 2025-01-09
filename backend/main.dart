@@ -7,7 +7,7 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 Handler init() {
   var app = Router(notFoundHandler: unknownEndpoint).plus;
-  app.mount('/api', logger(errorHandling(apiRouter())));
+  app.mount('/api', extractUserId(logger(errorHandling(apiRouter()))));
   app.get('/favicon.ico', faviconNotFound);
   return app.call;
 }

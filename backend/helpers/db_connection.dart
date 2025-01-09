@@ -8,7 +8,6 @@ class SupabaseClientSingleton {
   );
 
   static SupabaseClient get client => _client;
-  static String? get userId => _client.auth.currentUser?.id;
 
   static void resetClient() {
     _client = SupabaseClient(

@@ -30,6 +30,9 @@ class Note implements Model {
   int get hashCode => Object.hash(mediaId, userId);
 
   @override
+  dynamic get id => mediaId;
+
+  @override
   Map<String, dynamic> toJson() {
     return {
       'mediaid': mediaId,

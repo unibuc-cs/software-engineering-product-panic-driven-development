@@ -3,17 +3,13 @@ import '../helpers/responses.dart';
 import '../helpers/db_connection.dart';
 import 'package:supabase/supabase.dart';
 import 'package:shelf_plus/shelf_plus.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 RouterPlus authRouter() {
     final router = Router().plus;
     SupabaseClient supabase = SupabaseClientSingleton.client;
 
     router.post('/login', (Request req) async {
-        if (SupabaseClientSingleton.userId != null)
-        {
-            return sendConflict('User already logged in');
-        }
-
         final body = await req.body.asJson;
         validateBody(body, fields:
             [
@@ -26,7 +22,15 @@ RouterPlus authRouter() {
             email: body['email'],
             password: body['password']
         );
-        return sendNoContent();
+
+        final jwt = JWT(
+            {
+                'id': supabase.auth.currentUser?.id
+            },
+            issuer: 'MediaMaster',
+        );
+        final token = jwt.sign(SecretKey('secret'));
+        return sendOk({ 'token': token });
     });
 
     router.post('/signup', (Request req) async {

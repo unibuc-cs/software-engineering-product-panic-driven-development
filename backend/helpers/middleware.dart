@@ -2,10 +2,28 @@ import 'utils.dart';
 import 'responses.dart';
 import 'db_connection.dart';
 import 'package:shelf/shelf.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+
+Handler extractUserId(innerHandler) {
+  return (Request request) async {
+    final token = request.headers['Authorization']?.replaceAll('Bearer', '').trim();
+    if (token != null && token.isNotEmpty) {
+      try {
+        final userId = JWT.verify(token, SecretKey('secret')).payload['id'];
+        await SupabaseClientSingleton.client.auth.admin.getUserById(userId);
+        return await innerHandler(request.change(context: {'userId': userId }));
+      }
+      catch (e) {
+        return sendUnauthorized('Invalid token');
+      }
+    }
+    return await innerHandler(request);
+  };
+}
 
 Handler requireAuth(innerHandler) {
   return (Request request) async {
-    if (request.method != 'GET' && SupabaseClientSingleton.userId == null) {
+    if (request.method != 'GET' && request.context['userId'] == null) {
       return sendUnauthorized('Unauthorized');
     }
     return await innerHandler(request);

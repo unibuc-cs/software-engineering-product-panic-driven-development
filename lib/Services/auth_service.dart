@@ -1,3 +1,4 @@
+import 'general/config.dart';
 import 'general/request.dart';
 
 class AuthService {
@@ -6,14 +7,14 @@ class AuthService {
   Future<void> login({
     required String email,
     required String password
-  }) {
-    return postRequest<void>(
+  }) async {
+    Config.instance.token = await postRequest<String>(
       endpoint: '$endpoint/login',
       body: {
         'email': email,
         'password': password,
       },
-      fromJson: (_) => null,
+      fromJson: (json) => json['token'],
     );
   }
 

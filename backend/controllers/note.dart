@@ -12,7 +12,7 @@ RouterPlus notesRouter() {
     final notes = await supabase
       .from('note')
       .select()
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendOk(notes);
   });
 
@@ -21,7 +21,7 @@ RouterPlus notesRouter() {
       .from('note')
       .select()
       .eq('mediaid', mediaId)
-      .eq('userid', SupabaseClientSingleton.userId!)
+      .eq('userid', req.context['userId']!)
       .single();
     return sendOk(note);
   });
@@ -37,7 +37,7 @@ RouterPlus notesRouter() {
       ]
     );
     await validateExistence(body['mediaid'], 'media', supabase);
-    body['userid'] = SupabaseClientSingleton.userId;
+    body['userid'] = req.context['userId'];
 
     final note = await supabase
       .from('note')
@@ -60,7 +60,7 @@ RouterPlus notesRouter() {
       .from('note')
       .update(body)
       .eq('mediaid', mediaId)
-      .eq('userid', SupabaseClientSingleton.userId!)
+      .eq('userid', req.context['userId']!)
       .select()
       .single();
     return sendOk(note);
@@ -71,7 +71,7 @@ RouterPlus notesRouter() {
       .from('note')
       .delete()
       .eq('mediaid', mediaId)
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendNoContent();
   });
 

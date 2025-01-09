@@ -10,9 +10,13 @@ post {
   auth: none
 }
 
+headers {
+  Authorization: Bearer {{tokenValid}}
+}
+
 body:json {
   {
     "mediaid": 1,
-    "tagid": 1
+    "tagid": 2
   }
 }

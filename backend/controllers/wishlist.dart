@@ -12,7 +12,7 @@ RouterPlus wishlistsRouter() {
     final wishlists = await supabase
       .from('wishlist')
       .select()
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendOk(wishlists);
   });
 
@@ -21,7 +21,7 @@ RouterPlus wishlistsRouter() {
       .from('wishlist')
       .select()
       .eq('mediaid', mediaId)
-      .eq('userid', SupabaseClientSingleton.userId!)
+      .eq('userid', req.context['userId']!)
       .single();
     return sendOk(wishlist);
   });
@@ -42,7 +42,7 @@ RouterPlus wishlistsRouter() {
       }
     );
     await validateExistence(body['mediaid'], 'media', supabase);
-    body['userid'] = SupabaseClientSingleton.userId;
+    body['userid'] = req.context['userId'];
 
     final wishlist = await supabase
       .from('wishlist')
@@ -65,7 +65,7 @@ RouterPlus wishlistsRouter() {
       .from('wishlist')
       .update(body)
       .eq('mediaid', mediaId)
-      .eq('userid', SupabaseClientSingleton.userId!)
+      .eq('userid', req.context['userId']!)
       .select()
       .single();
     return sendOk(wishlist);
@@ -76,7 +76,7 @@ RouterPlus wishlistsRouter() {
       .from('wishlist')
       .delete()
       .eq('mediaid', mediaId)
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendNoContent();
   });
 

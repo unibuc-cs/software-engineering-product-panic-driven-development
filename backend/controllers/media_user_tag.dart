@@ -12,7 +12,7 @@ RouterPlus mediaUserTagsRouter() {
     final mediaUserTags = await supabase
       .from('mediausertag')
       .select()
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendOk(mediaUserTags);
   });
 
@@ -22,7 +22,7 @@ RouterPlus mediaUserTagsRouter() {
       .select()
       .eq('tagid', tagId)
       .eq('mediaid', mediaId)
-      .eq('userid', SupabaseClientSingleton.userId!)
+      .eq('userid', req.context['userId']!)
       .single();
     return sendOk(mediaUserTag);
   });
@@ -37,7 +37,7 @@ RouterPlus mediaUserTagsRouter() {
     );
     await validateExistence(body['mediaid'], 'media', supabase);
     await validateExistence(body['tagid'], 'tag', supabase);
-    body['userid'] = SupabaseClientSingleton.userId;
+    body['userid'] = req.context['userId'];
 
     final mediaUserTag = await supabase
       .from('mediausertag')
@@ -53,7 +53,7 @@ RouterPlus mediaUserTagsRouter() {
       .delete()
       .eq('mediaid', mediaId)
       .eq('tagid', tagId)
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendNoContent();
   });
 

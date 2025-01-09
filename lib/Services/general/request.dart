@@ -15,33 +15,37 @@ Future<T> request<T>({
   dynamic body,
   required T Function(dynamic) fromJson,
 }) async {
-  http.Response response;
+  http.Response response;;
+  final Config config = Config.instance;
   String errMsg, methodUpper = method.toUpperCase();
-  Map<String, String> headers = {'Content-Type': 'application/json'};
+  Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ${config.token}',
+  };
 
   if (methodUpper == 'POST') {
-    response = await axios.post(endpoint, body, headers: headers);
+    response = await config.axios.post(endpoint, body, headers: headers);
     errMsg = getErrMsg(
       response?.body,
       'Failed to create data at $endpoint: ${response.statusCode}'
     );
   }
   else if (methodUpper == 'PUT') {
-    response = await axios.put(endpoint, body, headers: headers);
+    response = await config.axios.put(endpoint, body, headers: headers);
     errMsg = getErrMsg(
       response?.body,
       'Failed to update data at $endpoint: ${response.statusCode}'
     );
   }
   else if (methodUpper == 'GET') {
-    response = await axios.get(endpoint);
+    response = await config.axios.get(endpoint, headers: headers);
     errMsg = getErrMsg(
       response?.body,
       'Failed to read data at $endpoint: ${response.statusCode}'
     );
   }
   else if (methodUpper == 'DELETE') {
-    response = await axios.delete(endpoint);
+    response = await config.axios.delete(endpoint, headers: headers);
     return Future.value(null);
   }
   else {

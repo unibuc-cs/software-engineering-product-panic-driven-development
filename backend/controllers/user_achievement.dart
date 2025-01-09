@@ -12,7 +12,7 @@ RouterPlus userAchievementsRouter() {
     final userAchievements = await supabase
       .from('userachievement')
       .select()
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendOk(userAchievements);
   });
 
@@ -21,7 +21,7 @@ RouterPlus userAchievementsRouter() {
       .from('userachievement')
       .select()
       .eq('achievementid', achievementId)
-      .eq('userid', SupabaseClientSingleton.userId!)
+      .eq('userid', req.context['userId']!)
       .single();
     return sendOk(userAchievement);
   });
@@ -35,7 +35,7 @@ RouterPlus userAchievementsRouter() {
       ]
     );
     await validateExistence(body['achievementid'], 'appachievement', supabase);
-    body['userid'] = SupabaseClientSingleton.userId;
+    body['userid'] = req.context['userId'];
 
     final userAchievement = await supabase
       .from('userachievement')
@@ -58,7 +58,7 @@ RouterPlus userAchievementsRouter() {
       .from('userachievement')
       .update(body)
       .eq('achievementid', achievementId)
-      .eq('userid', SupabaseClientSingleton.userId!)
+      .eq('userid', req.context['userId']!)
       .select()
       .single();
     return sendOk(userAchievement);
@@ -69,7 +69,7 @@ RouterPlus userAchievementsRouter() {
       .from('userachievement')
       .delete()
       .eq('achievementid', achievementId)
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendNoContent();
   });
 

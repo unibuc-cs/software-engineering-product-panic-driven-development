@@ -12,7 +12,7 @@ RouterPlus mediaUserGenresRouter() {
     final mediaUserGenres = await supabase
       .from('mediausergenre')
       .select()
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendOk(mediaUserGenres);
   });
 
@@ -22,7 +22,7 @@ RouterPlus mediaUserGenresRouter() {
       .select()
       .eq('mediaid', mediaId)
       .eq('genreid', genreId)
-      .eq('userid', SupabaseClientSingleton.userId!)
+      .eq('userid', req.context['userId']!)
       .single();
     return sendOk(mediaUserGenre);
   });
@@ -37,7 +37,7 @@ RouterPlus mediaUserGenresRouter() {
     );
     await validateExistence(body['mediaid'], 'media', supabase);
     await validateExistence(body['genreid'], 'genre', supabase);
-    body['userid'] = SupabaseClientSingleton.userId;
+    body['userid'] = req.context['userId'];
 
     final mediaUserGenre = await supabase
       .from('mediausergenre')
@@ -53,7 +53,7 @@ RouterPlus mediaUserGenresRouter() {
       .delete()
       .eq('mediaid', mediaId)
       .eq('genreid', genreId)
-      .eq('userid', SupabaseClientSingleton.userId!);
+      .eq('userid', req.context['userId']!);
     return sendNoContent();
   });
 

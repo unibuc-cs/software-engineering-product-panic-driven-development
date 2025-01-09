@@ -1,10 +1,8 @@
 import 'Models/tag.dart';
 import 'Helpers/database.dart';
 import 'Services/tag_service.dart';
-import 'package:dotenv/dotenv.dart';
 
 void main() async {
-  final env = DotEnv(includePlatformEnvironment: true)..load();
   final tagService = TagService();
   await seedData();
 
