@@ -1,6 +1,6 @@
 import 'dart:core';
-import 'package:mediamaster/Models/model.dart';
 import 'package:mediamaster/Services/auth_service.dart';
+import 'package:mediamaster/Models/general/model.dart';
 import 'package:mediamaster/Services/general/service.dart';
 
 Future<int> getValidId<T extends Model>({

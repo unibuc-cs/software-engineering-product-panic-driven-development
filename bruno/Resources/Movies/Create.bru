@@ -1,0 +1,31 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{URL}}/movies
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "originalname": "Home Alone",
+    "description": "Eight-year-old Kevin McCallister makes the most of the situation after his family unwittingly leaves him behind when they go on Christmas vacation. When thieves try to break into his home, he puts up a fight like no other.",
+    "language": "en",
+    "coverimage": "/onTSipZ8R3bliBdKfPtsDuHTdlL.jpg",
+    "creators": [
+      "Hughes Entertainment",
+      "20th Century Fox"
+    ],
+    "status": "Released",
+    "communityscore": 74,
+    "seriesname": [
+      "Home Alone Collection"
+    ],
+    "releasedate": "1990-11-16",
+    "durationinseconds": 6180
+  }
+}

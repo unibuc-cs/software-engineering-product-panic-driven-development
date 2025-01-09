@@ -1,4 +1,4 @@
-import 'media.dart';
+import '../media.dart';
 
 abstract class MediaType {
   Future<Media> get media async {

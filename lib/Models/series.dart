@@ -1,4 +1,4 @@
-import 'model.dart';
+import 'general/model.dart';
 
 class Series implements Model {
   // Data

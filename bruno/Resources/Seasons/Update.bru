@@ -1,0 +1,18 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{URL}}/seasons/5
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "tvseriesid": 1,
+    "name": "test12313"
+  }
+}

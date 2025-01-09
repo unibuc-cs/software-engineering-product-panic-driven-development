@@ -1,5 +1,5 @@
-import 'model.dart';
-import 'media_type.dart';
+import 'general/model.dart';
+import 'general/media_type.dart';
 
 class Manga extends MediaType implements Model {
   // Data

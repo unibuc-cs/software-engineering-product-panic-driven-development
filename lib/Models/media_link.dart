@@ -1,4 +1,4 @@
-import 'model.dart';
+import 'general/model.dart';
 
 class MediaLink implements Model {
   // Data
@@ -22,6 +22,9 @@ class MediaLink implements Model {
 
   @override
   int get hashCode => Object.hash(mediaId, linkId);
+
+  @override
+  dynamic get id => [mediaId, linkId];
 
   @override
   Map<String, dynamic> toJson() {

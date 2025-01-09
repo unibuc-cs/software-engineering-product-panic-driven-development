@@ -1,4 +1,4 @@
-import 'model.dart';
+import 'general/model.dart';
 
 class Note implements Model {
   // Data
@@ -25,7 +25,7 @@ class Note implements Model {
     }
     return mediaId == (other as Note).mediaId && userId == other.userId;
   }
-  
+
   @override
   int get hashCode => Object.hash(mediaId, userId);
 

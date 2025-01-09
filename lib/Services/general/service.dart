@@ -1,5 +1,5 @@
 import 'request.dart';
-import 'package:mediamaster/Models/model.dart';
+import 'package:mediamaster/Models/general/model.dart';
 
 bool findMatch(dynamic modelId, List<int> ids) {
   if (modelId is int) {

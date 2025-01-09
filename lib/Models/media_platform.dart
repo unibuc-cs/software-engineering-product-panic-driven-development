@@ -1,4 +1,4 @@
-import 'model.dart';
+import 'general/model.dart';
 
 class MediaPlatform implements Model {
   // Data
@@ -23,6 +23,9 @@ class MediaPlatform implements Model {
 
   @override
   int get hashCode => Object.hash(mediaId, platformId);
+
+  @override
+  dynamic get id => [mediaId, platformId];
 
   @override
   Map<String, dynamic> toJson() {

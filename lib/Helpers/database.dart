@@ -1,9 +1,9 @@
-import 'tag.dart';
-import 'genre.dart';
-import '../Services/tag_service.dart';
-import '../Services/genre_service.dart';
+import 'package:mediamaster/Models/tag.dart';
+import 'package:mediamaster/Models/genre.dart';
+import 'package:mediamaster/Services/tag_service.dart';
+import 'package:mediamaster/Services/genre_service.dart';
 
-Future<void> addSeedData() async {
+Future<void> seedData() async {
   TagService tagServ = TagService();
   GenreService genreServ = GenreService();
   List<Future<void>> allFutures = [];

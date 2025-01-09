@@ -1,16 +1,15 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mediamaster/Services/genre_service.dart';
-import 'package:mediamaster/Services/provider_service.dart';
+import 'package:mediamaster/Models/tag.dart';
+import 'package:mediamaster/UserSystem.dart';
+import 'package:mediamaster/Models/game.dart';
+import 'package:mediamaster/Models/genre.dart';
 import 'package:mediamaster/Services/tag_service.dart';
-
-import '../Models/tag.dart';
-import '../Models/game.dart';
-import '../Models/genre.dart';
-import '../Models/media_user_tag.dart';
-import '../Models/media_user_genre.dart';
-import '../UserSystem.dart';
+import 'package:mediamaster/Models/media_user_tag.dart';
+import 'package:mediamaster/Services/genre_service.dart';
+import 'package:mediamaster/Models/media_user_genre.dart';
+import 'package:mediamaster/Services/provider_service.dart';
 
 int getMinTimeToBeat(Game game) {
   List<int> times = List.from([

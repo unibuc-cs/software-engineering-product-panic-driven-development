@@ -1,4 +1,4 @@
-import 'model.dart';
+import 'general/model.dart';
 
 class UserAchievement implements Model {
   // Data
@@ -25,6 +25,8 @@ class UserAchievement implements Model {
 
   @override
   int get hashCode => Object.hash(userId, achievementId);
+
+  dynamic get id => achievementId;
 
   @override
   Map<String, dynamic> toJson() {
