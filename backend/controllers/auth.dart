@@ -6,9 +6,14 @@ import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus authRouter() {
     final router = Router().plus;
-    final supabase = SupabaseClientSingleton.client;
+    SupabaseClient supabase = SupabaseClientSingleton.client;
 
     router.post('/login', (Request req) async {
+        if (SupabaseClientSingleton.userId != null)
+        {
+            return sendConflict('User already logged in');
+        }
+
         final body = await req.body.asJson;
         validateBody(body, fields:
             [
@@ -52,6 +57,8 @@ RouterPlus authRouter() {
 
     router.get('/logout', (Request req) async {
         await supabase.auth.signOut();
+        SupabaseClientSingleton.resetClient();
+        supabase = SupabaseClientSingleton.client;
         return sendNoContent();
     });
 

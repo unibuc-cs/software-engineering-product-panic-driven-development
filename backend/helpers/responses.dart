@@ -36,6 +36,12 @@ Response sendResponse(dynamic data, String status) {
         errBody,
         headers: headersJson
       );
+    case '409':
+      return Response(
+        409,
+        body: errBody,
+        headers: headersJson
+      );
   }
   return Response.internalServerError(
     body: errBody,
@@ -49,6 +55,7 @@ Response sendNoContent() => sendResponse('', '204');
 Response sendBadRequest(data) => sendResponse(data, '400');
 Response sendUnauthorized(data) => sendResponse(data, '401');
 Response sendNotFound(data) => sendResponse(data, '404');
+Response sendConflict(data) => sendResponse(data, '409');
 Response sendInternalError(data) => sendResponse(data, '500');
 Response unknownEndpoint(Request req) => sendNotFound('Endpoint not found');
 Response faviconNotFound(Request req) => sendNotFound('No favicon');

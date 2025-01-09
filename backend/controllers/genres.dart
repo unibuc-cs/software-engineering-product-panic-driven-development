@@ -18,7 +18,7 @@ RouterPlus genresRouter() {
     final genre = await supabase
       .from('genre')
       .select()
-      .eq('id',id)
+      .eq('id', id)
       .single();
     return sendOk(genre);
   });
@@ -55,7 +55,7 @@ RouterPlus genresRouter() {
     final genre = await supabase
       .from('genre')
       .update(body)
-      .eq('id',id)
+      .eq('id', id)
       .select()
       .single();
     return sendOk(genre);

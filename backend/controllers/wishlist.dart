@@ -9,21 +9,19 @@ RouterPlus wishlistsRouter() {
   final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final userId = SupabaseClientSingleton.userId;
     final wishlists = await supabase
       .from('wishlist')
       .select()
-      .eq('userid', userId!);
+      .eq('userid', SupabaseClientSingleton.userId!);
     return sendOk(wishlists);
   });
 
   router.get('/<mediaId>', (Request req, String mediaId) async {
-    final userId = SupabaseClientSingleton.userId;
     final wishlist = await supabase
       .from('wishlist')
       .select()
       .eq('mediaid', mediaId)
-      .eq('userid', userId!)
+      .eq('userid', SupabaseClientSingleton.userId!)
       .single();
     return sendOk(wishlist);
   });
@@ -62,26 +60,23 @@ RouterPlus wishlistsRouter() {
         'userid',
       ]
     );
-    final userId = SupabaseClientSingleton.userId;
 
     final wishlist = await supabase
       .from('wishlist')
       .update(body)
       .eq('mediaid', mediaId)
-      .eq('userid', userId!)
+      .eq('userid', SupabaseClientSingleton.userId!)
       .select()
       .single();
     return sendOk(wishlist);
   });
 
   router.delete('/<mediaId>', (Request req, String mediaId) async {
-    final userId = SupabaseClientSingleton.userId;
-    
     await supabase
       .from('wishlist')
       .delete()
       .eq('mediaid', mediaId)
-      .eq('userid', userId!);
+      .eq('userid', SupabaseClientSingleton.userId!);
     return sendNoContent();
   });
 

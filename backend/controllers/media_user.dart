@@ -9,21 +9,19 @@ RouterPlus mediaUsersRouter() {
   final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final userId = SupabaseClientSingleton.userId;
     final mediaUsers = await supabase
       .from('mediauser')
       .select()
-      .eq('userid', userId!);
+      .eq('userid', SupabaseClientSingleton.userId!);
     return sendOk(mediaUsers);
   });
 
   router.get('/<mediaId>', (Request req, String mediaId) async {
-    final userId = SupabaseClientSingleton.userId;
     final mediaUser = await supabase
       .from('mediauser')
       .select()
       .eq('mediaid', mediaId)
-      .eq('userid', userId!)
+      .eq('userid', SupabaseClientSingleton.userId!)
       .single();
     return sendOk(mediaUser);
   });
@@ -65,26 +63,23 @@ RouterPlus mediaUsersRouter() {
         'userid',
       ]
     );
-    final userId = SupabaseClientSingleton.userId;
 
     final mediaUser = await supabase
       .from('mediauser')
       .update(body)
       .eq('mediaid', mediaId)
-      .eq('userid', userId!)
+      .eq('userid', SupabaseClientSingleton.userId!)
       .select()
       .single();
     return sendOk(mediaUser);
   });
 
   router.delete('/<mediaId>', (Request req, String mediaId) async {
-    final userId = SupabaseClientSingleton.userId;
-    
     await supabase
       .from('mediauser')
       .delete()
       .eq('mediaid', mediaId)
-      .eq('userid', userId!);
+      .eq('userid', SupabaseClientSingleton.userId!);
     return sendNoContent();
   });
 

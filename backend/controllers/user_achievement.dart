@@ -9,21 +9,19 @@ RouterPlus userAchievementsRouter() {
   final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final userId = SupabaseClientSingleton.userId;
     final userAchievements = await supabase
       .from('userachievement')
       .select()
-      .eq('userid', userId!);
+      .eq('userid', SupabaseClientSingleton.userId!);
     return sendOk(userAchievements);
   });
 
   router.get('/<achievementId>', (Request req, String achievementId) async {
-    final userId = SupabaseClientSingleton.userId;
     final userAchievement = await supabase
       .from('userachievement')
       .select()
       .eq('achievementid', achievementId)
-      .eq('userid', userId!)
+      .eq('userid', SupabaseClientSingleton.userId!)
       .single();
     return sendOk(userAchievement);
   });
@@ -55,26 +53,23 @@ RouterPlus userAchievementsRouter() {
         'userid',
       ]
     );
-    final userId = SupabaseClientSingleton.userId;
 
     final userAchievement = await supabase
       .from('userachievement')
       .update(body)
       .eq('achievementid', achievementId)
-      .eq('userid', userId!)
+      .eq('userid', SupabaseClientSingleton.userId!)
       .select()
       .single();
     return sendOk(userAchievement);
   });
 
   router.delete('/<achievementId>', (Request req, String achievementId) async {
-    final userId = SupabaseClientSingleton.userId;
-    
     await supabase
       .from('userachievement')
       .delete()
       .eq('achievementid', achievementId)
-      .eq('userid', userId!);
+      .eq('userid', SupabaseClientSingleton.userId!);
     return sendNoContent();
   });
 

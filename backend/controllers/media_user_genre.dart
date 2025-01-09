@@ -9,22 +9,20 @@ RouterPlus mediaUserGenresRouter() {
   final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final userId = SupabaseClientSingleton.userId;
     final mediaUserGenres = await supabase
       .from('mediausergenre')
       .select()
-      .eq('userid', userId!);
+      .eq('userid', SupabaseClientSingleton.userId!);
     return sendOk(mediaUserGenres);
   });
 
   router.get('/<mediaId>/<genreId>', (Request req, String mediaId, String genreId) async {
-    final userId = SupabaseClientSingleton.userId;
     final mediaUserGenre = await supabase
       .from('mediausergenre')
       .select()
       .eq('mediaid', mediaId)
-      .eq('userid', userId!)
       .eq('genreid', genreId)
+      .eq('userid', SupabaseClientSingleton.userId!)
       .single();
     return sendOk(mediaUserGenre);
   });
@@ -40,7 +38,7 @@ RouterPlus mediaUserGenresRouter() {
     await validateExistence(body['mediaid'], 'media', supabase);
     await validateExistence(body['genreid'], 'genre', supabase);
     body['userid'] = SupabaseClientSingleton.userId;
-    
+
     final mediaUserGenre = await supabase
       .from('mediausergenre')
       .insert(body)
@@ -50,14 +48,12 @@ RouterPlus mediaUserGenresRouter() {
   });
 
   router.delete('/<mediaId>/<genreId>', (Request req, String mediaId, String genreId) async {
-    final userId = SupabaseClientSingleton.userId;
-    
     await supabase
       .from('mediausergenre')
       .delete()
       .eq('mediaid', mediaId)
-      .eq('userid', userId!)
-      .eq('genreid', genreId);
+      .eq('genreid', genreId)
+      .eq('userid', SupabaseClientSingleton.userId!);
     return sendNoContent();
   });
 
