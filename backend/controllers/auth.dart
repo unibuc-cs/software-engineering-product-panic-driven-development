@@ -1,9 +1,9 @@
+import '../helpers/jwt.dart';
 import '../helpers/requests.dart';
 import '../helpers/responses.dart';
 import '../helpers/db_connection.dart';
 import 'package:supabase/supabase.dart';
 import 'package:shelf_plus/shelf_plus.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 RouterPlus authRouter() {
     final router = Router().plus;
@@ -22,15 +22,7 @@ RouterPlus authRouter() {
             email: body['email'],
             password: body['password']
         );
-
-        final jwt = JWT(
-            {
-                'id': supabase.auth.currentUser?.id
-            },
-            issuer: 'MediaMaster',
-        );
-        final token = jwt.sign(SecretKey('secret'));
-        return sendOk({ 'token': token });
+        return sendOk({ 'token': getToken(supabase.auth.currentUser?.id) });
     });
 
     router.post('/signup', (Request req) async {

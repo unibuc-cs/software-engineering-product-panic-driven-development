@@ -1,15 +1,15 @@
+import 'jwt.dart';
 import 'utils.dart';
 import 'responses.dart';
 import 'db_connection.dart';
 import 'package:shelf/shelf.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 Handler extractUserId(innerHandler) {
   return (Request request) async {
     final token = request.headers['Authorization']?.replaceAll('Bearer', '').trim();
     if (token != null && token.isNotEmpty) {
       try {
-        final userId = JWT.verify(token, SecretKey('secret')).payload['id'];
+        final userId = getPayload(token)['id'];
         await SupabaseClientSingleton.client.auth.admin.getUserById(userId);
         return await innerHandler(request.change(context: {'userId': userId }));
       }

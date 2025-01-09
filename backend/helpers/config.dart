@@ -41,6 +41,14 @@ class Config {
     return getEnv('ACCESS_TOKEN_TMDB') ?? '';
   }
 
+  String get steamKey {
+    return getEnv('API_KEY_STEAM') ?? '';
+  }
+
+  String get secret {
+    return getEnv('SECRET') ?? 'secret';
+  }
+
   String get supabaseUrl {
     return getEnv('URL_SUPABASE') ?? '';
   }
@@ -51,10 +59,6 @@ class Config {
 
   String get supabaseServiceKey {
     return getEnv('SERVICE_KEY_SUPABASE') ?? '';
-  }
-
-  String get steamKey {
-    return getEnv('API_KEY_STEAM') ?? '';
   }
 
   int get port {
