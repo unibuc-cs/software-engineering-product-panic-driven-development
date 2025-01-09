@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:mediamaster/Models/game.dart';
+import 'package:mediamaster/Models/media_creator.dart';
+import 'package:mediamaster/Models/media_platform.dart';
+import 'package:mediamaster/Models/media_publisher.dart';
 import 'package:mediamaster/Models/media_type.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mediamaster/Services/creator_service.dart';
+import 'package:mediamaster/Services/genre_service.dart';
+import 'package:mediamaster/Services/media_service.dart';
+import 'package:mediamaster/Services/platform_service.dart';
+import 'package:mediamaster/Services/publisher_service.dart';
+import 'package:mediamaster/Services/tag_service.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:mediamaster/Models/note.dart';
+import 'package:mediamaster/Widgets/game_widgets.dart';
+import 'package:mediamaster/Widgets/media_widgets.dart';
 import 'package:pair/pair.dart';
 import 'dart:async';
-import 'Services/ApiService.dart';
+import 'Services/provider_service.dart';
 
 import 'Models/genre.dart';
 import 'Models/publisher.dart';
@@ -28,75 +38,73 @@ class Library<MT extends MediaType> extends StatefulWidget {
 
 class LibraryState<MT extends MediaType> extends State<Library> {
   int selectedMediaId = 0;
-  String filterQuery = "";
+  String filterQuery = '';
   TextEditingController searchController = TextEditingController();
   bool increasingSorting = true;
   int selectedSortingMethod = 0;
   var mediaOrderComparators = [
     Pair<String, dynamic>(
-      "By original name",
+      'By original name',
       (MT a, MT b, int increasing) async {
         return increasing *
             (await a.media).originalName.compareTo((await b.media).originalName);
       },
     ),
     Pair<String, dynamic>(
-      "By critic score",
+      'By critic score',
       (MT a, MT b, int increasing) async {
         return increasing * (await a.media).criticScore.compareTo((await b.media).criticScore);
       },
     ),
     Pair<String, dynamic>(
-      "By comunity score",
+      'By comunity score',
       (MT a, MT b, int increasing) async {
         return increasing *
             (await a.media).communityScore.compareTo((await b.media).communityScore);
       },
     ),
     Pair<String, dynamic>(
-      "By release date",
+      'By release date',
       (MT a, MT b, int increasing) async {
         return increasing * (await a.media).releaseDate.compareTo((await b.media).releaseDate);
       },
     ),
-    // TODO: Think if there is some simple/easy way to add these
-    /*
-    Pair<String, dynamic>( // TODO: FIX THIS
-      "By time to beat",
-      (Game a, Game b, int increasing) {
-        int ta = a.getMinTimeToBeat();
-        int tb = b.getMinTimeToBeat();
+    if (MT == Game)
+      Pair<String, dynamic>(
+        'By time to beat',
+        (MT a, MT b, int increasing) {
+          int ta = getMinTimeToBeat(a as Game);
+          int tb = getMinTimeToBeat(b as Game);
 
-        if (tb == -1) {
-          return -1;
-        }
-        if (ta == -1) {
-          return 1;
-        }
-        return increasing * ta.compareTo(tb);
-      },
-    ),
-    Pair<String, dynamic>( // TODO: FIX THIS
-      "By time to 100%",
-      (Game a, Game b, int increasing) {
-        if (b.HLTBCompletionistInSeconds == -1) {
-          return -1;
-        }
-        if (a.HLTBCompletionistInSeconds == -1) {
-          return 1;
-        }
-        return increasing *
-            a.HLTBCompletionistInSeconds.compareTo(
-                b.HLTBCompletionistInSeconds);
-      },
-    ),
-    */
+          if (tb == -1) {
+            return -1;
+          }
+          if (ta == -1) {
+            return 1;
+          }
+          return increasing * ta.compareTo(tb);
+        },
+      ),
+    if (MT == Game)
+      Pair<String, dynamic>(
+        'By time to 100%',
+        (MT a, MT b, int increasing) {
+          if ((b as Game).HLTBCompletionistInSeconds == -1) {
+            return -1;
+          }
+          if ((a as Game).HLTBCompletionistInSeconds == -1) {
+            return 1;
+          }
+          return increasing *
+              a.HLTBCompletionistInSeconds.compareTo(
+                  b.HLTBCompletionistInSeconds);
+        },
+      ),
      // TODO: ADD OTHER SORTING METHODS
   ];
   bool filterAll = true;
   Set<Genre> selectedGenresIds = {};
   Set<Tag> selectedTagsIds = {};
-  final supabase = Supabase.instance.client;
 
   @override
   void initState() {
@@ -108,7 +116,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     List<ListTile> listTiles = List.empty(growable: true);
     List<MT> userMedia = List<MT>.empty();
     if (MT == Game) {
-      userMedia = (await UserSystem().getUserMedia("game")).map((x) => x as MT).toList();
+      userMedia = (await UserSystem().getUserMedia('game')).map((x) => x as MT).toList();
     }
     List<Pair<MT, int>> mediaIndices = List.empty(growable: true);
 
@@ -116,9 +124,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       int id = userMedia.elementAt(i).getMediaId();
       bool shouldAdd = true;
       if (selectedGenresIds.isNotEmpty || selectedTagsIds.isNotEmpty) {
-        int conditionsMet = (await supabase.from("mediausertag").select().eq("userid", UserSystem().getCurrentUserId()).eq("mediaid", id).inFilter("tagid", selectedTagsIds.toList())).length;
+        int conditionsMet = (await supabase.from('mediausertag').select().eq('userid', UserSystem().getCurrentUserId()).eq('mediaid', id).inFilter('tagid', selectedTagsIds.toList())).length;
         if (filterAll || conditionsMet == 0) {
-          conditionsMet += (await supabase.from("mediausergenre").select().eq("userid", UserSystem().getCurrentUserId()).eq("mediaid", id).inFilter("genreid", selectedGenresIds.toList())).length;
+          conditionsMet += (await supabase.from('mediausergenre').select().eq('userid', UserSystem().getCurrentUserId()).eq('mediaid', id).inFilter('genreid', selectedGenresIds.toList())).length;
         }
 
         if (filterAll) {
@@ -146,13 +154,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       leadingIcon = Icon(Icons.videogame_asset);
     }
     else {
-      throw UnimplementedError("Leading Icon for media type not declared.");
+      throw UnimplementedError('Leading Icon for media type not declared.');
     }
 
     for (int i = 0; i < mediaIndices.length; ++i) {
       final mt = mediaIndices[i].key;
       final idx = mediaIndices[i].value;
-      if (filterQuery == "" ||
+      if (filterQuery == '' ||
           (await mt.media).originalName.toLowerCase().contains(filterQuery)) {
         listTiles.add(
           ListTile(
@@ -192,50 +200,55 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
   // TODO: Remove year from game name before call.
   Future<MT?> mediaAlreadyInDB(String name) async {
-    String dbName = "";
+    String dbName = '';
     if (MT == Game) {
-      dbName = "game";
+      dbName = 'game';
     }
     else {
-      throw UnimplementedError("Media type already in db is not implemented");
+      throw UnimplementedError('Media type already in db is not implemented');
     }
 
-    List<dynamic> media = (await supabase.from("media").select("id").eq("originalname", name).eq("mediatype", dbName)).map((x) => x["id"]).toList();
+    // Notat
+    List<dynamic> media = (await supabase.from('media').select('id').eq('originalname', name).eq('mediatype', dbName)).map((x) => x['id']).toList();
 
     if (media.isEmpty) {
       return null;
     }
 
     if (MT == Game) {
-      return Game.from(await supabase.from(dbName).select().eq("mediaid", media.first).single()) as MT;
+      // Notat
+      return Game.from(await supabase.from(dbName).select().eq('mediaid', media.first).single()) as MT;
     }
 
-    throw UnimplementedError("Media type already in db is not implemented");
+    throw UnimplementedError('Media type already in db is not implemented');
   }
 
   Future<bool> mediaAlreadyInWishlist(String name) async {
-    String dbName = "";
+    String dbName = '';
     if (MT == Game) {
-      dbName = "game";
+      dbName = 'game';
     }
     else {
-      throw UnimplementedError("Media type already in wishlist is not implemented");
+      throw UnimplementedError('Media type already in wishlist is not implemented');
     }
 
-    return (await supabase.from("media").select("id").eq("originalname", name).eq("mediatype", dbName)).isNotEmpty;
+    // Notat
+    return (await supabase.from('wishlist').select('id').eq('originalname', name).eq('mediatype', dbName)).isNotEmpty;
   }
 
   Future<bool> mediaAlreadyInLibrary(String name) async {
-    String dbName = "";
+    String dbName = '';
     if (MT == Game) {
-      dbName = "game";
+      dbName = 'game';
     }
     else {
-      throw UnimplementedError("Media type already in library is not implemented");
+      throw UnimplementedError('Media type already in library is not implemented');
     }
 
-    var id = (await supabase.from("media").select("id").eq("originalname", name).eq("mediatype", dbName).single())["id"];
-    return (await supabase.from("mediauser").select().eq("mediaid", id)).isNotEmpty;
+    // Notat
+    var id = (await supabase.from('media').select('id').eq('originalname', name).eq('mediatype', dbName).single())['id'];
+    // TODO: ManyToMany
+    return (await supabase.from('mediauser').select().eq('mediaid', id).eq('userid', UserSystem().getCurrentUserId())).isNotEmpty;
   }
 
   @override
@@ -243,7 +256,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     _setSearchText();
 
     IconButton? butonSearchReset;
-    if (filterQuery == "") {
+    if (filterQuery == '') {
       butonSearchReset = IconButton(
         onPressed: () {
           /*TODO: The search box gets activated only if you hold down at least 2 frames, I do not know the function to activate it when pressing this button. I also do not know if this should be our priority right now*/
@@ -262,12 +275,12 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
     }
 
-    String mediaType = "";
+    String mediaType = '';
     if (MT == Game) {
-      mediaType = "game";
+      mediaType = 'game';
     }
     else {
-      throw UnimplementedError("Build not implemented for this media type");
+      throw UnimplementedError('Build not implemented for this media type');
     }
 
     TextField textField = TextField(
@@ -277,7 +290,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       },
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
-        hintText: "Search $mediaType in library",
+        hintText: 'Search $mediaType in library',
         suffixIcon: butonSearchReset,
       ),
     );
@@ -297,7 +310,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               foregroundColor: WidgetStatePropertyAll(Colors.white),
             ),
             // child: Text(UserSystem().currentUser!.username), // TODO: Username here
-            child: Text("Username placeholder"),
+            child: Text('Username placeholder'),
           ),
           IconButton(
               onPressed: () {
@@ -409,15 +422,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       return null;
     }
 
-    String mtDbName = "";
+    String mtDbName = '';
     if (MT == Game) {
-      mtDbName = "game";
+      mtDbName = 'game';
     }
     else {
-      throw UnimplementedError("getSelectedMT is not implemented for this media type");
+      throw UnimplementedError('getSelectedMT is not implemented for this media type');
     }
 
-    List<Map<String, dynamic>> list = (await supabase.from(mtDbName).select().eq("mediaid", selectedMediaId));
+    // Notat
+    List<Map<String, dynamic>> list = (await supabase.from(mtDbName).select().eq('mediaid', selectedMediaId));
     if (list.isEmpty) {
       return null;
     }
@@ -426,7 +440,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       return Game.from(list.first) as MT;
     }
     else {
-      throw UnimplementedError("getSelectedMT is not implemented for this media type");
+      throw UnimplementedError('getSelectedMT is not implemented for this media type');
     }
   }
 
@@ -437,12 +451,12 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     bool noSearch = true; // Flag to track if there are no search results
 
-    String mediaType = "";
+    String mediaType = '';
     if (MT == Game) {
-      mediaType = "Game";
+      mediaType = 'Game';
     }
     else {
-      throw UnimplementedError("Search dialog for this media type is not implemented");
+      throw UnimplementedError('Search dialog for this media type is not implemented');
     }
 
     return showDialog(
@@ -494,7 +508,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                       return ListTile(
                                         title: Text(mediaName),
                                         subtitle: Text(
-                                          "$mediaType is already in library.",
+                                          '$mediaType is already in library.',
                                           style: const TextStyle(
                                             color: Color.fromARGB(255, 255, 0, 0),
                                           ),
@@ -508,7 +522,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                       return ListTile(
                                         title: Text(mediaName),
                                         subtitle: Text(
-                                          "$mediaType is in wishlist.",
+                                          '$mediaType is in wishlist.',
                                           style: const TextStyle(
                                             color: Color.fromARGB(255, 255, 0, 0),
                                           ),
@@ -550,12 +564,12 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       setState(() {});
     }
 
-    String mediaType = "";
+    String mediaType = '';
     if (MT == Game) {
-      mediaType = "games";
+      mediaType = 'games';
     }
     else {
-      throw UnimplementedError("Sorting is not implemented for this media type");
+      throw UnimplementedError('Sorting is not implemented for this media type');
     }
 
     return showDialog(
@@ -667,16 +681,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       setState(() {});
     }
 
-    String mediaType = "";
+    String mediaType = '';
     if (MT == Game) {
-      mediaType = "games";
+      mediaType = 'games';
     }
     else {
-      throw UnimplementedError("Sorting is not implemented for this media type");
+      throw UnimplementedError('Sorting is not implemented for this media type');
     }
 
-    List<Tag> tags = await Tag.getAllTags(); // TODO: I don't know if we want all tags
-    List<Genre> genres = await Genre.getAllGenres(); // TODO: I don't know if we want all genres
+    List<Tag> tags = await TagService().readAll(); // TODO: I don't know if we want all tags
+    List<Genre> genres = await GenreService().readAll(); // TODO: I don't know if we want all genres
 
     if (context.mounted) {
       return showDialog(
@@ -845,12 +859,12 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context, int mediaId) async {
-    String mediaType = "";
+    String mediaType = '';
     if (MT == Game) {
-      mediaType = "game";
+      mediaType = 'game';
     }
     else {
-      throw UnimplementedError("Delete is not implemented for this media type");
+      throw UnimplementedError('Delete is not implemented for this media type');
     }
     return showDialog(
       context: context,
@@ -869,13 +883,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               onPressed: () {
                 // TODO: We might also want to remove the mediausertag and mediausergenre but I am not sure for now
                 // TODO: Endpoint this
+                // TODO: ManyToMany
                 Supabase
                   .instance
                   .client
-                  .from("mediauser")
+                  .from('mediauser')
                   .delete()
-                  .eq("mediaid", mediaId)
-                  .eq("userid", UserSystem().currentUser!.id);
+                  .eq('mediaid', mediaId)
+                  .eq('userid', UserSystem().currentUser!.id);
                 setState(() {
                   selectedMediaId = -1; // TODO: Might want to move to some random media instead of this
                 });
@@ -991,7 +1006,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       Media media = Media(
         originalName: name,
         description:
-            selectedGame['summary'] ?? "There is no summary for this game.",
+            selectedGame['summary'] ?? 'There is no summary for this game.',
         releaseDate: selectedGame['first_release_date'] != null
             ? selectedGame['first_release_date'] as DateTime
             : DateTime(1800),
@@ -1000,13 +1015,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             : 0,
         communityScore:
             selectedGame['user_rating'] != 0 ? selectedGame['user_rating'] : 0,
-        mediaType: "Game",
+        mediaType: 'Game',
       );
 
       // TODO: Endpoint
-      media.id = (await supabase.from("media").insert(media.toSupa()).select()).map(Media.from).first.id;
+      media.id = (await MediaService().create(media)).id;
 
-      Game newGame = Game(
+      nullableGame = Game(
         mediaId: media.id,
         parentGameId:
             -1 /*TODO in the next semester: Add parameter/call to API to check if this is a DLC*/,
@@ -1014,43 +1029,43 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         OSMinimum: answersPCGW.containsKey('OSMinimum') &&
                 answersPCGW['OSMinimum'] != null
             ? answersPCGW['OSMinimum']
-            : "N/A",
+            : 'N/A',
         OSRecommended: answersPCGW.containsKey('OSRecommended') &&
                 answersPCGW['OSRecommended'] != null
             ? answersPCGW['OSRecommended']
-            : "N/A",
+            : 'N/A',
         CPUMinimum: answersPCGW.containsKey('CPUMinimum') &&
                 answersPCGW['CPUMinimum'] != null
             ? answersPCGW['CPUMinimum']
-            : "N/A",
+            : 'N/A',
         CPURecommended: answersPCGW.containsKey('CPURecommended') &&
                 answersPCGW['CPURecommended'] != null
             ? answersPCGW['CPURecommended']
-            : "N/A",
+            : 'N/A',
         RAMMinimum: answersPCGW.containsKey('RAMMinimum') &&
                 answersPCGW['RAMMinimum'] != null
             ? answersPCGW['RAMMinimum']
-            : "N/A",
+            : 'N/A',
         RAMRecommended: answersPCGW.containsKey('RAMRecommended') &&
                 answersPCGW['RAMRecommended'] != null
             ? answersPCGW['RAMRecommended']
-            : "N/A",
+            : 'N/A',
         HDDMinimum: answersPCGW.containsKey('HDDMinimum') &&
                 answersPCGW['HDDMinimum'] != null
             ? answersPCGW['HDDMinimum']
-            : "N/A",
+            : 'N/A',
         HDDRecommended: answersPCGW.containsKey('HDDRecommended') &&
                 answersPCGW['HDDRecommended'] != null
             ? answersPCGW['HDDRecommended']
-            : "N/A",
+            : 'N/A',
         GPUMinimum: answersPCGW.containsKey('GPUMinimum') &&
                 answersPCGW['GPUMinimum'] != null
             ? answersPCGW['GPUMinimum']
-            : "N/A",
+            : 'N/A',
         GPURecommended: answersPCGW.containsKey('GPURecommended') &&
                 answersPCGW['GPURecommended'] != null
             ? answersPCGW['GPURecommended']
-            : "N/A",
+            : 'N/A',
         HLTBMainInSeconds: answersHLTB.containsKey('Main Story')
             ? answersHLTB['Main Story']
             : -1,
@@ -1074,68 +1089,59 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         List<String> gamePublishers = (selectedGame['publishers'] as List<dynamic>).map((x) => x.toString()).toList();
 
         for (String publisherString in gamePublishers) {
+          // Notat
           Publisher? publisher = await Publisher.tryGet(publisherString);
           if (publisher == null) {
             // A new publisher. Add it to the database
             publisher = Publisher(
               name: publisherString,
             );
-            // TODO: Endpoint
-            List<Publisher> list = (await supabase.from("publisher").insert(publisher.toSupa()).select()).map(Publisher.from).toList();
-            publisher.id = list.first.id;
+            publisher = await PublisherService().create(publisher);
           }
 
-          // TODO: Endpoint
-          await supabase.from("mediapublisher").insert({"mediaid": newGame.mediaId, "publisherid": publisher.id});
+          await MediaPublisherService().create(MediaPublisher(mediaId: nullableGame.mediaId, publisherId: publisher.id))
         }
       }
 
       if(selectedGame['developers'] != null) {
         // get the developers of the game
         List<String> gameCreators = (selectedGame['developers'] as List<dynamic>).map((x) => x.toString()).toList();
-        
+
         for (String creatorString in gameCreators) {
+          // Notat
           Creator? creator = await Creator.tryGet(creatorString);
           if (creator == null) {
             // A new developer. Add it to the database
             creator = Creator(
               name: creatorString,
             );
-            // TODO: Endpoint
-            List<Creator> list = (await supabase.from("creator").insert(creator.toSupa()).select()).map(Creator.from).toList();
-            creator.id = list.first.id;
+            creator = await CreatorService().create(creator);
           }
 
-          // TODO: Endpoint
-          await supabase.from("mediacreator").insert({"mediaid": newGame.mediaId, "creatorid": creator.id});
+          await MediaCreatorService().create(MediaCreator(mediaId: nullableGame.mediaId, creatorId: creator.id));
         }
       }
 
       if(selectedGame['platforms'] != null) {
         // get the platforms of the game
         List<dynamic> gamePlatforms = (selectedGame['platforms'] as List<dynamic>).map((x) => x.toString()).toList();
-        
+
         for (String platformString in gamePlatforms) {
+          // Notat
           Platform? platform = await Platform.tryGet(platformString);
           if (platform == null) {
             // A new platform. Add it to the database
             platform = Platform(
               name: platformString,
             );
-            // TODO: Endpoint
-            List<Platform> list = (await supabase.from("platform").insert(platform.toSupa()).select()).map(Platform.from).toList();
-            platform.id = list.first.id;
+            platform = await PlatformService().create(platform);
           }
 
-          // TODO: Endpoint
-          await supabase.from("mediaplatform").insert({"mediaid": newGame.mediaId, "platformid": platform.id});
+          await MediaPlatformService().create(MediaPlatform(mediaId: nullableGame.mediaId, platformId: platform.id));
         }
       }
 
-      // TODO: Endpoint
-      newGame.id = (await supabase.from("game").insert(newGame.toSupa()).select()).map(Game.from).first.id;
-
-      nullableGame = newGame;
+      nullableGame = await GameService().create(nullableGame);
     }
 
     Game game = nullableGame;
@@ -1147,36 +1153,34 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         name: name,
         userScore: -1,
         addedDate: DateTime.now(),
-        coverImage: selectedGame["cover"] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
-        status: "Plan To Play",
+        coverImage: selectedGame['cover'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
+        status: 'Plan To Play',
         series: name, // TODO: Add parameter/call to game series API
-        icon: selectedGame["cover"] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
-        backgroundImage: selectedGame["artworks"] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame["artworks"][0],
+        icon: selectedGame['cover'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
+        backgroundImage: selectedGame['artworks'] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame['artworks'][0],
         lastInteracted: DateTime.now(),
       );
 
-      // TODO: Endpoint
-      await supabase.from("mediauser").insert(mu.toSupa());
+      MediaUserService().create(mu);
     }
   }
 
-  // TODO: FIX THIS FUNCTION
   Future<Widget> _displayMedia(MT? mt) async {
-    String mediaType = "";
+    String mediaType = '';
     Widget additionalButtons = Container();
     if (MT == Game) {
-      mediaType = "game";
+      mediaType = 'game';
     }
     else {
-      throw UnimplementedError("Display media for this media type is not implemented");
+      throw UnimplementedError('Display media for this media type is not implemented');
     }
 
     if (mt == null) {
       return Container(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withAlpha(128),
         child: Center(
           child: Text(
-            "Choose a $mediaType",
+            'Choose a $mediaType',
             style: const TextStyle(color: Colors.white, fontSize: 24.0),
           ),
         )
@@ -1184,19 +1188,20 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     if (MT == Game) {
-      additionalButtons = Game.getAditionalButtons(mt as Game, context, () {setState(() {});});
+      additionalButtons = await getAdditionalButtons(mt as Game, context, () {setState(() {});});
     }
     else {
-      throw UnimplementedError("Get additional buttons for this media type is not implemented");
+      throw UnimplementedError('Get additional buttons for this media type is not implemented');
     }
 
-    return (await mt.media)
-      .displayMedia(
-        additionalButtons,
-        renderNotes(
-          await Note.getNotes(UserSystem().getCurrentUserId(), mt.getMediaId())
-        ),
-      );
+    return await displayMedia(
+      await mt.media,
+      additionalButtons,
+      renderNotes(
+        // Notat
+        await Note.getNotes(UserSystem().getCurrentUserId(), mt.getMediaId())
+      ),
+    );
   }
 
   Future<void> _showNewStickyDialog(int mediaId) {
@@ -1206,7 +1211,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("New sticky note"),
+          title: const Text('New sticky note'),
           content: SizedBox(
             width: 350,
             child: TextFormField(
@@ -1222,7 +1227,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 Navigator.of(context).pop();
                 setState(() {});
               },
-              child: const Text("Cancel"),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -1231,11 +1236,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                   userId: UserSystem().currentUser!.id,
                   content: controller.text,
                 );
-                Supabase.instance.client.from("note").insert(note.toSupa()); // TODO: Use endpoint
+                await NoteService().create(note);
                 Navigator.of(context).pop();
                 setState(() {});
               },
-              child: const Text("Save"),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -1245,7 +1250,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
   Widget renderStickyNote(Note? note, int mediaId) {
     Widget textToDisplay = const Text(
-      "+",
+      '+',
       style: TextStyle(
         fontSize: 70,
         color: Colors.black26,
@@ -1267,8 +1272,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     void removeNote() async {
-      note as Note;
-      await Supabase.instance.client.from("note").delete().eq("id", note.id);
+      await NoteService().delete((note as Note).id);
       setState(() {});
     }
 

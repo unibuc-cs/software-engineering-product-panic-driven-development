@@ -1,105 +1,21 @@
-import 'dart:io';
+import 'helpers/utils.dart';
 import 'helpers/config.dart';
-import 'providers/manager.dart';
+import 'controllers/api.dart';
+import 'helpers/responses.dart';
 import 'helpers/middleware.dart';
-import 'package:shelf/shelf.dart';
-import 'helpers/serialization.dart';
-import 'package:shelf/shelf_io.dart';
-import 'package:shelf_router/shelf_router.dart';
+import 'package:shelf_plus/shelf_plus.dart';
 
-Response handleErrorResponse(String error) {
-  final errorLower = error.toLowerCase();
-  if (errorLower.contains("something went wrong")) {
-    return Response.internalServerError(body: error);
-  }
-  else if ((errorLower.contains("no") || errorLower.contains("not")) && errorLower.contains("found")) {
-    return Response.notFound(error);
-  }
-  return Response.badRequest(body: error);
+Handler init() {
+  var app = Router(notFoundHandler: unknownEndpoint).plus;
+  app.mount('/api', logger(errorHandling(apiRouter())));
+  app.get('/favicon.ico', faviconNotFound);
+  return app.call;
 }
 
-void main() async {
-  final router = Router();
-
-  router.get('/', (Request request) {
-    final sb = StringBuffer()
-      ..write('Available endpoints\n\n')
-      ..write('/health\n')
-      ..write('/api');
-
-    return Response.ok(sb.toString());
-  });
-
-  router.get('/health', (Request request) {
-    return Response.ok('Server is healthy!');
-  });
-
-  router.get('/api', (Request request) {
-    final sb = StringBuffer()
-      ..write('Available services\n\n')
-      ..write('/igdb\n')
-      ..write('/pcgamingwiki\n')
-      ..write('/howlongtobeat\n')
-      ..write('/steam\n')
-      ..write('/goodreads\n')
-      ..write('/tmdbmovie\n')
-      ..write('/tmdbseries\n')
-      ..write('/anilistanime\n')
-      ..write('/anilistmanga');
-
-    return Response.ok(sb.toString());
-  });
-
-  router.get('/api/<provider>', (Request request) {
-    final sb = StringBuffer()
-      ..write('Available methods\n\n')
-      ..write('/options?name=<query>\n')
-      ..write('/info?id=<query>\n')
-      ..write('/recommendations?id=<query>');
-
-    return Response.ok(sb.toString());
-  });
-
-  router.get('/api/<provider>/<method>', (Request request, String provider, String method) async {
-    final Map<String, String> queryParams = request.url.queryParameters;
-    final providerManager = Manager(provider);
-    final parameter = method == 'options'
-      ? queryParams['name']
-      : queryParams['id'];
-
-    if (parameter == null) {
-      return Response.badRequest(body: 'Missing parameter for the ${method} method');
-    }
-
-    if (method == 'options') {
-      final options = await providerManager.getOptions(parameter);
-      if (options.length == 1 && options[0].containsKey('error')) {
-        return handleErrorResponse(options[0]['error']);
-      }
-      return listToJson(serializeList(options));
-    }
-    if (method == 'info') {
-      final info = await providerManager.getInfo(parameter);
-      if (info.containsKey('error')) {
-        return handleErrorResponse(info['error']);
-      }
-      return mapToJson(serializeMap(info));
-    }
-    if (method == 'recommendations') {
-      final recommendations = await providerManager.getRecommendations(parameter);
-      if (recommendations.length == 1 && recommendations[0].containsKey('error')) {
-        return handleErrorResponse(recommendations[0]['error']);
-      }
-      return listToJson(serializeList(recommendations));
-    }
-    return Response.notFound('Method not found');
-  });
-
-  final handler = const Pipeline()
-    .addMiddleware(logger())
-    .addMiddleware(unknownEndpoint())
-    .addHandler(router);
-
-  final server = await serve(handler, InternetAddress.anyIPv4, Config().port);
-  print('Server listening on port ${server.port}');
-}
+void main() => shelfRun(
+  init,
+  defaultBindPort: Config().port,
+  defaultBindAddress: bool.fromEnvironment('LOCAL', defaultValue: false) ? 'localhost' : '0.0.0.0',
+  defaultEnableHotReload: bool.fromEnvironment('RELOAD', defaultValue: false),
+  onStarted: startupLog
+);

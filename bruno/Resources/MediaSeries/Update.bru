@@ -1,0 +1,19 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{URL}}/mediaseries/1/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 1,
+    "seriesid": 4,
+    "index": 4
+  }
+}

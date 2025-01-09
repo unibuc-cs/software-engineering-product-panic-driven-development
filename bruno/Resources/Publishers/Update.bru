@@ -1,0 +1,17 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{URL}}/publishers/{{idValid}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Team Apple"
+  }
+}

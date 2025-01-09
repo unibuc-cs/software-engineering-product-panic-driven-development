@@ -1,0 +1,18 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{URL}}/medialinks/2/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 2,
+    "linkid": 3
+  }
+}

@@ -1,5 +1,5 @@
 import 'package:mediamaster/Models/media_type.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as supa; // The "as supa" is required because 2 different User exists
+import 'package:supabase_flutter/supabase_flutter.dart' as supa; // The 'as supa' is required because 2 different User exists
 import 'Models/user.dart';
 import 'Models/game.dart';
 
@@ -43,10 +43,10 @@ class UserSystem {
                      .Supabase
                      .instance
                      .client
-                     .from("media-user")
-                     .select("mediaid")
-                     .eq("userid", currentUser!.id)
-                     ).map((x) => x["mediaid"])
+                     .from('media-user')
+                     .select('mediaid')
+                     .eq('userid', currentUser!.id)
+                     ).map((x) => x['mediaid'])
                       .toList();
 
     return
@@ -54,18 +54,18 @@ class UserSystem {
         .Supabase
         .instance
         .client
-        .from("game")
+        .from('game')
         .select()
-        .inFilter("mediaid", ids)
+        .inFilter('mediaid', ids)
         ).map(Game.from)
          .toList();
   }
 
   Future<List<MediaType>> getUserMedia(String type) async {
-    if (type.toLowerCase()=="game") {
+    if (type.toLowerCase()=='game') {
       return getUserGames();
     }
 
-    throw UnimplementedError("Getter getUserMedia is not implemented for type $type");
+    throw UnimplementedError('Getter getUserMedia is not implemented for type $type');
   }
 }

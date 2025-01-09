@@ -1,0 +1,22 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{URL}}/medias
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "originalname": "test3",
+    "description": "test2",
+    "releasedate": "2017-02-24 00:00:00.000",
+    "criticscore": 88,
+    "communityscore": 90,
+    "mediatype": "book"
+  }
+}

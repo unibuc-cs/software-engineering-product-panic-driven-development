@@ -1,9 +1,16 @@
-class Retailer {
+import 'model.dart';
+
+class Retailer implements Model {
   // Data
   int id;
   String name;
 
-  Retailer({this.id = -1, required this.name});
+  Retailer({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'retailers';
 
   @override
   bool operator ==(Object other) {
@@ -16,16 +23,18 @@ class Retailer {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "name": name,
+      'name': name,
     };
   }
 
+  @override
   factory Retailer.from(Map<String, dynamic> json) {
     return Retailer(
-      id: json["id"],
-      name: json["name"],
+      id: json['id'],
+      name: json['name'],
     );
   }
 }

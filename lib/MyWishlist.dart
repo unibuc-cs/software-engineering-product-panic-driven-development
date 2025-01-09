@@ -20,7 +20,7 @@ import 'Models/publisher.dart';
 import 'Models/tag.dart';
 import 'Models/wishlist.dart';
 
-import 'Services/ApiService.dart';
+import 'Services/provider_service.dart';
 
 import 'Main.dart';
 import 'UserSystem.dart';

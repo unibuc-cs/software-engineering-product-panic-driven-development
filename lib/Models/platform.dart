@@ -1,9 +1,16 @@
-class Platform {
+import 'model.dart';
+
+class Platform implements Model {
   // Data
   int id;
   String name;
 
-  Platform({this.id = -1, required this.name});
+  Platform({
+    this.id = -1,
+    required this.name
+  });
+
+  static String get endpoint => 'platforms';
 
   @override
   bool operator ==(Object other) {
@@ -16,22 +23,24 @@ class Platform {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "name": name,
+      'name': name,
     };
   }
 
+  @override
   factory Platform.from(Map<String, dynamic> json) {
     return Platform(
-      id: json["id"],
-      name: json["name"],
+      id: json['id'],
+      name: json['name'],
     );
   }
 
   // TODO: Endpoint this
   // static Future<Platform?> tryGet(String name) async {
-  //   var list = await Supabase.instance.client.from("platform").select().eq("name", name);
+  //   var list = await Supabase.instance.client.from('platform').select().eq('name', name);
 
   //   if (list.isEmpty) {
   //     return null;

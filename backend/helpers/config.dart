@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
+import 'package:axios_package/axios_package.dart';
 
 class Config {
   final _dotenv = DotEnv();
+  final baseUrl = const bool.fromEnvironment('LOCAL', defaultValue: false)
+    ? 'http://localhost:3007/api'
+    : 'https://mediamaster.fly.dev/api';
 
   Config() {
     _loadEnvFile();
@@ -15,35 +19,41 @@ class Config {
     }
   }
 
+  Axios get axios => Axios(baseUrl: baseUrl);
+
   String? getEnv(String key) {
     return _dotenv[key] ?? Platform.environment[key];
   }
 
-  String get igdb_id {
+  String get igdbId {
     return getEnv('CLIENT_ID_IGDB') ?? '';
   }
 
-  String get igdb_secret {
+  String get igdbSecret {
     return getEnv('CLIENT_SECRET_IGDB') ?? '';
   }
 
-  String get goodreads_agents {
+  String get goodreadsAgents {
     return getEnv('USER_AGENTS_GOODREADS') ?? '';
   }
 
-  String get tmdb_token {
+  String get tmdbToken {
     return getEnv('ACCESS_TOKEN_TMDB') ?? '';
   }
 
-  String get supabase_url {
+  String get supabaseUrl {
     return getEnv('URL_SUPABASE') ?? '';
   }
 
-  String get supabase_key {
+  String get supabaseKey {
     return getEnv('ANON_KEY_SUPABASE') ?? '';
   }
 
-  String get steam_key {
+  String get supabaseServiceKey {
+    return getEnv('SERVICE_KEY_SUPABASE') ?? '';
+  }
+
+  String get steamKey {
     return getEnv('API_KEY_STEAM') ?? '';
   }
 

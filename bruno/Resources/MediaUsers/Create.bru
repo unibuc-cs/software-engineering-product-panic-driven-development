@@ -1,0 +1,20 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{URL}}/mediausers
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 1,
+    "name": "alex",
+    "addeddate": "2025-01-08T19:17:01.132830",
+    "lastinteracted": "2025-01-08T19:17:01.132830"
+  }
+}
