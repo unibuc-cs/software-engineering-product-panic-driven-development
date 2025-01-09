@@ -1,3 +1,4 @@
+import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
@@ -8,16 +9,8 @@ import 'Auth/signup_bloc.dart';
 import 'Auth/login_screen.dart';
 import 'Auth/login_bloc.dart';
 
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:dotenv/dotenv.dart';
-
 void main() async {
   final env = DotEnv(includePlatformEnvironment: true)..load();
-
-  await Supabase.initialize(
-    url: env['URL_SUPABASE'] ?? 'default_value',
-    anonKey: env['ANON_KEY_SUPABASE'] ?? 'default_value',
-  );
 
   addSeedData();
 
@@ -57,21 +50,6 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-  //function for testing database connection
-  Future<void> insertPublisher() async {
-  final response = await Supabase.instance.client
-      .from('publisher')
-      .insert({'name': 'Test Publisher'});
-
-  if (response.error != null) {
-    // Handle error
-    // print("Error inserting publisher: ${response.error.message}");
-  }
-  else {
-    // print("Publisher inserted successfully.");
-  }
-}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,7 +101,6 @@ class HomeState extends State<Home> {
               ),
               child: const Text('Log in'),
             ),
-
           ],
         ),
       ),

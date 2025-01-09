@@ -25,6 +25,9 @@ class MediaRetailer implements Model {
   int get hashCode => Object.hash(mediaId, retailerId);
 
   @override
+  dynamic get id => [mediaId, retailerId];
+
+  @override
   Map<String, dynamic> toJson() {
     return {
       'mediaid': mediaId,

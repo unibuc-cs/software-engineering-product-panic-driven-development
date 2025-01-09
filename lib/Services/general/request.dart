@@ -63,9 +63,9 @@ Future<T> postRequest<T>({
   required T Function(dynamic) fromJson,
 }) async {
   return await request<T>(
-    method: 'POST',
+    method  : 'POST',
     endpoint: endpoint,
-    body: body,
+    body    : body,
     fromJson: fromJson,
   );
 }
@@ -75,7 +75,7 @@ Future<T> getRequest<T>({
   required T Function(dynamic) fromJson,
 }) async {
   return await request<T>(
-    method: 'GET',
+    method  : 'GET',
     endpoint: endpoint,
     fromJson: fromJson,
   );
@@ -87,9 +87,9 @@ Future<T> putRequest<T>({
   required T Function(dynamic) fromJson,
 }) async {
   return await request<T>(
-    method: 'PUT',
+    method  : 'PUT',
     endpoint: endpoint,
-    body: body,
+    body    : body,
     fromJson: fromJson,
   );
 }
@@ -98,7 +98,7 @@ Future<void> deleteRequest({
   required String endpoint,
 }) async {
   await request<void>(
-    method: 'DELETE',
+    method  : 'DELETE',
     endpoint: endpoint,
     fromJson: (_) => null,
   );

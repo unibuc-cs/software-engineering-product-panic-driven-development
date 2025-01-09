@@ -56,6 +56,7 @@ scripts:
   app                 : flutter run -d windows
   app:dev             : flutter run -d windows --release
   app:local           : flutter run --dart-define=LOCAL=true -d windows
+  dummy               : dart --define=LOCAL=true lib\Dummy.dart
   lint                : flutter analyze
   server              : dart run --define=LOCAL=true backend/main.dart
   server:dev          : dart run --define=RELOAD=true --define=LOCAL=true --enable-vm-service backend/main.dart

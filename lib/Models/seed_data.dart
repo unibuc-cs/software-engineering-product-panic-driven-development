@@ -5,6 +5,8 @@ import '../Services/genre_service.dart';
 
 Future<void> addSeedData() async {
   TagService tagServ = TagService();
+  GenreService genreServ = GenreService();
+  List<Future<void>> allFutures = [];
 
   if ((await tagServ.readAll()).isEmpty) {
     var tagsToAdd = [
@@ -19,12 +21,8 @@ Future<void> addSeedData() async {
       'MMO',
     ];
 
-    for (String tagName in tagsToAdd) {
-      tagServ.create(Tag(name: tagName));
-    }
+    allFutures.addAll(tagsToAdd.map((tagName) => tagServ.create(Tag(name: tagName))));
   }
-
-  GenreService genreServ = GenreService();
 
   if ((await genreServ.readAll()).isEmpty) {
     var genresToAdd = [
@@ -66,12 +64,9 @@ Future<void> addSeedData() async {
       'MOBA',
     ];
 
-    for (String genreName in genresToAdd) {
-      genreServ.create(Genre(name: genreName));
-    }
+    allFutures.addAll(genresToAdd.map((genreName) => genreServ.create(Genre(name: genreName))));
   }
+
+  await Future.wait(allFutures);
 }
 
-Future<void> main() async {
-  await addSeedData();
-}
