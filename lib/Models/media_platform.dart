@@ -1,9 +1,16 @@
-class MediaPlatform {
+import 'model.dart';
+
+class MediaPlatform implements Model {
   // Data
   int mediaId;
   int platformId;
 
-  MediaPlatform({required this.mediaId, required this.platformId});
+  MediaPlatform({
+    required this.mediaId,
+    required this.platformId
+  });
+
+  static String get endpoint => 'mediaplatforms';
 
   @override
   bool operator ==(Object other) {
@@ -17,17 +24,19 @@ class MediaPlatform {
   @override
   int get hashCode => Object.hash(mediaId, platformId);
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "platformid": platformId,
+      'mediaid': mediaId,
+      'platformid': platformId,
     };
   }
 
+  @override
   factory MediaPlatform.from(Map<String, dynamic> json) {
     return MediaPlatform(
-      mediaId: json["mediaid"],
-      platformId: json["platformid"],
+      mediaId: json['mediaid'],
+      platformId: json['platformid'],
     );
   }
 }

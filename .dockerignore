@@ -1,73 +1,73 @@
 # flyctl launch added from .gitignore
 # Miscellaneous
-**\*.class
-**\*.log
-**\*.pyc
-**\*.swp
-**\.DS_Store
-**\.atom
-**\.buildlog
-**\.history
-**\.svn
-**\migrate_working_dir
+**/*.class
+**/*.log
+**/*.pyc
+**/*.swp
+**/.DS_Store
+**/.atom
+**/.buildlog
+**/.history
+**/.svn
+**/migrate_working_dir
 
 # IntelliJ related
-**\*.iml
-**\*.ipr
-**\*.iws
-**\.idea
+**/*.iml
+**/*.ipr
+**/*.iws
+**/.idea
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
 #.vscode/
-**\vs
+**/vs
 
 # Flutter/Dart/Pub related
-**\**\doc\api
-**\**\ios\Flutter\.last_build_id
-**\.dart_tool
-**\.flutter-plugins
-**\.flutter-plugins-dependencies
-**\.pub-cache
-**\.pub
+**/**/doc/api
+**/**/ios/Flutter/.last_build_id
+**/.dart_tool
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache
+**/.pub
 build
 
 # Symbolication related
-**\app.*.symbols
+**/app.*.symbols
 
 # Obfuscation related
-**\app.*.map.json
+**/app.*.map.json
 
 # Android Studio will place build artifacts here
-android\app\debug
-android\app\profile
-android\app\release
+android/app/debug
+android/app/profile
+android/app/release
 
-**\*web
-**\*linux
-**\*macos
-**\*ios
-**\*android
+**/*web
+**/*linux
+**/*macos
+**/*ios
+**/*android
 
-**\.env
+**/.env
 
-# flyctl launch added from windows\.gitignore
-windows\**\flutter\ephemeral
+# flyctl launch added from windows/.gitignore
+windows/**/flutter/ephemeral
 
 # Visual Studio user-specific files.
-windows\**\*.suo
-windows\**\*.user
-windows\**\*.userosscache
-windows\**\*.sln.docstates
+windows/**/*.suo
+windows/**/*.user
+windows/**/*.userosscache
+windows/**/.sln.docstates
 
 # Visual Studio build-related files.
-windows\**\x64
-windows\**\x86
+windows/**/x64
+windows/**/x86
 
 # Visual Studio cache files
 # files ending in .cache can be ignored
-windows\**\*.[Cc]ache
+windows/**/*.cache
 # but keep track of directories ending in .cache
-!windows\**\*.[Cc]ache
+!windows/**/*.cache
 fly.toml

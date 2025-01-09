@@ -1,7 +1,9 @@
-class Wishlist {
+import 'model.dart';
+
+class Wishlist implements Model {
   // Data
   int mediaId;
-  int userId;
+  String userId;
   String name;
   int userScore;
   DateTime addedDate;
@@ -12,18 +14,21 @@ class Wishlist {
   String backgroundImage;
   DateTime lastInteracted;
 
-  Wishlist(
-      {required this.mediaId,
-      required this.userId,
-      required this.name,
-      required this.userScore,
-      required this.addedDate,
-      required this.coverImage,
-      required this.status,
-      required this.series,
-      required this.icon,
-      required this.backgroundImage,
-      required this.lastInteracted});
+  Wishlist({
+    required this.mediaId,
+    required this.userId,
+    required this.name,
+    this.userScore = 0,
+    required this.addedDate,
+    this.coverImage = '',
+    this.status = '',
+    this.series = '',
+    this.icon = '',
+    this.backgroundImage = '',
+    required this.lastInteracted
+  });
+
+  static String get endpoint => 'wishlists';
 
   @override
   bool operator ==(Object other) {
@@ -36,35 +41,37 @@ class Wishlist {
   @override
   int get hashCode => Object.hash(mediaId, userId);
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "userid": userId,
-      "name": name,
-      "userscore": userScore,
-      "addeddate": addedDate,
-      "coverimage": coverImage,
-      "status": status,
-      "series": series,
-      "icon": icon,
-      "backgroundimage": backgroundImage,
-      "lastinteracted": lastInteracted,
+      'mediaid': mediaId,
+      'userid': userId,
+      'name': name,
+      'userscore': userScore,
+      'addeddate': addedDate.toIso8601String(),
+      'coverimage': coverImage,
+      'status': status,
+      'series': series,
+      'icon': icon,
+      'backgroundimage': backgroundImage,
+      'lastinteracted': lastInteracted.toIso8601String(),
     };
   }
 
+  @override
   factory Wishlist.from(Map<String, dynamic> json) {
     return Wishlist(
-      mediaId: json["mediaid"],
-      userId: json["userid"],
-      name: json["name"],
-      userScore: json["userscore"],
-      addedDate: json["addeddate"],
-      coverImage: json["coverimage"],
-      status: json["status"],
-      series: json["series"],
-      icon: json["icon"],
-      backgroundImage: json["backgroundimage"],
-      lastInteracted: json["lastinteracted"],
+      mediaId: json['mediaid'],
+      userId: json['userid'],
+      name: json['name'],
+      userScore: json['userscore'] ?? 0,
+      addedDate: DateTime.parse(json['addeddate']),
+      coverImage: json['coverimage'] ?? '',
+      status: json['status'] ?? '',
+      series: json['series'] ?? '',
+      icon: json['icon'] ?? '',
+      backgroundImage: json['backgroundimage'] ?? '',
+      lastInteracted: DateTime.parse(json['lastinteracted']),
     );
   }
 
@@ -75,9 +82,9 @@ class Wishlist {
   //       await Supabase
   //         .instance
   //         .client
-  //         .from("media")
+  //         .from('media')
   //         .select()
-  //         .eq("mediaid", mediaId)
+  //         .eq('mediaid', mediaId)
   //         .single()
   //     );
   // }

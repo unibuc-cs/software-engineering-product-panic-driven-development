@@ -1,15 +1,20 @@
-class AppAchievement {
+import 'model.dart';
+
+class AppAchievement implements Model {
   // Data
   int id;
   String name;
   String description;
   int xp;
 
-  AppAchievement(
-      {this.id = -1,
-      required this.name,
-      required this.description,
-      this.xp = 100});
+  AppAchievement({
+    this.id = -1,
+    required this.name,
+    required this.description,
+    this.xp = 100
+  });
+
+  static String get endpoint => 'appachievements';
 
   @override
   bool operator ==(Object other) {
@@ -22,20 +27,22 @@ class AppAchievement {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "name": name,
-      "description": description,
-      "xp": xp,
+      'name': name,
+      'description': description,
+      'xp': xp,
     };
   }
 
+  @override
   factory AppAchievement.from(Map<String, dynamic> json) {
     return AppAchievement(
-      id: json["id"],
-      name: json["name"],
-      description: json["description"],
-      xp: json["xp"],
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      xp: json['xp'],
     );
   }
 }

@@ -1,49 +1,54 @@
-class Note {
-  // Data
-  int id;
-  int mediaId;
-  int userId;
-  String content;
-  DateTime creationDate = DateTime.now();
-  DateTime modifiedDate = DateTime.now();
+import 'model.dart';
 
-  Note(
-      {this.id = -1,
-      required this.mediaId,
-      required this.userId,
-      required this.content});
+class Note implements Model {
+  // Data
+  int mediaId;
+  String userId;
+  String content;
+  DateTime creationDate;
+  DateTime modifiedDate;
+
+  Note({
+    required this.mediaId,
+    required this.userId,
+    required this.content,
+    required this.creationDate,
+    required this.modifiedDate,
+  });
+
+  static String get endpoint => 'notes';
 
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {
       return false;
     }
-    return id == (other as Note).id;
+    return mediaId == (other as Note).mediaId && userId == other.userId;
   }
+  
+  @override
+  int get hashCode => Object.hash(mediaId, userId);
 
   @override
-  int get hashCode => id;
-
-  Map<String, dynamic> toSupa() {
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "userid": userId,
-      "content": content,
-      "creationdate": creationDate,
-      "modifieddate": modifiedDate,
+      'mediaid': mediaId,
+      'userid': userId,
+      'content': content,
+      'creationdate': creationDate.toIso8601String(),
+      'modifieddate': modifiedDate.toIso8601String(),
     };
   }
 
+  @override
   factory Note.from(Map<String, dynamic> json) {
-    Note note = Note(
-      id: json["id"],
-      mediaId: json["mediaid"],
-      userId: json["userid"],
-      content: json["content"],
+    return Note(
+      mediaId: json['mediaid'],
+      userId: json['userid'],
+      content: json['content'],
+      creationDate: DateTime.parse(json['creationdate']),
+      modifiedDate: DateTime.parse(json['modifieddate']),
     );
-    note.creationDate = json["creationdate"];
-    note.modifiedDate = json["modifieddate"];
-    return note;
   }
 
   // TODO: Endpoint this
@@ -51,10 +56,10 @@ class Note {
   //   return (await Supabase
   //     .instance
   //     .client
-  //     .from("note")
+  //     .from('note')
   //     .select()
-  //     .eq("userid", userId)
-  //     .eq("mediaid", mediaId)
+  //     .eq('userid', userId)
+  //     .eq('mediaid', mediaId)
   //   ).map(Note.from)
   //    .toList();
   // }

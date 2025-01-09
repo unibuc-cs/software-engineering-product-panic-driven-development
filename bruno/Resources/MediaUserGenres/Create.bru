@@ -1,0 +1,18 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{URL}}/mediausergenres
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "mediaid": 1,
+    "genreid": 1
+  }
+}

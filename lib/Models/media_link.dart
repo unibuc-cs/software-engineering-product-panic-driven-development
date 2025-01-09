@@ -1,9 +1,16 @@
-class MediaLink {
+import 'model.dart';
+
+class MediaLink implements Model {
   // Data
   int mediaId;
   int linkId;
 
-  MediaLink({required this.mediaId, required this.linkId});
+  MediaLink({
+    required this.mediaId,
+    required this.linkId
+  });
+
+  static String get endpoint => 'medialinks';
 
   @override
   bool operator ==(Object other) {
@@ -16,17 +23,19 @@ class MediaLink {
   @override
   int get hashCode => Object.hash(mediaId, linkId);
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "mediaid": mediaId,
-      "linkid": linkId,
+      'mediaid': mediaId,
+      'linkid': linkId,
     };
   }
 
+  @override
   factory MediaLink.from(Map<String, dynamic> json) {
     return MediaLink(
-      mediaId: json["mediaid"],
-      linkId: json["linkid"],
+      mediaId: json['mediaid'],
+      linkId: json['linkid'],
     );
   }
 
@@ -35,18 +44,18 @@ class MediaLink {
   //   List<dynamic> ids = await Supabase
   //     .instance
   //     .client
-  //     .from("medialink")
-  //     .select("linkid")
-  //     .eq("mediaid", mediaId);
-    
+  //     .from('medialink')
+  //     .select('linkid')
+  //     .eq('mediaid', mediaId);
+
   //   List<Link> ans = List.empty(
   //     growable: true,
   //   );
 
-  //   for(var json in await Supabase.instance.client.from("link").select().inFilter("id", ids)) {
+  //   for(var json in await Supabase.instance.client.from('link').select().inFilter('id', ids)) {
   //     ans.add(Link.from(json));
   //   }
-    
+
   //   return ans;
   // }
 }

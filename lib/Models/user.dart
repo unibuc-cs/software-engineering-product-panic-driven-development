@@ -1,11 +1,16 @@
-class User {
+import 'model.dart';
+
+class User implements Model {
   // Data
   int id;
   int idAuth;
 
-  User(
-      {this.id = -1,
-      this.idAuth = -1});
+  User({
+    this.id = -1,
+    this.idAuth = -1
+  });
+
+  static String get endpoint => 'users';
 
   @override
   bool operator ==(Object other) {
@@ -18,16 +23,18 @@ class User {
   @override
   int get hashCode => id;
 
-  Map<String, dynamic> toSupa() {
+  @override
+  Map<String, dynamic> toJson() {
     return {
-      "idauth": idAuth,
+      'idauth': idAuth,
     };
   }
 
+  @override
   factory User.from(Map<String, dynamic> json) {
     return User(
-      id: json["id"],
-      idAuth: json["idauth"],
+      id: json['id'],
+      idAuth: json['idauth'],
     );
   }
 }
