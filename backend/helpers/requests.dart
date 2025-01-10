@@ -203,10 +203,6 @@ Future<Map<String, dynamic>> createFromBody(
     .single();
   partialResult.forEach((key, value) => result[key] = value);
 
-  // TO DO: create mediauser from body
-
-  // TO DO: Create mediausergenres from body
-
   // Create X=creators/publishers/platforms/links/series and mediaX from body
   final mapToPlural = {
     'creator'  : 'creators',
@@ -252,7 +248,7 @@ Future<Map<String, dynamic>> createFromBody(
   if (result['series'].isEmpty) {
     result.remove('series');
   }
-  
+
   if(body['mediaseriesBody']?['series'].length == 0) {
     return result;
   }
