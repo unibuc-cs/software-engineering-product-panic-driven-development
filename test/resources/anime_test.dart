@@ -13,7 +13,10 @@ void main() async {
     'genres': [
       'Sports'
     ],
-    'coverimage': 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx5231-LOB6lgM2Coto.png',
+    'retailers': [
+      'test'
+    ],
+    // 'coverimage': 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx5231-LOB6lgM2Coto.png',
     'communityscore': 76,
     'criticscore': 76,
     'status': 'FINISHED',

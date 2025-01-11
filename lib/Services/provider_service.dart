@@ -3,7 +3,7 @@ import 'general/config.dart';
 import 'package:http/http.dart' as http;
 
 Future<dynamic> _fetchEndpoint(String endpoint) async {
-  http.Response response = await axios.get(endpoint);
+  http.Response response = await Config.instance.axios.get(endpoint);
   return jsonDecode(response.body);
 }
 

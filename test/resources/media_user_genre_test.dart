@@ -20,7 +20,7 @@ void main() async {
   await runService(
     service    : MediaUserGenreService(),
     dummyItem  : dummy,
-    tables     : ['media', 'user', 'genre'],
+    tables     : ['media', 'genre'],
     authNeeded : true,
   );
 }

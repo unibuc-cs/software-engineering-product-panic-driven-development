@@ -50,6 +50,7 @@ RouterPlus mangaRouter() {
         'publishers': [],
         'platforms': [],
         'links': [],
+        'retailers': [],
         'seriesname': [],
         'series': [],
       },

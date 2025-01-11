@@ -91,16 +91,17 @@ Map<String, Map<String, dynamic>> splitBody(
       'communityscore',
       'mediatype',
     ],
-    'mediauserBody': [
-      'coverimage',
-      'icon',
-      'backgroundimage', // the user chooses from the artworks provided by the api and the backend only receives one image
-    ],
+    // 'mediauserBody': [
+    //   'coverimage',
+    //   'icon',
+    //   'backgroundimage', // the user chooses from the artworks provided by the api and the backend only receives one image
+    // ],
     'genresBody': ['genres'],
     'creatorsBody': ['creators'],
     'publishersBody': ['publishers'],
     'platformsBody': ['platforms'],
     'linksBody': ['links'],
+    'retailersBody': ['retailers'],
     'seriesBody': ['seriesname'],
     'mediaseriesBody': ['series'],
   };
@@ -209,6 +210,7 @@ Future<Map<String, dynamic>> createFromBody(
     'publisher': 'publishers',
     'platform' : 'platforms',
     'link'     : 'links',
+    'retailer' : 'retailers'
   };
   for (MapEntry<String, dynamic> entry in mapToPlural.entries) {
     final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);

@@ -16,7 +16,10 @@ void main() async {
       'Fantasy',
       'Sports'
     ],
-    'coverimage': 'https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx49315-2AqZShRMXyfx.png',
+    'retailers': [
+      'test'
+    ],
+    // 'coverimage': 'https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx49315-2AqZShRMXyfx.png',
     'communityscore': 69,
     'criticscore': 65,
     'status': 'FINISHED',

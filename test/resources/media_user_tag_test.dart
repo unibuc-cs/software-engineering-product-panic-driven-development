@@ -20,7 +20,7 @@ void main() async {
   await runService(
     service    : MediaUserTagService(),
     dummyItem  : dummy,
-    tables     : ['media', 'user', 'tag'],
+    tables     : ['media', 'tag'],
     authNeeded : true,
   );
 }

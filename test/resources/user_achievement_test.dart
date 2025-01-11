@@ -32,7 +32,7 @@ void main() async {
     service    : UserAchievementService(),
     dummyItem  : dummy,
     updatedItem: updatedDummy,
-    tables     : ['user', 'achievement'],
+    tables     : ['achievement'],
     authNeeded : true,
   );
 }

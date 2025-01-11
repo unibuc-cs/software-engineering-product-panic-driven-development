@@ -15,5 +15,6 @@ void main() async {
     service    : RetailerService(),
     dummyItem  : dummy,
     updatedItem: updated,
+    itemName   : dummy.name,
   );
 }

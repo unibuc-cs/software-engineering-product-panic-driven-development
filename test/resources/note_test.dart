@@ -24,7 +24,7 @@ void main() async {
     service    : NoteService(),
     dummyItem  : dummy,
     updatedItem: updatedDummy,
-    tables     : ['media', 'user'],
+    tables     : ['media'],
     authNeeded : true,
   );
 }

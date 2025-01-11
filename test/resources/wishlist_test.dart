@@ -25,7 +25,7 @@ void main() async {
     service    : WishlistService(),
     dummyItem  : dummy,
     updatedItem: updatedDummy,
-    tables     : ['media', 'user'],
+    tables     : ['media'],
     authNeeded : true,
   );
 }

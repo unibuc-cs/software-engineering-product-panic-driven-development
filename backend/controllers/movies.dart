@@ -49,6 +49,7 @@ RouterPlus moviesRouter() {
         'publishers': [],
         'platforms': [],
         'links': [],
+        'retailers': [],
         'seriesname': [],
         'series': [],
       },

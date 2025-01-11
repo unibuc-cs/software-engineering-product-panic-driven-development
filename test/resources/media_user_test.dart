@@ -25,7 +25,7 @@ void main() async {
     service    : MediaUserService(),
     dummyItem  : dummy,
     updatedItem: updatedDummy,
-    tables     : ['media', 'user'],
+    tables     : ['media'],
     authNeeded : true,
   );
 }

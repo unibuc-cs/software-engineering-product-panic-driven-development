@@ -11,7 +11,22 @@ void runTests({
 }) {
   excluded ??= [];
   excluded.add('run_tests');
-  List<String> last = ['anime', 'book', 'game', 'manga', 'movie', 'tv_series'];
+  List<String> last = [
+    'media_creator',
+    'media_link',
+    'media_platform',
+    'media_publisher',
+    'media_retailer',
+    'media_series',
+    'anime',
+    'book',
+    'game',
+    'manga',
+    'movie',
+    'tv_series',
+    'season',
+    'game_achievement'
+  ];
   var files = Directory(Platform.script.toFilePath())
     .parent
     .listSync()
