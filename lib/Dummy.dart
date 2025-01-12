@@ -1,3 +1,7 @@
+import 'package:mediamaster/Models/media_user.dart';
+import 'package:mediamaster/Services/auth_service.dart';
+import 'package:mediamaster/Services/media_user_service.dart';
+
 import 'Models/tag.dart';
 import 'Models/book.dart';
 import 'Helpers/database.dart';
@@ -6,10 +10,49 @@ import 'Services/book_service.dart';
 import 'Services/media_service.dart';
 
 void main() async {
+  final tagService = TagService.instance;
   final bookService = BookService.instance;
   final mediaService = MediaService.instance;
+  final mediaUserService = MediaUserService.instance;
   await seedData();
+
+  final authService = AuthService.instance;
   
+  final Map<String, String> dummyUser = {
+    'name': 'John Doe',
+    'email': 'test@gmail.com',
+    'password': '123456',
+  };
+  try {
+    await authService.signup(
+      name: dummyUser['name']!,
+      email: dummyUser['email']!,
+      password: dummyUser['password']!,
+    );
+    print('Dummy user created');
+  }
+  catch (e) {
+    if (!e.toString().contains('a user with this email address has already been registered')) {
+      print('Signup error: $e');
+      return;
+    }
+    print('Dummy user already exists');
+  }
+
+  try {
+    await authService.login(
+      email: dummyUser['email']!,
+      password: dummyUser['password']!,
+    );
+    print('Logged in');
+  }
+  catch (e) {
+    print('Login error: $e');
+    return;
+  }
+
+  print(await AuthService.instance.details());
+
   await bookService.hydrate();
   await mediaService.hydrate();
   print('-----------');
@@ -95,9 +138,6 @@ void main() async {
   print(bookService.items.length);
   print('\n');
 
-  final tagService = TagService.instance;
-  await seedData();
-
   await tagService.hydrate();
   print('-----------');
   print('Before add');
@@ -125,4 +165,42 @@ void main() async {
   print('-----------');
   tagService.items.forEach((tag) => print('${tag.name} ${tag.id}'));
   print('\n');
+
+  // MediaUser Test
+  await mediaUserService.hydrate();
+  print('-----------');
+  print('Before add');
+  print('-----------');
+  mediaUserService.items.forEach((mu) => print('${mu.mediaId} ${mu.userId} ${mu.name}'));
+  print('\n');
+
+  MediaUser dummy = await mediaUserService.create(
+    MediaUser(
+      mediaId: 1,
+      userId: '6f61eb81-444a-4956-ac97-f81113cb12cc',
+      name: 'asdfghjkl',
+      addedDate: DateTime.now(),
+      lastInteracted: DateTime.now(),
+    )
+  );
+  print('-----------');
+  print('After add | Before update');
+  print('-----------');
+  mediaUserService.items.forEach((mu) => print('${mu.mediaId} ${mu.userId} ${mu.name}'));
+  print('\n');
+
+  await mediaUserService.update(dummy.mediaId, { 'name': 'Updated MU' });
+  print('-----------');
+  print('After update | Before delete');
+  print('-----------');
+  mediaUserService.items.forEach((mu) => print('${mu.mediaId} ${mu.userId} ${mu.name}'));
+  print('\n');
+
+  await mediaUserService.delete(dummy.mediaId);
+  print('-----------');
+  print('After delete');
+  print('-----------');
+  mediaUserService.items.forEach((mu) => print('${mu.mediaId} ${mu.userId} ${mu.name}'));
+  print('\n');
+  // End MediaUser test
 }

@@ -1,71 +1,116 @@
-import 'package:mediamaster/Models/media_type.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as supa; // The 'as supa' is required because 2 different User exists
-import 'Models/user.dart';
+import 'package:mediamaster/Helpers/database.dart';
+import 'package:mediamaster/Services/anime_service.dart';
+import 'package:mediamaster/Services/auth_service.dart';
+import 'package:mediamaster/Services/book_service.dart';
+import 'package:mediamaster/Services/game_service.dart';
+import 'package:mediamaster/Services/manga_service.dart';
+import 'package:mediamaster/Services/media_user_service.dart';
+import 'package:mediamaster/Services/movie_service.dart';
+import 'package:mediamaster/Services/tv_series_service.dart';
+
+import 'Models/general/media_type.dart';
 import 'Models/game.dart';
 
 class UserSystem {
   // The following 3 definitions are used to make this class a singleton
-  static final UserSystem _userSystem = UserSystem._internal();
+  UserSystem._();
+  
+  static final UserSystem _instance = UserSystem._();
 
-  factory UserSystem() {
-    return _userSystem;
-  }
-
-  // This is the constructor, which will need to be changed probably when we add AUTH
-  UserSystem._internal() {
-    init();
-  }
+  static UserSystem get instance => _instance;
   // Until now we made the class a singleton. Next is what really matters
 
-  User? currentUser;
+  Map<String, dynamic>? currentUserData;
+  // late final authService;
 
   void init() {
-    currentUser = null;
+    // authService = AuthService.instance;
   }
 
-  void login(User user) {
-    currentUser = user;
+  Future<void> login() async {
+    final userData = await AuthService.instance.details();
+
+    currentUserData = Map<String, dynamic>();
+    currentUserData!['id'] = userData['id'];
+    currentUserData!['name'] = userData['user_metadata']?['name'];
+    await HydrateWithUser();
   }
 
-  void logout() {
-    currentUser = null;
+  Future<void> logout() async {
+    await AuthService.instance.logout();
+    currentUserData = null;
+    await UnhydrateWithUser();
   }
 
   int getCurrentUserId() {
-    if (currentUser != null) {
-      return currentUser!.id;
+    if (currentUserData != null) {
+      return currentUserData!['id'];
     }
     return -1;
   }
 
-  Future<List<Game>> getUserGames() async {
-    var ids = (await supa
-                     .Supabase
-                     .instance
-                     .client
-                     .from('media-user')
-                     .select('mediaid')
-                     .eq('userid', currentUser!.id)
-                     ).map((x) => x['mediaid'])
-                      .toList();
-
-    return
-      (await supa
-        .Supabase
-        .instance
-        .client
-        .from('game')
-        .select()
-        .inFilter('mediaid', ids)
-        ).map(Game.from)
-         .toList();
-  }
-
-  Future<List<MediaType>> getUserMedia(String type) async {
-    if (type.toLowerCase()=='game') {
-      return getUserGames();
+  List<Game> getUserGames() {
+    if (currentUserData == null) {
+      return [];
     }
 
-    throw UnimplementedError('Getter getUserMedia is not implemented for type $type');
+    dynamic userId = currentUserData!['id'];
+
+    var ids = MediaUserService
+      .instance
+      .items
+      .where((mu) => mu.userId == userId)
+      .map((mu) => mu.mediaId)
+      .toSet();
+
+    return GameService
+      .instance
+      .items
+      .where((game) => ids.contains(game.mediaId))
+      .toList();
+  }
+
+  List<MediaType> getUserMedia(String type) {
+    if (currentUserData == null) {
+      return [];
+    }
+
+    dynamic userId = currentUserData!['id'];
+
+    var ids = MediaUserService
+      .instance
+      .items
+      .where((mu) => mu.userId == userId)
+      .map((mu) => mu.mediaId)
+      .toSet();
+
+    dynamic service;
+
+    if (type.toLowerCase() == 'game') {
+      service = GameService.instance;
+    }
+    else if (type.toLowerCase() == 'book') {
+      service = BookService.instance;
+    }
+    else if (type.toLowerCase() == 'anime') {
+      service = AnimeService.instance;
+    }
+    else if (type.toLowerCase() == 'manga') {
+      service = MangaService.instance;
+    }
+    else if (type.toLowerCase() == 'movie') {
+      service = MovieService.instance;
+    }
+    else if (type.toLowerCase() == 'tvseries') {
+      service = TVSeriesService.instance;
+    }
+    else {
+      throw UnimplementedError('GetUserMedia of type $type is not implemented!');
+    }
+
+    return service
+      .items
+      .where((mt) => ids.contains(mt.mediaId))
+      .toList();
   }
 }

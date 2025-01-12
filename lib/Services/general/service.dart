@@ -34,6 +34,10 @@ class Service<T extends Model> {
     _items.addAll(await readAll());
   }
 
+  Future<void> unhydrate() async {
+    _items.clear();
+  }
+
   List<T> get items => List.unmodifiable(_items);
 
   Future<dynamic> makePostRequest(dynamic model) async {

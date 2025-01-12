@@ -1,3 +1,5 @@
+import 'package:mediamaster/UserSystem.dart';
+
 import '../Menu.dart';
 import 'package:bloc/bloc.dart';
 import '../Services/auth_service.dart';
@@ -20,6 +22,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         email: body['email']!,
         password: body['password']!,
       );
+      UserSystem.instance.login();
     }
     catch (e) {
       String new_error = e.toString().split(',')[0].split('message:')[1].trim();

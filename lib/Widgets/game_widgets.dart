@@ -332,7 +332,7 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
 }
 
 Future<void> _showGameRecommendationsDialog(Game game, BuildContext context) async {
-  var similarGames = await getRecsIGDB(game.toSupa());
+  var similarGames = await getRecsIGDB(game.toJson());
   List<Widget> recommendations = [];
 
   if (context.mounted) {

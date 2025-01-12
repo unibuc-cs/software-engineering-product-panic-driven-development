@@ -1,8 +1,8 @@
+import 'Helpers/database.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'Helpers/database.dart';
 
 import 'Auth/signup_screen.dart';
 import 'Auth/signup_bloc.dart';
@@ -12,7 +12,10 @@ import 'Auth/login_bloc.dart';
 void main() async {
   DotEnv(includePlatformEnvironment: true)..load();
 
-  seedData();
+  // TODO: remove this from client side
+  await seedData();
+
+  await HydrateWithoutUser();
 
   runApp(MyApp());
 }

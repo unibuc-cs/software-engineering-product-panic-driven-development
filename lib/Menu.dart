@@ -1,3 +1,5 @@
+import 'UserSystem.dart';
+
 import 'Main.dart';
 import 'Library.dart';
 import 'Models/game.dart';
@@ -57,8 +59,8 @@ class MenuState extends State<Menu> {
             tooltip: 'Toggle dark mode',
           ),
           IconButton(
-              onPressed: () {
-                // UserSystem().logout();
+              onPressed: () async {
+                UserSystem.instance.logout();
                 Navigator.pop(context);
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const Home()));
