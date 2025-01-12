@@ -16,7 +16,7 @@ void main() async {
   );
 
   await runService(
-    service    : AppAchievementService(),
+    service    : AppAchievementService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

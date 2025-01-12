@@ -4,12 +4,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 String getErrMsg(String? body, String fallbackMsg) {
-  return (body != null && body!.isNotEmpty && body!.contains('error'))
+  return (body != null && body.isNotEmpty && body.contains('error'))
     ? body.split('{"error":"')[1].split('"}')[0]
     : fallbackMsg;
 }
 
-Future<T> request<T>({
+Future<dynamic> request<T>({
   required String method,
   required String endpoint,
   dynamic body,
@@ -26,21 +26,21 @@ Future<T> request<T>({
   if (methodUpper == 'POST') {
     response = await config.axios.post(endpoint, body, headers: headers);
     errMsg = getErrMsg(
-      response?.body,
+      response.body,
       'Failed to create data at $endpoint: ${response.statusCode}'
     );
   }
   else if (methodUpper == 'PUT') {
     response = await config.axios.put(endpoint, body, headers: headers);
     errMsg = getErrMsg(
-      response?.body,
+      response.body,
       'Failed to update data at $endpoint: ${response.statusCode}'
     );
   }
   else if (methodUpper == 'GET') {
     response = await config.axios.get(endpoint, headers: headers);
     errMsg = getErrMsg(
-      response?.body,
+      response.body,
       'Failed to read data at $endpoint: ${response.statusCode}'
     );
   }
@@ -58,10 +58,15 @@ Future<T> request<T>({
   if (response.body.isEmpty) {
     return fromJson({});
   }
+
+  if (methodUpper == 'POST') {
+    return jsonDecode(response.body);
+  }
+
   return fromJson(jsonDecode(response.body));
 }
 
-Future<T> postRequest<T>({
+Future<Map<String, dynamic>> postRequest<T>({
   required String endpoint,
   required dynamic body,
   required T Function(dynamic) fromJson,

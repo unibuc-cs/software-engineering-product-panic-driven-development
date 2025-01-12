@@ -31,7 +31,7 @@ Future<void> runService<T extends Model>({
       'password': '123456',
     };
     try {
-      final response = await authService.signup(
+      await authService.signup(
         name: dummyUser['name']!,
         email: dummyUser['email']!,
         password: dummyUser['password']!,

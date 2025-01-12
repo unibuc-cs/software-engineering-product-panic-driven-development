@@ -36,7 +36,7 @@ class Service<T extends Model> {
 
   List<T> get items => List.unmodifiable(_items);
 
-  Future<T> create(dynamic model) async {
+  Future<dynamic> makePostRequest(dynamic model) async {
     Map<String, dynamic> body;
     if (model is T) {
       body = model.toJson();
@@ -48,11 +48,26 @@ class Service<T extends Model> {
       throw ArgumentError('The model must be either a Map or an instance of $T');
     }
 
-    T item = await postRequest<T>(
+    return await postRequest<T>(
       endpoint: '/$resource',
       body    : body,
       fromJson: fromJson,
     );
+  }
+
+  void addToItems(dynamic model) {
+    if (model == null) {
+      return;
+    }
+    if (!(model is List)) {
+      model = [model];
+    }
+    
+    _items.addAll(model.map((item) => fromJson(item)));
+  }
+
+  Future<T> create(dynamic model) async {
+    final item = fromJson(await makePostRequest(model));
     _items.add(item);
     return item;
   }
@@ -99,7 +114,7 @@ class Service<T extends Model> {
 
     T updatedItem = await putRequest<T>(
       endpoint: '/$resource/${ids.join('/')}',
-      body    : model,
+      body    : body,
       fromJson: fromJson,
     );
     _items = _items

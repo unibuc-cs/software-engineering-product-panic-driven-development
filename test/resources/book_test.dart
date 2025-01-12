@@ -57,7 +57,7 @@ void main() async {
   );
 
   await runService(
-    service    : BookService(),
+    service    : BookService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

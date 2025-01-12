@@ -22,7 +22,7 @@ void main() async {
   );
 
   await runService(
-    service    : MediaService(),
+    service    : MediaService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

@@ -36,7 +36,7 @@ void main() async {
   );
 
   await runService(
-    service    : AnimeService(),
+    service    : AnimeService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

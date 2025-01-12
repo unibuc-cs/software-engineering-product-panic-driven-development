@@ -22,7 +22,7 @@ void main() async {
   );
 
   await runService(
-    service    : WishlistService(),
+    service    : WishlistService.instance,
     dummyItem  : dummy,
     updatedItem: updatedDummy,
     tables     : ['media'],

@@ -12,13 +12,13 @@ void main() async {
   MediaLink dummy = MediaLink(
     mediaId: 1,
     linkId : await getValidId(
-      service: LinkService(),
+      service: LinkService.instance,
       backup : link,
     ),
   );
 
   await runService(
-    service  : MediaLinkService(),
+    service  : MediaLinkService.instance,
     dummyItem: dummy,
     tables   : ['media', 'link'],
   );

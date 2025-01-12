@@ -14,7 +14,7 @@ void main() async {
   );
 
   await runService(
-    service    : LinkService(),
+    service    : LinkService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
     itemName   : dummy.href,

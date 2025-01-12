@@ -32,7 +32,7 @@ void main() async {
   );
 
   await runService(
-    service    : TVSeriesService(),
+    service    : TVSeriesService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

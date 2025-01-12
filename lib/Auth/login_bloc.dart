@@ -25,7 +25,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     // check if the email address is valid
     if (!EmailValidator.validate(_email)) {
-      throw Exception("Enter a valid email address.");
+      throw Exception('Enter a valid email address.');
     }
 
     // check if a user has this email address
@@ -36,14 +36,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
     }
     if (index == -1) {
-      throw Exception("There is no account with this email address.");
+      throw Exception('There is no account with this email address.');
     }
 
     // check if the password is the same as the confirmed password
     var possiblePassword =
         sha256.convert(utf8.encode(_password + users.getAt(index)!.hashSalt));
     if (possiblePassword.toString() != users.getAt(index)!.password) {
-      throw Exception("Invalid password.");
+      throw Exception('Invalid password.');
     }
 
     User user = users.getAt(index)!;

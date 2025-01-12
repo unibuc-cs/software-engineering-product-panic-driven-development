@@ -3,10 +3,16 @@ import 'package:mediamaster/Models/game.dart';
 import 'package:mediamaster/Models/media_creator.dart';
 import 'package:mediamaster/Models/media_platform.dart';
 import 'package:mediamaster/Models/media_publisher.dart';
-import 'package:mediamaster/Models/media_type.dart';
+import 'package:mediamaster/Models/general/media_type.dart';
 import 'package:mediamaster/Services/creator_service.dart';
+import 'package:mediamaster/Services/game_service.dart';
 import 'package:mediamaster/Services/genre_service.dart';
 import 'package:mediamaster/Services/media_service.dart';
+import 'package:mediamaster/Services/media_creator_service.dart';
+import 'package:mediamaster/Services/media_platform_service.dart';
+import 'package:mediamaster/Services/media_publisher_service.dart';
+import 'package:mediamaster/Services/media_user_service.dart';
+import 'package:mediamaster/Services/note_service.dart';
 import 'package:mediamaster/Services/platform_service.dart';
 import 'package:mediamaster/Services/publisher_service.dart';
 import 'package:mediamaster/Services/tag_service.dart';
@@ -689,8 +695,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Sorting is not implemented for this media type');
     }
 
-    List<Tag> tags = await TagService().readAll(); // TODO: I don't know if we want all tags
-    List<Genre> genres = await GenreService().readAll(); // TODO: I don't know if we want all genres
+    List<Tag> tags = await TagService.instance.readAll(); // TODO: I don't know if we want all tags
+    List<Genre> genres = await GenreService.instance.readAll(); // TODO: I don't know if we want all genres
 
     if (context.mounted) {
       return showDialog(
@@ -1019,7 +1025,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
 
       // TODO: Endpoint
-      media.id = (await MediaService().create(media)).id;
+      media.id = (await MediaService.instance.create(media)).id;
 
       nullableGame = Game(
         mediaId: media.id,
@@ -1096,10 +1102,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             publisher = Publisher(
               name: publisherString,
             );
-            publisher = await PublisherService().create(publisher);
+            publisher = await PublisherService.instance.create(publisher);
           }
 
-          await MediaPublisherService().create(MediaPublisher(mediaId: nullableGame.mediaId, publisherId: publisher.id))
+          await MediaPublisherService.instance.create(MediaPublisher(mediaId: nullableGame.mediaId, publisherId: publisher.id))
         }
       }
 
@@ -1115,10 +1121,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             creator = Creator(
               name: creatorString,
             );
-            creator = await CreatorService().create(creator);
+            creator = await CreatorService.instance.create(creator);
           }
 
-          await MediaCreatorService().create(MediaCreator(mediaId: nullableGame.mediaId, creatorId: creator.id));
+          await MediaCreatorService.instance.create(MediaCreator(mediaId: nullableGame.mediaId, creatorId: creator.id));
         }
       }
 
@@ -1134,14 +1140,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             platform = Platform(
               name: platformString,
             );
-            platform = await PlatformService().create(platform);
+            platform = await PlatformService.instance.create(platform);
           }
 
-          await MediaPlatformService().create(MediaPlatform(mediaId: nullableGame.mediaId, platformId: platform.id));
+          await MediaPlatformService.instance.create(MediaPlatform(mediaId: nullableGame.mediaId, platformId: platform.id));
         }
       }
 
-      nullableGame = await GameService().create(nullableGame);
+      nullableGame = await GameService.instance.create(nullableGame);
     }
 
     Game game = nullableGame;
@@ -1161,7 +1167,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         lastInteracted: DateTime.now(),
       );
 
-      MediaUserService().create(mu);
+      MediaUserService.instance.create(mu);
     }
   }
 
@@ -1236,7 +1242,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                   userId: UserSystem().currentUser!.id,
                   content: controller.text,
                 );
-                await NoteService().create(note);
+                await NoteService.instance.create(note);
                 Navigator.of(context).pop();
                 setState(() {});
               },
@@ -1272,7 +1278,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     void removeNote() async {
-      await NoteService().delete((note as Note).id);
+      await NoteService.instance.delete((note as Note).id);
       setState(() {});
     }
 

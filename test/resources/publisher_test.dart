@@ -12,7 +12,7 @@ void main() async {
   );
 
   await runService(
-    service    : PublisherService(),
+    service    : PublisherService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
     itemName   : dummy.name,

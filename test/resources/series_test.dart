@@ -12,7 +12,7 @@ void main() async {
   );
 
   await runService(
-    service    : SeriesService(),
+    service    : SeriesService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
     itemName   : dummy.name,

@@ -60,7 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(const SnackBar(
-                content: Text("The account has been successfully registered."),
+                content: Text('The account has been successfully registered.'),
                 duration: Duration(seconds: 3),
               ));
           }
@@ -82,7 +82,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Please enter a username.";
+                              return 'Please enter a username.';
                             }
                             return null;
                           }),
@@ -97,7 +97,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Please enter an email.";
+                              return 'Please enter an email.';
                             }
                             return null;
                           }),
@@ -113,10 +113,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Please enter a password.";
+                              return 'Please enter a password.';
                             }
                             if (value.length < 8) {
-                              return "Please enter a password of at least 8 characters.";
+                              return 'Please enter a password of at least 8 characters.';
                             }
                             return null;
                           }),
@@ -132,7 +132,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Please enter the same password as above.";
+                              return 'Please enter the same password as above.';
                             }
                             return null;
                           }),

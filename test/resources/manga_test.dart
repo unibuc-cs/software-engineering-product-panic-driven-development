@@ -38,7 +38,7 @@ void main() async {
   );
 
   await runService(
-    service    : MangaService(),
+    service    : MangaService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

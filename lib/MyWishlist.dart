@@ -35,39 +35,39 @@ class MyWishlist extends StatefulWidget {
 
 class MyWishlistState extends State<MyWishlist> {
   int selectedGameIndex = 0;
-  String filterQuery = "";
+  String filterQuery = '';
   TextEditingController searchController = TextEditingController();
   bool increasingSorting = true;
   int selectedSortingMethod = 0;
   var gameOrderComparators = [
     Pair<String, dynamic>(
-      "By original name",
+      'By original name',
       (Game a, Game b, int increasing) {
         return increasing *
             a.media.originalName.compareTo(b.media.originalName);
       },
     ),
     Pair<String, dynamic>(
-      "By critic score",
+      'By critic score',
       (Game a, Game b, int increasing) {
         return increasing * a.media.criticScore.compareTo(b.media.criticScore);
       },
     ),
     Pair<String, dynamic>(
-      "By comunity score",
+      'By comunity score',
       (Game a, Game b, int increasing) {
         return increasing *
             a.media.communityScore.compareTo(b.media.communityScore);
       },
     ),
     Pair<String, dynamic>(
-      "By release date",
+      'By release date',
       (Game a, Game b, int increasing) {
         return increasing * a.media.releaseDate.compareTo(b.media.releaseDate);
       },
     ),
     Pair<String, dynamic>(
-      "By time to beat",
+      'By time to beat',
       (Game a, Game b, int increasing) {
         int ta = a.getMinTimeToBeat();
         int tb = b.getMinTimeToBeat();
@@ -82,7 +82,7 @@ class MyWishlistState extends State<MyWishlist> {
       },
     ),
     Pair<String, dynamic>(
-      "By time to 100%",
+      'By time to 100%',
       (Game a, Game b, int increasing) {
         if (b.HLTBCompletionistInSeconds == -1) {
           return -1;
@@ -175,7 +175,7 @@ class MyWishlistState extends State<MyWishlist> {
     for (int i = 0; i < gamesIndices.length; ++i) {
       final game = gamesIndices[i].key;
       final idx = gamesIndices[i].value;
-      if (filterQuery == "" ||
+      if (filterQuery == '' ||
           game.media.originalName.toLowerCase().contains(filterQuery)) {
         listTiles.add(
           ListTile(
@@ -258,7 +258,7 @@ class MyWishlistState extends State<MyWishlist> {
     _setSearchText();
 
     IconButton? butonSearchReset;
-    if (filterQuery == "") {
+    if (filterQuery == '') {
       butonSearchReset = IconButton(
         onPressed: () {
           /*TODO: The search box gets activated only if you hold down at least 2 frames, I do not know the function to activate it when pressing this button. I also do not know if this should be our priority right now*/
@@ -284,7 +284,7 @@ class MyWishlistState extends State<MyWishlist> {
       },
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
-        hintText: "Search game in wishlist",
+        hintText: 'Search game in wishlist',
         suffixIcon: butonSearchReset,
       ),
     );
@@ -455,7 +455,7 @@ class MyWishlistState extends State<MyWishlist> {
                                   return ListTile(
                                     title: Text(gameName),
                                     subtitle: const Text(
-                                      "Game is already in wishlist.",
+                                      'Game is already in wishlist.',
                                       style: TextStyle(
                                         color: Color.fromARGB(255, 255, 0, 0),
                                       ),
@@ -469,7 +469,7 @@ class MyWishlistState extends State<MyWishlist> {
                                   return ListTile(
                                     title: Text(gameName),
                                     subtitle: const Text(
-                                      "Game is already in library.",
+                                      'Game is already in library.',
                                       style: TextStyle(
                                         color: Color.fromARGB(255, 255, 0, 0),
                                       ),
@@ -921,7 +921,7 @@ class MyWishlistState extends State<MyWishlist> {
       Media media = Media(
         originalName: name,
         description:
-            selectedGame['summary'] ?? "There is no summary for this game.",
+            selectedGame['summary'] ?? 'There is no summary for this game.',
         releaseDate: selectedGame['first_release_date'] != null
             ? DateTime.parse(selectedGame['first_release_date'])
             : DateTime(1800),
@@ -930,7 +930,7 @@ class MyWishlistState extends State<MyWishlist> {
             : 0,
         communityScore:
             selectedGame['user_rating'] != 0 ? selectedGame['user_rating'] : 0,
-        mediaType: "Game",
+        mediaType: 'Game',
       );
       Game newGame = Game(
         mediaId: media.id,
@@ -940,43 +940,43 @@ class MyWishlistState extends State<MyWishlist> {
         OSMinimum: answersPCGW.containsKey('OSMinimum') &&
                 answersPCGW['OSMinimum'] != null
             ? answersPCGW['OSMinimum']
-            : "N/A",
+            : 'N/A',
         OSRecommended: answersPCGW.containsKey('OSRecommended') &&
                 answersPCGW['OSRecommended'] != null
             ? answersPCGW['OSRecommended']
-            : "N/A",
+            : 'N/A',
         CPUMinimum: answersPCGW.containsKey('CPUMinimum') &&
                 answersPCGW['CPUMinimum'] != null
             ? answersPCGW['CPUMinimum']
-            : "N/A",
+            : 'N/A',
         CPURecommended: answersPCGW.containsKey('CPURecommended') &&
                 answersPCGW['CPURecommended'] != null
             ? answersPCGW['CPURecommended']
-            : "N/A",
+            : 'N/A',
         RAMMinimum: answersPCGW.containsKey('RAMMinimum') &&
                 answersPCGW['RAMMinimum'] != null
             ? answersPCGW['RAMMinimum']
-            : "N/A",
+            : 'N/A',
         RAMRecommended: answersPCGW.containsKey('RAMRecommended') &&
                 answersPCGW['RAMRecommended'] != null
             ? answersPCGW['RAMRecommended']
-            : "N/A",
+            : 'N/A',
         HDDMinimum: answersPCGW.containsKey('HDDMinimum') &&
                 answersPCGW['HDDMinimum'] != null
             ? answersPCGW['HDDMinimum']
-            : "N/A",
+            : 'N/A',
         HDDRecommended: answersPCGW.containsKey('HDDRecommended') &&
                 answersPCGW['HDDRecommended'] != null
             ? answersPCGW['HDDRecommended']
-            : "N/A",
+            : 'N/A',
         GPUMinimum: answersPCGW.containsKey('GPUMinimum') &&
                 answersPCGW['GPUMinimum'] != null
             ? answersPCGW['GPUMinimum']
-            : "N/A",
+            : 'N/A',
         GPURecommended: answersPCGW.containsKey('GPURecommended') &&
                 answersPCGW['GPURecommended'] != null
             ? answersPCGW['GPURecommended']
-            : "N/A",
+            : 'N/A',
         HLTBMainInSeconds: answersHLTB.containsKey('Main Story')
             ? answersHLTB['Main Story']
             : -1,
@@ -1111,12 +1111,12 @@ class MyWishlistState extends State<MyWishlist> {
         name: game.media.originalName,
         userScore: -1,
         addedDate: DateTime.now(),
-        coverImage: selectedGame["cover"] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame["cover"],
-        status: "Plan To Play",
+        coverImage: selectedGame['cover'] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame['cover'],
+        status: 'Plan To Play',
         series:
             game.media.originalName /*Add parameter/call to game series API*/,
-        icon: selectedGame["cover"] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame["cover"],
-        backgroundImage: selectedGame["artworks"] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame["artworks"][0],
+        icon: selectedGame['cover'] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame['cover'],
+        backgroundImage: selectedGame['artworks'] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame['artworks'][0],
         lastInteracted: DateTime.now(),
       );
 
@@ -1131,7 +1131,7 @@ class MyWishlistState extends State<MyWishlist> {
           color: Colors.black.withOpacity(0.5),
           child: const Center(
             child: Text(
-              "Choose a game",
+              'Choose a game',
               style: TextStyle(color: Colors.white, fontSize: 24.0),
             ),
           ));
@@ -1177,7 +1177,7 @@ class MyWishlistState extends State<MyWishlist> {
                 if (gameAlreadyInLibrary(game.media.originalName))
                   const Center(
                     child: Text(
-                      "Game is already in library.",
+                      'Game is already in library.',
                       style: TextStyle(
                         color: Color.fromARGB(255, 255, 0, 0),
                       ),
@@ -1206,7 +1206,7 @@ class MyWishlistState extends State<MyWishlist> {
                         child: const Column(
                           children: [
                             Text(
-                              "Play",
+                              'Play',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 24.0,
@@ -1214,7 +1214,7 @@ class MyWishlistState extends State<MyWishlist> {
                               textAlign: TextAlign.center,
                             ),
                             Text(
-                              "(currently unnavailable)",
+                              '(currently unnavailable)',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 12.0,
@@ -1633,7 +1633,7 @@ class MyWishlistState extends State<MyWishlist> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("New sticky note"),
+          title: const Text('New sticky note'),
           content: SizedBox(
             width: 350,
             child: TextFormField(
@@ -1649,7 +1649,7 @@ class MyWishlistState extends State<MyWishlist> {
                 Navigator.of(context).pop();
                 setState(() {});
               },
-              child: const Text("Cancel"),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -1663,7 +1663,7 @@ class MyWishlistState extends State<MyWishlist> {
                 setState(() {});
                 await Hive.box<Note>('notes').add(note);
               },
-              child: const Text("Save"),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -1673,7 +1673,7 @@ class MyWishlistState extends State<MyWishlist> {
 
   Widget renderStickyNote(Note? note, int mediaId) {
     Widget textToDisplay = const Text(
-      "+",
+      '+',
       style: TextStyle(
         fontSize: 70,
         color: Colors.black26,

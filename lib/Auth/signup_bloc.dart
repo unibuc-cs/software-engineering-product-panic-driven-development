@@ -30,19 +30,19 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
     // check if the email address is valid
     if (!EmailValidator.validate(_email)) {
-      throw Exception("Enter a valid email address.");
+      throw Exception('Enter a valid email address.');
     }
 
     // check if a user has this email address
     for (int i = 0; i < users.length; i++) {
       if (users.getAt(i)!.email == _email) {
-        throw Exception("This email address is already used.");
+        throw Exception('This email address is already used.');
       }
     }
 
     // check if the password is the same as the confirmed password
     if (_password != _confirmedPassword) {
-      throw Exception("The passwords don't match.");
+      throw Exception('The passwords don't match.');
     }
 
     // generate a hashSalt

@@ -2,7 +2,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'Models/seed_data.dart';
+import 'Helpers/database.dart';
 
 import 'Auth/signup_screen.dart';
 import 'Auth/signup_bloc.dart';
@@ -12,7 +12,7 @@ import 'Auth/login_bloc.dart';
 void main() async {
   final env = DotEnv(includePlatformEnvironment: true)..load();
 
-  addSeedData();
+  seedData();
 
   runApp(MyApp());
 }

@@ -13,7 +13,7 @@ void main() async {
   UserAchievement dummy = UserAchievement(
     userId: '',
     achievementId: await getValidId(
-      service: AppAchievementService(),
+      service: AppAchievementService.instance,
       backup : achievement
     ),
     unlockDate: DateTime.now(),
@@ -22,14 +22,14 @@ void main() async {
   UserAchievement updatedDummy = UserAchievement(
     userId: '',
     achievementId: await getValidId(
-      service: AppAchievementService(),
+      service: AppAchievementService.instance,
       backup : achievement
     ),
     unlockDate: DateTime.now(),
   );
 
   await runService(
-    service    : UserAchievementService(),
+    service    : UserAchievementService.instance,
     dummyItem  : dummy,
     updatedItem: updatedDummy,
     tables     : ['achievement'],

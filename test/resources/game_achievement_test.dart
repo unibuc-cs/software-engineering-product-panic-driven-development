@@ -50,7 +50,7 @@ void main() async {
 
   GameAchievement dummy = GameAchievement(
     gameId: await getValidId(
-      service: GameService(),
+      service: GameService.instance,
       backup : game,
     ),
     name: 'Good game',
@@ -58,7 +58,7 @@ void main() async {
   );
   GameAchievement updated = GameAchievement(
     gameId: await getValidId(
-      service: GameService(),
+      service: GameService.instance,
       backup : game,
     ),
     name: 'Well played',
@@ -66,7 +66,7 @@ void main() async {
   );
 
   await runService(
-    service    : GameAchievementService(),
+    service    : GameAchievementService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

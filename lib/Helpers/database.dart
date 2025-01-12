@@ -4,8 +4,8 @@ import 'package:mediamaster/Services/tag_service.dart';
 import 'package:mediamaster/Services/genre_service.dart';
 
 Future<void> seedData() async {
-  TagService tagServ = TagService();
-  GenreService genreServ = GenreService();
+  TagService tagServ = TagService.instance;
+  GenreService genreServ = GenreService.instance;
   List<Future<void>> allFutures = [];
 
   if ((await tagServ.readAll()).isEmpty) {

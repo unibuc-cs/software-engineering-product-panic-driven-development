@@ -222,7 +222,7 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
       context: context,
       builder: (context) {
         return FutureBuilder(
-          future: Future.wait([TagService().readAll(), GenreService().readAll()]),
+          future: Future.wait([TagService.instance.readAll(), GenreService.instance.readAll()]),
           builder: (context, snapshot) {
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {

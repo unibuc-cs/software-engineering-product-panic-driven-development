@@ -11,13 +11,13 @@ void main() async {
   MediaCreator dummy = MediaCreator(
     mediaId  : 1,
     creatorId: await getValidId(
-      service: CreatorService(),
+      service: CreatorService.instance,
       backup : creator,
     ),
   );
 
   await runService(
-    service   : MediaCreatorService(),
+    service   : MediaCreatorService.instance,
     dummyItem : dummy,
     tables    : ['media', 'creator'],
   );

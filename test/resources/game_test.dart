@@ -55,7 +55,7 @@ void main() async {
   );
 
   await runService(
-    service    : GameService(),
+    service    : GameService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

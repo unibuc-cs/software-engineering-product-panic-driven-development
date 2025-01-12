@@ -32,7 +32,7 @@ void main() async {
   );
 
   await runService(
-    service    : MovieService(),
+    service    : MovieService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );
