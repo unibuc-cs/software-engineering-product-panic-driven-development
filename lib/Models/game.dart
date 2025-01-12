@@ -124,14 +124,14 @@ class Game extends MediaType implements Model {
 
   @override
   Future<Media> get media async {
-    _media ??= await MediaService().readById([mediaId]);
+    _media ??= await MediaService.instance.readById([mediaId]);
     return _media!;
   }
 
   Game? _parentGame;
 
   Future<Game?> get parentGame async {
-    _parentGame ??= await GameService().readById([parentGameId]);
+    _parentGame ??= (await GameService.instance.readById([parentGameId])) as Game?;
     return _parentGame;
   }
 }

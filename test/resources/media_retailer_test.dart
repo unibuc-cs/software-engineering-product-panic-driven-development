@@ -11,13 +11,13 @@ void main() async {
   MediaRetailer dummy = MediaRetailer(
     mediaId   : 1,
     retailerId: await getValidId(
-      service: RetailerService(),
+      service: RetailerService.instance,
       backup : retailer
     ),
   );
 
   await runService(
-    service  : MediaRetailerService(),
+    service  : MediaRetailerService.instance,
     dummyItem: dummy,
     tables   : ['media', 'retailer'],
   );

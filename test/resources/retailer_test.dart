@@ -12,8 +12,9 @@ void main() async {
   );
 
   await runService(
-    service    : RetailerService(),
+    service    : RetailerService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
+    itemName   : dummy.name,
   );
 }

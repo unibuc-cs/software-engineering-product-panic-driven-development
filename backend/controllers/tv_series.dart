@@ -49,6 +49,7 @@ RouterPlus TVSeriesRouter() {
         'publishers': [],
         'platforms': [],
         'links': [],
+        'retailers': [],
         'seriesname': [],
         'series': [],
       },

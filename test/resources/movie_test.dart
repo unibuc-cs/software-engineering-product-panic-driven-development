@@ -9,7 +9,7 @@ void main() async {
     'originalname': 'Home Alone',
     'description': 'Eight-year-old Kevin McCallister makes the most of the situation after his family unwittingly leaves him behind when they go on Christmas vacation. When thieves try to break into his home, he puts up a fight like no other.',
     'language': 'en',
-    'coverimage': '/onTSipZ8R3bliBdKfPtsDuHTdlL.jpg',
+    // 'coverimage': '/onTSipZ8R3bliBdKfPtsDuHTdlL.jpg',
     'creators': [
       'Hughes Entertainment',
       '20th Century Fox'
@@ -18,6 +18,9 @@ void main() async {
     'communityscore': 74,
     'seriesname': [
       'Home Alone Collection'
+    ],
+    'retailers': [
+      'test'
     ],
     'releasedate': '1990-11-16',
     'durationinseconds': 6180
@@ -29,7 +32,7 @@ void main() async {
   );
 
   await runService(
-    service    : MovieService(),
+    service    : MovieService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

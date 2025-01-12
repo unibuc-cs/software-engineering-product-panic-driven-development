@@ -12,15 +12,15 @@ void main() async {
     mediaId: 1,
     userId: '',
     tagId: await getValidId(
-      service: TagService(),
+      service: TagService.instance,
       backup : tag
     ),
   );
 
   await runService(
-    service    : MediaUserTagService(),
+    service    : MediaUserTagService.instance,
     dummyItem  : dummy,
-    tables     : ['media', 'user', 'tag'],
+    tables     : ['media', 'tag'],
     authNeeded : true,
   );
 }

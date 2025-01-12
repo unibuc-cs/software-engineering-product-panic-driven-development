@@ -49,6 +49,7 @@ RouterPlus moviesRouter() {
         'publishers': [],
         'platforms': [],
         'links': [],
+        'retailers': [],
         'seriesname': [],
         'series': [],
       },
@@ -56,7 +57,6 @@ RouterPlus moviesRouter() {
 
     body['mediatype'] = 'movie';
     final specificBodies = splitBody(body, mediaType: 'movie');
-    print(specificBodies);
     final result = await createFromBody(specificBodies, supabase, mediaType: 'movie', mediaTypePlural: 'movies');
     return sendOk(result);
   });

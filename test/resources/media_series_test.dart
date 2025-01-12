@@ -11,14 +11,14 @@ void main() async {
   MediaSeries dummy = MediaSeries(
     mediaId : 1,
     seriesId: await getValidId(
-      service: SeriesService(),
+      service: SeriesService.instance,
       backup : series
     ),
     index   : 1.0,
   );
 
   await runService(
-    service  : MediaSeriesService(),
+    service  : MediaSeriesService.instance,
     dummyItem: dummy,
     tables   : ['media', 'series'],
   );

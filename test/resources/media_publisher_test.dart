@@ -11,13 +11,13 @@ void main() async {
   MediaPublisher dummy = MediaPublisher(
     mediaId    : 1,
     publisherId: await getValidId(
-      service: PublisherService(),
+      service: PublisherService.instance,
       backup : publisher,
     ),
   );
 
   await runService(
-    service  : MediaPublisherService(),
+    service  : MediaPublisherService.instance,
     dummyItem: dummy,
     tables   : ['media', 'publisher'],
   );

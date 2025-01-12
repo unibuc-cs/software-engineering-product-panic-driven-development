@@ -12,7 +12,7 @@ void main() async {
   );
 
   await runService(
-    service    : TagService(),
+    service    : TagService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

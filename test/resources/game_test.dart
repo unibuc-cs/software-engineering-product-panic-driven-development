@@ -5,11 +5,11 @@ import 'package:mediamaster/Services/game_service.dart';
 
 void main() async {
   final dummy = {
-    'genres': [
-    'Platform',
-    'Adventure',
-    'Indie'
-    ],
+    // 'genres': [
+      // 'Platform',
+      // 'Adventure',
+      // 'Indie'
+    // ],
     'platforms': [
       'PC (Microsoft Windows)',
       'Wii U',
@@ -22,7 +22,7 @@ void main() async {
     'releasedate': '2017-02-24T00:00:00.000',
     'description': 'A 2D metroidvania with an emphasis on close combat and exploration in which the player enters the once-prosperous now-bleak insect kingdom of Hallownest, travels through its various districts, meets friendly inhabitants, fights hostile ones and uncovers the kingdom\'s history while improving their combat abilities and movement arsenal by fighting bosses and accessing out-of-the-way areas.',
     'criticscore': 91,
-    'coverimage': '//images.igdb.com/igdb/image/upload/t_original/co93cr.jpg',
+    // 'coverimage': '//images.igdb.com/igdb/image/upload/t_original/co93cr.jpg',
     'seriesname': [
       'Hollow Knight'
     ],
@@ -31,6 +31,9 @@ void main() async {
     ],
     'publishers': [
       'Team Cherry'
+    ],
+    'retailers': [
+      'test'
     ],
     'communityscore': 92,
     'links': [
@@ -52,7 +55,7 @@ void main() async {
   );
 
   await runService(
-    service    : GameService(),
+    service    : GameService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

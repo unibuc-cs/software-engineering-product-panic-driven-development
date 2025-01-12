@@ -9,7 +9,7 @@ void main() async {
     'originalname': 'Prison Break',
     'description': 'Due to a political conspiracy, an innocent man is sent to death row and his only hope is his brother, who makes it his mission to deliberately get himself sent to the same prison in order to break the both of them out, from the inside out.',
     'language': 'en',
-    'coverimage': '/5E1BhkCgjLBlqx557Z5yzcN0i88.jpg',
+    // 'coverimage': '/5E1BhkCgjLBlqx557Z5yzcN0i88.jpg',
     'creators': [
       'Adelstein-Parouse Productions',
       '20th Century Fox Television',
@@ -18,6 +18,9 @@ void main() async {
       'Adelstein Productions',
       'One Light Road Productions',
       'Original Film'
+    ],
+    'retailers': [
+      'test'
     ],
     'status': 'Ended',
     'communityscore': 81,
@@ -29,7 +32,7 @@ void main() async {
   );
 
   await runService(
-    service    : TVSeriesService(),
+    service    : TVSeriesService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

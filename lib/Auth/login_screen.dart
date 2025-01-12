@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Please enter an email.";
+                              return 'Please enter an email.';
                             }
                             return null;
                           }),
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Please enter a password.";
+                              return 'Please enter a password.';
                             }
                             return null;
                           }),

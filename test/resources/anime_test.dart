@@ -10,10 +10,13 @@ void main() async {
     'originalname': 'Inazuma Eleven',
     'description': 'The main character, Endou Mamoru, is a very talented goalkeeper and the grandson of one of the strongest goalkeepers in Japan, who died before he was born. Even though his skills are incredible his school lacks a real soccer club as the 6 other members don\'t appear very interested even in training. But as soon as a mysterious forward called Gouenji moves to Endou\'s town, the young goalkeeper sets out to find and recruit members for his soccer team. (Source: Wikipedia)',
     'releasedate': '2008-10-05T00:00:00.000',
-    'genres': [
-      'Sports'
+    // 'genres': [
+    //   'Sports'
+    // ],
+    'retailers': [
+      'test'
     ],
-    'coverimage': 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx5231-LOB6lgM2Coto.png',
+    // 'coverimage': 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx5231-LOB6lgM2Coto.png',
     'communityscore': 76,
     'criticscore': 76,
     'status': 'FINISHED',
@@ -33,7 +36,7 @@ void main() async {
   );
 
   await runService(
-    service    : AnimeService(),
+    service    : AnimeService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

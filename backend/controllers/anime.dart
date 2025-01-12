@@ -51,6 +51,7 @@ RouterPlus animeRouter() {
         'publishers': [],
         'platforms': [],
         'links': [],
+        'retailers': [],
         'seriesname': [],
         'series': [],
       },

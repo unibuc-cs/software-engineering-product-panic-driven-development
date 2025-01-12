@@ -12,15 +12,15 @@ void main() async {
     mediaId: 1,
     userId: '',
     genreId: await getValidId(
-      service: GenreService(),
+      service: GenreService.instance,
       backup : genre
     ),
   );
 
   await runService(
-    service    : MediaUserGenreService(),
+    service    : MediaUserGenreService.instance,
     dummyItem  : dummy,
-    tables     : ['media', 'user', 'genre'],
+    tables     : ['media', 'genre'],
     authNeeded : true,
   );
 }

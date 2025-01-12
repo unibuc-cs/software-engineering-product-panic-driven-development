@@ -11,13 +11,13 @@ void main() async {
   MediaPlatform dummy = MediaPlatform(
     mediaId   : 1,
     platformId: await getValidId(
-      service: PlatformService(),
+      service: PlatformService.instance,
       backup : platform,
     ),
   );
 
   await runService(
-    service  : MediaPlatformService(),
+    service  : MediaPlatformService.instance,
     dummyItem: dummy,
     tables   : ['media', 'platform'],
   );

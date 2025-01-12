@@ -22,10 +22,10 @@ void main() async {
   );
 
   await runService(
-    service    : MediaUserService(),
+    service    : MediaUserService.instance,
     dummyItem  : dummy,
     updatedItem: updatedDummy,
-    tables     : ['media', 'user'],
+    tables     : ['media'],
     authNeeded : true,
   );
 }

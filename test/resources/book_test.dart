@@ -11,21 +11,24 @@ void main() async {
     'platforms': ['PS7'],
     'publishers': ['Andreeeeea'],
     'links': ['https://www.goodreads.com/book/show/68429.The_Well_of_Ascension?from_search=true'],
+    'retailers': [
+      'test'
+    ],
     'releasedate': '2017-02-24 00:00:00.000',
     'criticscore': '75',
     'communityscore': '88',
     'description': 'it bestows.',
     'totalpages': 590,
-    'coverimage': 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1619538925i/68429.jpg',
-    'genres': [
-      'Fantasy',
-      'Fiction',
-      'High Fantasy',
-      'Epic Fantasy',
-      'Audiobook',
-      'Adult',
-      'Magic'
-    ],
+    // 'coverimage': 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1619538925i/68429.jpg',
+    // 'genres': [
+    //   'Fantasy',
+    //   'Fiction',
+    //   'High Fantasy',
+    //   'Epic Fantasy',
+    //   'Audiobook',
+    //   'Adult',
+    //   'Magic'
+    // ],
     'format': 'Hardcover',
     'language': 'English',
     'seriesname': [
@@ -54,7 +57,7 @@ void main() async {
   );
 
   await runService(
-    service    : BookService(),
+    service    : BookService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

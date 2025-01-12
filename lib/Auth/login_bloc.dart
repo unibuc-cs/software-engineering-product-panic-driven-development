@@ -1,13 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:mediamaster/UserSystem.dart';
+
+import '../Menu.dart';
 import 'package:bloc/bloc.dart';
+import '../Services/auth_service.dart';
+import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:crypto/crypto.dart';
-import 'package:email_validator/email_validator.dart';
-import 'dart:convert' show utf8;
-import '../Models/user.dart';
-import '../UserSystem.dart';
-import '../GameLibrary.dart';
 
 part 'login_event.dart';
 part 'login_state.dart';
@@ -17,55 +14,38 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginButtonPressed>(_onLoginButtonPressed);
   }
 
-  void checkUser(
-    String _email,
-    String _password,
-  ) {
-    Box<User> users = Hive.box<User>('users');
-
-    // check if the email address is valid
-    if (!EmailValidator.validate(_email)) {
-      throw Exception("Enter a valid email address.");
+  Future<void> checkUser(
+    Map<String, dynamic> body,
+  ) async {
+    try {
+      await AuthService.instance.login(
+        email: body['email']!,
+        password: body['password']!,
+      );
+      UserSystem.instance.login();
     }
-
-    // check if a user has this email address
-    int index = -1;
-    for (int i = 0; i < users.length; i++) {
-      if (users.getAt(i)!.email == _email) {
-        index = i;
-      }
+    catch (e) {
+      String new_error = e.toString().split(',')[0].split('message:')[1].trim();
+      throw new_error.replaceFirst(new_error[0], new_error[0].toUpperCase());
     }
-    if (index == -1) {
-      throw Exception("There is no account with this email address.");
-    }
-
-    // check if the password is the same as the confirmed password
-    var possiblePassword =
-        sha256.convert(utf8.encode(_password + users.getAt(index)!.hashSalt));
-    if (possiblePassword.toString() != users.getAt(index)!.password) {
-      throw Exception("Invalid password.");
-    }
-
-    User user = users.getAt(index)!;
-    UserSystem().login(user);
   }
 
-  @override
   Future<void> _onLoginButtonPressed(LoginButtonPressed event, Emitter<LoginState> emit) async {
-    if (event is LoginButtonPressed) {
-      emit(LoginLoading());
-      try {
-        await Future.delayed(const Duration(seconds: 1));
-        List<Object> list = event.props;
-        checkUser(list[1].toString(), list[2].toString());
-        emit(LoginSuccess());
-        Navigator.pop(list[0] as BuildContext);
-        Navigator.pop(list[0] as BuildContext);
-        Navigator.of(list[0] as BuildContext)
-            .push(MaterialPageRoute(builder: (context) => const GameLibrary()));
-      } catch (error) {
-        emit(LoginFailure(error: error.toString()));
-      }
+    emit(LoginLoading());
+    try {
+      await Future.delayed(const Duration(seconds: 1));
+      List<Object> list = event.props;
+      await checkUser({
+        'email'    : list[1].toString(),
+        'password' : list[2].toString(),
+      });
+      emit(LoginSuccess());
+      Navigator.pop(list[0] as BuildContext);
+      Navigator.pop(list[0] as BuildContext);
+      Navigator.of(list[0] as BuildContext)
+          .push(MaterialPageRoute(builder: (context) => const Menu()));
+    } catch (error) {
+      emit(LoginFailure(error: error.toString()));
     }
   }
 }

@@ -26,21 +26,21 @@ void main() async {
 
   Season dummy = Season(
     TVSeriesId: await getValidId(
-      service: TVSeriesService(),
+      service: TVSeriesService.instance,
       backup : tv_series,
     ),
     name: 'season 1',
   );
   Season updated = Season(
     TVSeriesId: await getValidId(
-      service: TVSeriesService(),
+      service: TVSeriesService.instance,
       backup : tv_series,
     ),
     name: 'season 2',
   );
 
   await runService(
-    service    : SeasonService(),
+    service    : SeasonService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
   );

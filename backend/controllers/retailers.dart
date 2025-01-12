@@ -14,6 +14,17 @@ RouterPlus retailersRouter() {
     return sendOk(retailers);
   });
 
+  router.get('/name', (Request req) async {
+    final queryParams = req.url.queryParameters;
+    final name = queryParams['query'] ?? '';
+    final retailer = await supabase
+      .from('retailer')
+      .select()
+      .ilike('name', name)
+      .single();
+    return sendOk(retailer);
+  });
+
   router.get('/<id>', (Request req, String id) async {
     final retailer = await supabase
       .from('retailer')

@@ -12,7 +12,7 @@ void main() async {
   );
 
   await runService(
-    service    : CreatorService(),
+    service    : CreatorService.instance,
     dummyItem  : dummy,
     updatedItem: updated,
     itemName   : dummy.name,

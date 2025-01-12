@@ -91,16 +91,17 @@ Map<String, Map<String, dynamic>> splitBody(
       'communityscore',
       'mediatype',
     ],
-    'mediauserBody': [
-      'coverimage',
-      'icon',
-      'backgroundimage', // the user chooses from the artworks provided by the api and the backend only receives one image
-    ],
-    'genresBody': ['genres'],
+    // 'mediauserBody': [
+    //   'coverimage',
+    //   'icon',
+    //   'backgroundimage', // the user chooses from the artworks provided by the api and the backend only receives one image
+    // ],
+    // 'genresBody': ['genres'],
     'creatorsBody': ['creators'],
     'publishersBody': ['publishers'],
     'platformsBody': ['platforms'],
     'linksBody': ['links'],
+    'retailersBody': ['retailers'],
     'seriesBody': ['seriesname'],
     'mediaseriesBody': ['series'],
   };
@@ -203,16 +204,13 @@ Future<Map<String, dynamic>> createFromBody(
     .single();
   partialResult.forEach((key, value) => result[key] = value);
 
-  // TO DO: create mediauser from body
-
-  // TO DO: Create mediausergenres from body
-
   // Create X=creators/publishers/platforms/links/series and mediaX from body
   final mapToPlural = {
     'creator'  : 'creators',
     'publisher': 'publishers',
     'platform' : 'platforms',
     'link'     : 'links',
+    'retailer' : 'retailers'
   };
   for (MapEntry<String, dynamic> entry in mapToPlural.entries) {
     final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);
@@ -252,7 +250,7 @@ Future<Map<String, dynamic>> createFromBody(
   if (result['series'].isEmpty) {
     result.remove('series');
   }
-  
+
   if(body['mediaseriesBody']?['series'].length == 0) {
     return result;
   }

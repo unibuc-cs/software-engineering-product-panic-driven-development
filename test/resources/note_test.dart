@@ -21,10 +21,10 @@ void main() async {
   );
 
   await runService(
-    service    : NoteService(),
+    service    : NoteService.instance,
     dummyItem  : dummy,
     updatedItem: updatedDummy,
-    tables     : ['media', 'user'],
+    tables     : ['media'],
     authNeeded : true,
   );
 }

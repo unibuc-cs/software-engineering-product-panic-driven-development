@@ -21,7 +21,7 @@ Future<void> runService<T extends Model>({
   List<String>? tables,
   bool authNeeded = false
 }) async {
-  final AuthService authService = AuthService();
+  final AuthService authService = AuthService.instance;
   List<int> ids = [];
 
   if (authNeeded) {
@@ -31,7 +31,7 @@ Future<void> runService<T extends Model>({
       'password': '123456',
     };
     try {
-      final response = await authService.signup(
+      await authService.signup(
         name: dummyUser['name']!,
         email: dummyUser['email']!,
         password: dummyUser['password']!,
@@ -76,7 +76,6 @@ Future<void> runService<T extends Model>({
     print('Created $dataMap');
     if (tables != null) {
       ids = tables
-        .where((table) => table != 'user')
         .map((table) => dataMap['${table}id'] as int)
         .toList();
     }
