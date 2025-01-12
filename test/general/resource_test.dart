@@ -21,7 +21,7 @@ Future<void> runService<T extends Model>({
   List<String>? tables,
   bool authNeeded = false
 }) async {
-  final AuthService authService = AuthService();
+  final AuthService authService = AuthService.instance;
   List<int> ids = [];
 
   if (authNeeded) {

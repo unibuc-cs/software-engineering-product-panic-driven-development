@@ -10,7 +10,7 @@ import 'Auth/login_screen.dart';
 import 'Auth/login_bloc.dart';
 
 void main() async {
-  final env = DotEnv(includePlatformEnvironment: true)..load();
+  DotEnv(includePlatformEnvironment: true)..load();
 
   seedData();
 
@@ -24,11 +24,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return AdaptiveTheme(
       light: ThemeData.light().copyWith(
-        useMaterial3: true,
         colorScheme: ColorScheme.light(primary: const Color.fromARGB(219, 10, 94, 87)),
       ),
       dark: ThemeData.dark().copyWith(
-        useMaterial3: true,
         colorScheme: ColorScheme.dark(primary: const Color.fromARGB(219, 10, 94, 87)),
       ),
       initial: AdaptiveThemeMode.light,
@@ -54,7 +52,7 @@ class HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home page'),
+        title: const Text('Welcome'),
         actions: <Widget>[
           IconButton(
             onPressed: () {
@@ -80,9 +78,9 @@ class HomeState extends State<Home> {
                         )));
               },
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
+                backgroundColor: WidgetStateProperty.all<Color>(
                     const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
               ),
               child: const Text('Sign Up'),
             ),
@@ -95,9 +93,9 @@ class HomeState extends State<Home> {
                         )));
               },
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
+                backgroundColor: WidgetStateProperty.all<Color>(
                     const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
               ),
               child: const Text('Log in'),
             ),

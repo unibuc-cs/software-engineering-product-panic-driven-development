@@ -9,6 +9,11 @@ RouterPlus authRouter() {
     final router = Router().plus;
     SupabaseClient supabase = SupabaseClientSingleton.client;
 
+    router.get('/details', (Request req) async {
+      final User? user = supabase.auth.currentUser;
+      return sendOk(user);
+    });
+
     router.post('/login', (Request req) async {
         final body = await req.body.asJson;
         validateBody(body, fields:
