@@ -20,15 +20,15 @@ void main() async {
     'description': 'it bestows.',
     'totalpages': 590,
     // 'coverimage': 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1619538925i/68429.jpg',
-    'genres': [
-      'Fantasy',
-      'Fiction',
-      'High Fantasy',
-      'Epic Fantasy',
-      'Audiobook',
-      'Adult',
-      'Magic'
-    ],
+    // 'genres': [
+    //   'Fantasy',
+    //   'Fiction',
+    //   'High Fantasy',
+    //   'Epic Fantasy',
+    //   'Audiobook',
+    //   'Adult',
+    //   'Magic'
+    // ],
     'format': 'Hardcover',
     'language': 'English',
     'seriesname': [

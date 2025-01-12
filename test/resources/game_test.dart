@@ -5,11 +5,11 @@ import 'package:mediamaster/Services/game_service.dart';
 
 void main() async {
   final dummy = {
-    'genres': [
-    'Platform',
-    'Adventure',
-    'Indie'
-    ],
+    // 'genres': [
+      // 'Platform',
+      // 'Adventure',
+      // 'Indie'
+    // ],
     'platforms': [
       'PC (Microsoft Windows)',
       'Wii U',

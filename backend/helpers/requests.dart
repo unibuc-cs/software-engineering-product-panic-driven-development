@@ -96,7 +96,7 @@ Map<String, Map<String, dynamic>> splitBody(
     //   'icon',
     //   'backgroundimage', // the user chooses from the artworks provided by the api and the backend only receives one image
     // ],
-    'genresBody': ['genres'],
+    // 'genresBody': ['genres'],
     'creatorsBody': ['creators'],
     'publishersBody': ['publishers'],
     'platformsBody': ['platforms'],

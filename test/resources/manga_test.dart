@@ -10,12 +10,12 @@ void main() async {
     'originalname': 'Inazuma Eleven',
     'description': 'Raimon Middle School\'s soccer club captain, Endou Mamoru is in a pinch - his club is about to be destroyed! Literally! To avert the wrecking ball and disbanding of the club, his team must win against the toughest soccer team in the area - Teikoku. Will Endou and his team meet a crushing defeat or will a mysterious transfer student with a fiery kick save them from disaster?!',
     'releasedate': '2008-05-15T00:00:00.000',
-    'genres': [
-      'Action',
-      'Comedy',
-      'Fantasy',
-      'Sports'
-    ],
+    // 'genres': [
+    //   'Action',
+    //   'Comedy',
+    //   'Fantasy',
+    //   'Sports'
+    // ],
     'retailers': [
       'test'
     ],
