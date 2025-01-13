@@ -40,6 +40,11 @@ RouterPlus booksRouter() {
     discardFromBody(body, fields:
       [
         'id',
+        'url',
+        'artworks',
+        'genres',
+        'coverimage',
+        'icon',
       ]
     );
     populateBody(body, defaultFields:

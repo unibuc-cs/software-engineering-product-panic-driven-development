@@ -40,6 +40,11 @@ RouterPlus TVSeriesRouter() {
     discardFromBody(body, fields:
       [
         'id',
+        'url',
+        'artworks',
+        'genres',
+        'coverimage',
+        'icon',
         'status',
       ]
     );

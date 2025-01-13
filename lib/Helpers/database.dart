@@ -127,9 +127,7 @@ Future<void> HydrateWithoutUser() async {
     TVSeriesService.instance,
   ];
 
-  for (dynamic service in services) {
-    service.hydrate();
-  }
+  await Future.wait(services.map((service) => service.hydrate()).toList());
 }
 
 Future<void> HydrateWithUser() async {
@@ -142,12 +140,10 @@ Future<void> HydrateWithUser() async {
     WishlistService.instance,
   ];
 
-  for (dynamic service in services) {
-    service.hydrate();
-  }
+  await Future.wait(services.map((service) => service.hydrate()).toList());
 }
 
-Future<void> UnhydrateWithUser() async {
+void UnhydrateWithUser() {
   List<Service> services = [
     MediaUserService.instance,
     MediaUserGenreService.instance,

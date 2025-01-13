@@ -34,7 +34,7 @@ class Service<T extends Model> {
     _items.addAll(await readAll());
   }
 
-  Future<void> unhydrate() async {
+  void unhydrate() {
     _items.clear();
   }
 

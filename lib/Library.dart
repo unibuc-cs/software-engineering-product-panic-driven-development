@@ -3,31 +3,25 @@ import 'package:mediamaster/Models/anime.dart';
 import 'package:mediamaster/Models/book.dart';
 import 'package:mediamaster/Models/game.dart';
 import 'package:mediamaster/Models/manga.dart';
-import 'package:mediamaster/Models/media_creator.dart';
-import 'package:mediamaster/Models/media_platform.dart';
-import 'package:mediamaster/Models/media_publisher.dart';
 import 'package:mediamaster/Models/general/media_type.dart';
 import 'package:mediamaster/Models/movie.dart';
 import 'package:mediamaster/Models/tv_series.dart';
 import 'package:mediamaster/Services/anime_service.dart';
 import 'package:mediamaster/Services/book_service.dart';
-import 'package:mediamaster/Services/creator_service.dart';
 import 'package:mediamaster/Services/game_service.dart';
 import 'package:mediamaster/Services/genre_service.dart';
 import 'package:mediamaster/Services/manga_service.dart';
 import 'package:mediamaster/Services/media_service.dart';
-import 'package:mediamaster/Services/media_creator_service.dart';
-import 'package:mediamaster/Services/media_platform_service.dart';
-import 'package:mediamaster/Services/media_publisher_service.dart';
+import 'package:mediamaster/Services/media_user_genre_service.dart';
 import 'package:mediamaster/Services/media_user_service.dart';
+import 'package:mediamaster/Services/media_user_tag_service.dart';
 import 'package:mediamaster/Services/movie_service.dart';
 import 'package:mediamaster/Services/note_service.dart';
-import 'package:mediamaster/Services/platform_service.dart';
-import 'package:mediamaster/Services/publisher_service.dart';
 import 'package:mediamaster/Services/tag_service.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:mediamaster/Models/note.dart';
 import 'package:mediamaster/Services/tv_series_service.dart';
+import 'package:mediamaster/Services/wishlist_service.dart';
 import 'package:mediamaster/Widgets/game_widgets.dart';
 import 'package:mediamaster/Widgets/media_widgets.dart';
 import 'package:pair/pair.dart';
@@ -35,9 +29,6 @@ import 'dart:async';
 import 'Services/provider_service.dart';
 
 import 'Models/genre.dart';
-import 'Models/publisher.dart';
-import 'Models/platform.dart';
-import 'Models/creator.dart';
 import 'Models/tag.dart';
 import 'Models/media.dart';
 import 'Models/media_user.dart';
@@ -54,28 +45,28 @@ class Library<MT extends MediaType> extends StatefulWidget {
 
 dynamic getServiceForType(Type type) {
   if (type == Game) {
-      return GameService.instance;
-    }
-    if (type == Book) {
-      return BookService.instance;
-    }
-    if (type == Anime) {
-      return AnimeService.instance;
-    }
-    if (type == Manga) {
-      return MangaService.instance;
-    }
-    if (type == Movie) {
-      return MovieService.instance;
-    }
-    if (type == TVSeries) {
-      return TVSeriesService.instance;
-    }
-    throw UnimplementedError('GetUserMedia of type $type is not implemented!');
+    return GameService.instance;
+  }
+  if (type == Book) {
+    return BookService.instance;
+  }
+  if (type == Anime) {
+    return AnimeService.instance;
+  }
+  if (type == Manga) {
+    return MangaService.instance;
+  }
+  if (type == Movie) {
+    return MovieService.instance;
+  }
+  if (type == TVSeries) {
+    return TVSeriesService.instance;
+  }
+  throw UnimplementedError('GetUserMedia of type $type is not implemented!');
 }
 
 class LibraryState<MT extends MediaType> extends State<Library> {
-  int selectedMediaId = 0;
+  int selectedMediaId = -1;
   String filterQuery = '';
   TextEditingController searchController = TextEditingController();
   bool increasingSorting = true;
@@ -149,34 +140,40 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     super.initState();
   }
 
+  Future<String> getCustomName(MT mt) async {
+    return await (await getCustomizations(await mt.media)).name;
+  }
+
   // Create and return a list view of the filtered media
   Future<ListView> mediaListBuilder(BuildContext context) async {
     List<ListTile> listTiles = List.empty(growable: true);
-    List<MT> userMedia = List<MT>.empty();
-    if (MT == Game) {
-      userMedia = (await UserSystem().getUserMedia('game')).map((x) => x as MT).toList();
-    }
+    List<MT> userMedia = UserSystem.instance.getUserMedia(MT).map((x) => x as MT).toList();
     List<Pair<MT, int>> mediaIndices = List.empty(growable: true);
 
     for (int i = 0; i < userMedia.length; ++i) {
       int id = userMedia.elementAt(i).getMediaId();
       bool shouldAdd = true;
       if (selectedGenresIds.isNotEmpty || selectedTagsIds.isNotEmpty) {
-        int conditionsMet = (
-          await supabase
-            .from('mediausertag')
-            .select()
-            .eq('userid', UserSystem().getCurrentUserId())
-            .eq('mediaid', id)
-            .inFilter('tagid', selectedTagsIds.toList())).length;
-        if (filterAll || conditionsMet == 0) {
-          conditionsMet += (await supabase.from('mediausergenre').select().eq('userid', UserSystem().getCurrentUserId()).eq('mediaid', id).inFilter('genreid', selectedGenresIds.toList())).length;
-        }
-
+        int conditionsMet = MediaUserTagService
+          .instance
+          .items
+          .where((mut) =>
+            mut.mediaId == id &&
+            selectedTagsIds.contains(mut.tagId)
+          )
+          .length +
+          MediaUserGenreService
+            .instance
+            .items
+            .where((mug) =>
+              mug.mediaId == id &&
+              selectedGenresIds.contains(mug.genreId)
+            )
+            .length;
         if (filterAll) {
-          shouldAdd =
-              (selectedGenresIds.length + selectedTagsIds.length == conditionsMet);
-        } else if (conditionsMet == 0) {
+          shouldAdd = (selectedGenresIds.length + selectedTagsIds.length == conditionsMet);
+        }
+        else if (conditionsMet == 0) {
           shouldAdd = false;
         }
       }
@@ -204,12 +201,12 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     for (int i = 0; i < mediaIndices.length; ++i) {
       final mt = mediaIndices[i].key;
       final idx = mediaIndices[i].value;
-      if (filterQuery == '' ||
-          (await mt.media).originalName.toLowerCase().contains(filterQuery)) {
+      final mediaName = await getCustomName(mt);
+      if (filterQuery == '' || mediaName.toLowerCase().contains(filterQuery)) {
         listTiles.add(
           ListTile(
             leading: leadingIcon,
-            title: Text((await mt.media).originalName), // TODO: Fix this to use user customization
+            title: Text(mediaName),
             onTap: () {
               setState(() {
                 selectedMediaId = mt.getMediaId();
@@ -242,15 +239,31 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     filterQuery = '';
   }
 
-  // TODO: Remove year from game name before call.
-  Future<MT?> mediaAlreadyInDB(String name) async {
-    String dbName = '';
+  String getMediaTypeDbName() {
     if (MT == Game) {
-      dbName = 'game';
+      return 'game';
     }
-    else {
-      throw UnimplementedError('Media type already in db is not implemented');
+    if (MT == Book) {
+      return 'book';
     }
+    if (MT == Anime) {
+      return 'anime';
+    }
+    if (MT == Manga) {
+      return 'manga';
+    }
+    if (MT == Movie) {
+      return 'movie';
+    }
+    if (MT == TVSeries) {
+      return 'tv_series';
+    }
+    throw UnimplementedError('Media type already in db is not implemented');
+  }
+
+  // TODO: Remove year from game name before call.
+  MT? mediaAlreadyInDB(String name) {
+    String dbName = getMediaTypeDbName();
 
     // Notat
     List<int> media = MediaService
@@ -275,37 +288,45 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     throw UnimplementedError('Media type already in db is not implemented');
   }
 
-  Future<bool> mediaAlreadyInWishlist(String name) async {
-    String dbName = '';
-    if (MT == Game) {
-      dbName = 'game';
-    }
-    else {
-      throw UnimplementedError('Media type already in wishlist is not implemented');
-    }
+  bool mediaAlreadyInWishlist(String name) {
+    String dbName = getMediaTypeDbName();
 
-    // Notat
-    TODO idiot
-    return (await supabase.from('wishlist').select('id').eq('originalname', name).eq('mediatype', dbName)).isNotEmpty;
-  }
-
-  Future<bool> mediaAlreadyInLibrary(String name) async {
-    String dbName = '';
-    if (MT == Game) {
-      dbName = 'game';
-    }
-    else {
-      throw UnimplementedError('Media type already in library is not implemented');
-    }
-
-    int id = MediaService
+    Map<int, String> mediaId2mediaType = Map.from({});
+    MediaService
       .instance
       .items
-      .where((media) => media.originalName == name && media.mediaType == dbName)
-      .first
-      .id;
-    // TODO: ManyToMany
-    return (await supabase.from('mediauser').select().eq('mediaid', id).eq('userid', UserSystem().getCurrentUserId())).isNotEmpty;
+      .map((media) => mediaId2mediaType[media.id] = media.mediaType);
+    return WishlistService
+      .instance
+      .items
+      .where((wish) =>
+        wish.name == name &&
+        mediaId2mediaType[wish.mediaId] == dbName
+      )
+      .isNotEmpty;
+  }
+
+  bool mediaAlreadyInLibrary(String name) {
+    String dbName = getMediaTypeDbName();
+    List<Media> media = MediaService
+      .instance
+      .items
+      .where((media) =>
+        media.originalName == name &&
+        media.mediaType == dbName
+      ).toList();
+
+    if (media.isEmpty) {
+      return false;
+    }
+
+    int id = media.first.id;
+    
+    return MediaUserService
+      .instance
+      .items
+      .where((mu) => mu.mediaId == id)
+      .isNotEmpty;
   }
 
   @override
@@ -320,7 +341,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         },
         icon: const Icon(Icons.search),
       );
-    } else {
+    }
+    else {
       butonSearchReset = IconButton(
         onPressed: () {
           setState(() {
@@ -353,7 +375,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
 
     var mediaListWidget = mediaListBuilder(context);
-    Future<MT?> selectedMT = getSelectedMT();
+    MT? selectedMT = getSelectedMT();
 
     // TODO: This might not work because we have a builder within a builder
     return Scaffold(
@@ -366,12 +388,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
               foregroundColor: WidgetStatePropertyAll(Colors.white),
             ),
-            // child: Text(UserSystem().currentUser!.username), // TODO: Username here
-            child: Text('Username placeholder'),
+            child: Text(UserSystem.instance.currentUserData!['name']),
           ),
           IconButton(
               onPressed: () {
-                UserSystem().logout();
+                UserSystem.instance.logout();
                 Navigator.pop(context);
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const Home()));
@@ -381,100 +402,97 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         ],
       ),
       body: FutureBuilder(
-        future: selectedMT,
+        future: Future.wait([mediaListWidget, _displayMedia(selectedMT)]),
         builder: (context, snapshot) {
-          return FutureBuilder(
-            future: Future.wait([mediaListWidget, _displayMedia(snapshot.data)]),
-            builder: (context, snapshot) {
-              return Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Column(
+          return Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Column(
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                _showSortMediaDialog(context);
-                              },
-                              icon: const Icon(Icons.sort),
-                              tooltip: 'Sort ${mediaType}s',
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                _showFilterMediaDialog(context);
-                              },
-                              icon: const Icon(Icons.filter_alt),
-                              tooltip: 'Filter ${mediaType}s',
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                AdaptiveTheme.of(context).mode ==
-                                        AdaptiveThemeMode.light
-                                    ? AdaptiveTheme.of(context).setDark()
-                                    : AdaptiveTheme.of(context).setLight();
-                              },
-                              icon: const Icon(Icons.dark_mode),
-                              tooltip: 'Toggle dark mode',
-                            ),
-                            TextButton(
-                              onPressed: () { // TODO: Change the button to switch to wishlist
-                                // Navigator.pop(context);
-                                // Navigator.of(context).push(MaterialPageRoute(
-                                //     builder: (context) => MyWishlist<MT>()
-                                //   )
-                                // );
-                              },
-                              style: const ButtonStyle(
-                                backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
-                                foregroundColor: WidgetStatePropertyAll(Colors.white),
-                              ),
-                              child: const Text('Wishlist'),
-                            )
-                          ],
+                        IconButton(
+                          onPressed: () {
+                            _showSortMediaDialog(context);
+                          },
+                          icon: const Icon(Icons.sort),
+                          tooltip: 'Sort ${mediaType}s',
                         ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              child: IconButton(
-                                onPressed: () {
-                                  _showSearchMediaDialog(context);
-                                },
-                                icon: const Icon(Icons.add_circle),
-                                tooltip: 'Add $mediaType to library',
-                              ),
-                            ),
-                            Expanded(
-                              child: textField,
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            )
-                          ],
+                        IconButton(
+                          onPressed: () {
+                            _showFilterMediaDialog(context);
+                          },
+                          icon: const Icon(Icons.filter_alt),
+                          tooltip: 'Filter ${mediaType}s',
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            AdaptiveTheme.of(context).mode ==
+                                    AdaptiveThemeMode.light
+                                ? AdaptiveTheme.of(context).setDark()
+                                : AdaptiveTheme.of(context).setLight();
+                          },
+                          icon: const Icon(Icons.dark_mode),
+                          tooltip: 'Toggle dark mode',
+                        ),
+                        TextButton(
+                          onPressed: () { // TODO: Change the button to switch to wishlist
+                            // Navigator.pop(context);
+                            // Navigator.of(context).push(MaterialPageRoute(
+                            //     builder: (context) => MyWishlist<MT>()
+                            //   )
+                            // );
+                          },
+                          style: const ButtonStyle(
+                            backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
+                            foregroundColor: WidgetStatePropertyAll(Colors.white),
+                          ),
+                          child: const Text('Wishlist'),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          child: IconButton(
+                            onPressed: () {
+                              _showSearchMediaDialog(context);
+                            },
+                            icon: const Icon(Icons.add_circle),
+                            tooltip: 'Add $mediaType to library',
+                          ),
                         ),
                         Expanded(
-                          child: snapshot.data!.first,
+                          child: textField,
                         ),
+                        const SizedBox(
+                          width: 5,
+                        )
                       ],
-                    )
-                  ),
-                  Expanded(
-                    flex: 10,
-                    child: Container(
-                      child: snapshot.data!.elementAt(1),
                     ),
+                    if (snapshot.hasData)
+                      Expanded(
+                        child: snapshot.data!.first,
+                      ),
+                  ],
+                )
+              ),
+              if (snapshot.hasData)
+                Expanded(
+                  flex: 10,
+                  child: Container(
+                    child: snapshot.data!.elementAt(1),
                   ),
-                ],
-              );
-            },
+                ),
+            ],
           );
         },
       ),
     );
   }
 
-  Future<MT?> getSelectedMT() async {
+  MT? getSelectedMT() {
     if (selectedMediaId == -1) {
       return null;
     }
@@ -492,6 +510,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     return mts.first as MT;
   }
 
+  // TODO: FIX THIS FUNCTION
   // TODO: FIX THIS FUNCTION
   Future<void> _showSearchMediaDialog(BuildContext context) async {
     TextEditingController searchController = TextEditingController();
@@ -549,48 +568,45 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                               ...searchResults.map((result) {
                                 String mediaName = result['name'];
 
-                                return FutureBuilder(
-                                  future: Future.wait([mediaAlreadyInLibrary(mediaName), mediaAlreadyInWishlist(mediaName)]),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.data!.first) {
-                                      return ListTile(
-                                        title: Text(mediaName),
-                                        subtitle: Text(
-                                          '$mediaType is already in library.',
-                                          style: const TextStyle(
-                                            color: Color.fromARGB(255, 255, 0, 0),
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          _addGame(result);
-                                          Navigator.of(context).pop();
-                                        },
-                                      );
-                                    } else if (snapshot.data!.elementAt(1)) {
-                                      return ListTile(
-                                        title: Text(mediaName),
-                                        subtitle: Text(
-                                          '$mediaType is in wishlist.',
-                                          style: const TextStyle(
-                                            color: Color.fromARGB(255, 255, 0, 0),
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          _addGame(result);
-                                          Navigator.of(context).pop();
-                                        },
-                                      );
-                                    } else {
-                                      return ListTile(
-                                        title: Text(mediaName),
-                                        onTap: () {
-                                          _addGame(result);
-                                          Navigator.of(context).pop();
-                                        },
-                                      );
-                                    }
-                                  },
-                                );
+                                if (mediaAlreadyInLibrary(mediaName)) {
+                                  return ListTile(
+                                    title: Text(mediaName),
+                                    subtitle: Text(
+                                      '$mediaType is already in library.',
+                                      style: const TextStyle(
+                                        color: Color.fromARGB(255, 255, 0, 0),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      _addGame(result);
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                }
+                                else if (mediaAlreadyInWishlist(mediaName)) {
+                                  return ListTile(
+                                    title: Text(mediaName),
+                                    subtitle: Text(
+                                      '$mediaType is in wishlist.',
+                                      style: const TextStyle(
+                                        color: Color.fromARGB(255, 255, 0, 0),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      _addGame(result);
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                }
+                                else {
+                                  return ListTile(
+                                    title: Text(mediaName),
+                                    onTap: () {
+                                      _addGame(result);
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                }
                               }),
                             ],
                           ),
@@ -737,173 +753,171 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Sorting is not implemented for this media type');
     }
 
-    List<Tag> tags = await TagService.instance.readAll(); // TODO: I don't know if we want all tags
-    List<Genre> genres = await GenreService.instance.readAll(); // TODO: I don't know if we want all genres
+    List<Tag> tags = TagService.instance.items; // TODO: I don't know if we want all tags
+    List<Genre> genres = GenreService.instance.items; // TODO: I don't know if we want all genres
 
-    if (context.mounted) {
-      return showDialog(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return AlertDialog(
-                title: Text('Filter $mediaType'),
-                content: SizedBox(
-                  height: 400,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Filter type',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('Filter $mediaType'),
+              content: SizedBox(
+                height: 400,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Filter type',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: filterAll,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  filterAll = true;
+                                  resetState();
+                                }
+                              });
+                            },
+                          ),
+                          const Text(
+                            'All',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: !filterAll,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  filterAll = false;
+                                  resetState();
+                                }
+                              });
+                            },
+                          ),
+                          const Text(
+                            'Any',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text(
+                            'Tags',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => setState(() {
+                              selectedTagsIds.clear();
+                              resetState();
+                            }),
+                            icon: const Icon(
+                              Icons.clear,
+                            ),
+                          ),
+                        ],
+                      ),
+                      for (Tag tag in tags)
                         Row(
                           children: [
                             Checkbox(
-                              value: filterAll,
+                              value: selectedTagsIds.contains(tag),
                               onChanged: (value) {
                                 setState(() {
                                   if (value == true) {
-                                    filterAll = true;
-                                    resetState();
+                                    selectedTagsIds.add(tag);
+                                  } else {
+                                    selectedTagsIds.remove(tag);
                                   }
+                                  resetState();
                                 });
                               },
                             ),
-                            const Text(
-                              'All',
-                              style: TextStyle(
+                            Text(
+                              tag.name,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
+                      Row(
+                        children: [
+                          const Text(
+                            'Genres',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => setState(() {
+                              selectedGenresIds.clear();
+                              resetState();
+                            }),
+                            icon: const Icon(
+                              Icons.clear,
+                            ),
+                          ),
+                        ],
+                      ),
+                      for (Genre genre in genres)
                         Row(
                           children: [
                             Checkbox(
-                              value: !filterAll,
+                              value: selectedGenresIds.contains(genre),
                               onChanged: (value) {
                                 setState(() {
                                   if (value == true) {
-                                    filterAll = false;
-                                    resetState();
+                                    selectedGenresIds.add(genre);
+                                  } else {
+                                    selectedGenresIds.remove(genre);
                                   }
+                                  resetState();
                                 });
                               },
                             ),
-                            const Text(
-                              'Any',
-                              style: TextStyle(
+                            Text(
+                              genre.name,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                        Row(
-                          children: [
-                            const Text(
-                              'Tags',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () => setState(() {
-                                selectedTagsIds.clear();
-                                resetState();
-                              }),
-                              icon: const Icon(
-                                Icons.clear,
-                              ),
-                            ),
-                          ],
-                        ),
-                        for (Tag tag in tags)
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: selectedTagsIds.contains(tag),
-                                onChanged: (value) {
-                                  setState(() {
-                                    if (value == true) {
-                                      selectedTagsIds.add(tag);
-                                    } else {
-                                      selectedTagsIds.remove(tag);
-                                    }
-                                    resetState();
-                                  });
-                                },
-                              ),
-                              Text(
-                                tag.name,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        Row(
-                          children: [
-                            const Text(
-                              'Genres',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () => setState(() {
-                                selectedGenresIds.clear();
-                                resetState();
-                              }),
-                              icon: const Icon(
-                                Icons.clear,
-                              ),
-                            ),
-                          ],
-                        ),
-                        for (Genre genre in genres)
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: selectedGenresIds.contains(genre),
-                                onChanged: (value) {
-                                  setState(() {
-                                    if (value == true) {
-                                      selectedGenresIds.add(genre);
-                                    } else {
-                                      selectedGenresIds.remove(genre);
-                                    }
-                                    resetState();
-                                  });
-                                },
-                              ),
-                              Text(
-                                genre.name,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
-              );
-            },
-          );
-        }
-      );
-    }
+              ),
+            );
+          },
+        );
+      }
+    );
   }
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context, int mediaId) async {
@@ -918,7 +932,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Delete Game'),
+          title: Text('Delete $mediaType'),
           content: Text('Are you sure you want to delete this $mediaType?'),
           actions: <Widget>[
             TextButton(
@@ -928,17 +942,32 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                // TODO: We might also want to remove the mediausertag and mediausergenre but I am not sure for now
-                // TODO: Endpoint this
-                // TODO: ManyToMany
-                Supabase
+              onPressed: () async {
+                List<Future<void>> toDo = [];
+                MediaUserTagService
                   .instance
-                  .client
-                  .from('mediauser')
-                  .delete()
-                  .eq('mediaid', mediaId)
-                  .eq('userid', UserSystem().currentUser!.id);
+                  .items
+                  .where((mut) => mut.mediaId == mediaId)
+                  .forEach((mut) =>
+                    toDo.add(
+                      MediaUserTagService
+                        .instance
+                        .delete([mediaId, mut.tagId])
+                    )
+                  );
+                MediaUserGenreService
+                  .instance
+                  .items
+                  .where((mug) => mug.mediaId == mediaId)
+                  .forEach((mug) =>
+                    toDo.add(
+                      MediaUserGenreService
+                        .instance
+                        .delete([mediaId, mug.genreId])
+                    )
+                  );
+                toDo.add(MediaUserService.instance.delete(mediaId));
+                await Future.wait(toDo);
                 setState(() {
                   selectedMediaId = -1; // TODO: Might want to move to some random media instead of this
                 });
@@ -954,264 +983,120 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
   // TODO: FIX THIS FUNCTION
   Future<void> _addGame(Map<String, dynamic> result) async {
-    if (UserSystem().currentUser == null) {
+    if (UserSystem.instance.currentUserData == null) {
       return;
     }
 
     var selectedGame = await getInfoIGDB(result);
-    String name = selectedGame['name'];
+    Map<String, dynamic> gameData = Map.fromEntries(selectedGame.entries);
+    gameData['igdbid'] = gameData['id'];
+    String name = selectedGame['originalname'];
 
     if (name[name.length - 1] == ')' && name.length >= 7) {
       name = name.substring(0, name.length - 7);
     }
 
-    Game? nullableGame = await mediaAlreadyInDB(name) as Game?;
-
-    // Get information from PCGamingWiki
-    var optionsPCGW = await getOptionsPCGW(name);
-    Map<String, dynamic> resultPCGW = {};
-    if (optionsPCGW.isNotEmpty) {
-      // This is kind of a hack but we will do it legit in the future
-      resultPCGW = await getInfoPCGW(optionsPCGW[0]);
-    }
-    Map<String, dynamic> answersPCGW = {};
-    if (resultPCGW.containsKey('windows')) {
-      if (resultPCGW['windows'].containsKey('OS')) {
-        answersPCGW['OSMinimum'] = resultPCGW['windows']['OS']['minimum']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-        answersPCGW['OSRecommended'] = resultPCGW['windows']['OS']
-                ['recommended']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-      }
-      if (resultPCGW['windows'].containsKey('CPU')) {
-        answersPCGW['CPUMinimum'] = resultPCGW['windows']['CPU']['minimum']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-        answersPCGW['CPURecommended'] = resultPCGW['windows']['CPU']
-                ['recommended']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-      }
-      if (resultPCGW['windows'].containsKey('RAM')) {
-        answersPCGW['RAMMinimum'] = resultPCGW['windows']['RAM']['minimum']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-        answersPCGW['RAMRecommended'] = resultPCGW['windows']['RAM']
-                ['recommended']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-      }
-      if (resultPCGW['windows'].containsKey('HDD')) {
-        answersPCGW['HDDMinimum'] = resultPCGW['windows']['HDD']['minimum']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-        answersPCGW['HDDRecommended'] = resultPCGW['windows']['HDD']
-                ['recommended']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-      }
-      if (resultPCGW['windows'].containsKey('GPU')) {
-        answersPCGW['GPUMinimum'] = resultPCGW['windows']['GPU']['minimum']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-        answersPCGW['GPURecommended'] = resultPCGW['windows']['GPU']
-                ['recommended']
-            ?.replaceAll(RegExp(r'\s+'), ' ');
-      }
-    }
-
-    // Get information from HLTB
-    var optionsHLTB = await getOptionsHLTB(selectedGame['name']);
-    Map<String, dynamic> resultHLTB = {};
-    if (optionsHLTB.isNotEmpty) {
-      // This is kind of a hack but we will do it legit in the future
-      resultHLTB = await getInfoHLTB(optionsHLTB[0]);
-    }
-    Map<String, dynamic> answersHLTB = {};
-    if (resultHLTB.containsKey('Main Story')) {
-      answersHLTB['Main Story'] =
-          (double.parse(resultHLTB['Main Story'].split(' Hours')[0]) * 3600)
-              .round();
-    }
-    if (resultHLTB.containsKey('Main + Sides')) {
-      answersHLTB['Main + Sides'] =
-          (double.parse(resultHLTB['Main + Sides'].split(' Hours')[0]) * 3600)
-              .round();
-    }
-    if (resultHLTB.containsKey('Completionist')) {
-      answersHLTB['Completionist'] =
-          (double.parse(resultHLTB['Completionist'].split(' Hours')[0]) * 3600)
-              .round();
-    }
-    if (resultHLTB.containsKey('All Styles')) {
-      answersHLTB['All Styles'] =
-          (double.parse(resultHLTB['All Styles'].split(' Hours')[0]) * 3600)
-              .round();
-    }
-    if (resultHLTB.containsKey('Co-Op')) {
-      answersHLTB['Co-Op'] =
-          (double.parse(resultHLTB['Co-Op'].split(' Hours')[0]) * 3600).round();
-    }
-    if (resultHLTB.containsKey('Vs.')) {
-      answersHLTB['Vs.'] =
-          (double.parse(resultHLTB['Vs.'].split(' Hours')[0]) * 3600).round();
-    }
+    Game? nullableGame = mediaAlreadyInDB(name) as Game?;
 
     if (nullableGame == null) {
-      Media media = Media(
-        originalName: name,
-        description:
-            selectedGame['summary'] ?? 'There is no summary for this game.',
-        releaseDate: selectedGame['first_release_date'] != null
-            ? selectedGame['first_release_date'] as DateTime
-            : DateTime(1800),
-        criticScore: selectedGame['critic_rating'] != 0
-            ? selectedGame['critic_rating']
-            : 0,
-        communityScore:
-            selectedGame['user_rating'] != 0 ? selectedGame['user_rating'] : 0,
-        mediaType: 'Game',
-      );
-
-      // TODO: Endpoint
-      media.id = (await MediaService.instance.create(media)).id;
-
-      nullableGame = Game(
-        mediaId: media.id,
-        parentGameId:
-            -1 /*TODO in the next semester: Add parameter/call to API to check if this is a DLC*/,
-        IGDBId: selectedGame['id'],
-        OSMinimum: answersPCGW.containsKey('OSMinimum') &&
-                answersPCGW['OSMinimum'] != null
-            ? answersPCGW['OSMinimum']
-            : 'N/A',
-        OSRecommended: answersPCGW.containsKey('OSRecommended') &&
-                answersPCGW['OSRecommended'] != null
-            ? answersPCGW['OSRecommended']
-            : 'N/A',
-        CPUMinimum: answersPCGW.containsKey('CPUMinimum') &&
-                answersPCGW['CPUMinimum'] != null
-            ? answersPCGW['CPUMinimum']
-            : 'N/A',
-        CPURecommended: answersPCGW.containsKey('CPURecommended') &&
-                answersPCGW['CPURecommended'] != null
-            ? answersPCGW['CPURecommended']
-            : 'N/A',
-        RAMMinimum: answersPCGW.containsKey('RAMMinimum') &&
-                answersPCGW['RAMMinimum'] != null
-            ? answersPCGW['RAMMinimum']
-            : 'N/A',
-        RAMRecommended: answersPCGW.containsKey('RAMRecommended') &&
-                answersPCGW['RAMRecommended'] != null
-            ? answersPCGW['RAMRecommended']
-            : 'N/A',
-        HDDMinimum: answersPCGW.containsKey('HDDMinimum') &&
-                answersPCGW['HDDMinimum'] != null
-            ? answersPCGW['HDDMinimum']
-            : 'N/A',
-        HDDRecommended: answersPCGW.containsKey('HDDRecommended') &&
-                answersPCGW['HDDRecommended'] != null
-            ? answersPCGW['HDDRecommended']
-            : 'N/A',
-        GPUMinimum: answersPCGW.containsKey('GPUMinimum') &&
-                answersPCGW['GPUMinimum'] != null
-            ? answersPCGW['GPUMinimum']
-            : 'N/A',
-        GPURecommended: answersPCGW.containsKey('GPURecommended') &&
-                answersPCGW['GPURecommended'] != null
-            ? answersPCGW['GPURecommended']
-            : 'N/A',
-        HLTBMainInSeconds: answersHLTB.containsKey('Main Story')
-            ? answersHLTB['Main Story']
-            : -1,
-        HLTBMainSideInSeconds: answersHLTB.containsKey('Main + Sides')
-            ? answersHLTB['Main + Sides']
-            : -1,
-        HLTBCompletionistInSeconds: answersHLTB.containsKey('Completionist')
-            ? answersHLTB['Completionist']
-            : -1,
-        HLTBAllStylesInSeconds: answersHLTB.containsKey('All Styles')
-            ? answersHLTB['All Styles']
-            : -1,
-        HLTBCoopInSeconds:
-            answersHLTB.containsKey('Co-Op') ? answersHLTB['Co-Op'] : -1,
-        HLTBVersusInSeconds:
-            answersHLTB.containsKey('Vs.') ? answersHLTB['Vs.'] : -1,
-      );
-
-      if(selectedGame['publishers'] != null) {
-        // get the publishers of the game
-        List<String> gamePublishers = (selectedGame['publishers'] as List<dynamic>).map((x) => x.toString()).toList();
-
-        for (String publisherString in gamePublishers) {
-          List<Publisher> publisherList = PublisherService.instance.items.where((pub) => pub.name == publisherString).toList();
-          Publisher? publisher;
-          if (publisherList.isEmpty) {
-            // A new publisher. Add it to the database
-            publisher = Publisher(
-              name: publisherString,
-            );
-            publisher = await PublisherService.instance.create(publisher);
-          }
-
-          await MediaPublisherService.instance.create(MediaPublisher(mediaId: nullableGame.mediaId, publisherId: publisher!.id));
+      // Get information from PCGamingWiki
+      var optionsPCGW = await getOptionsPCGW(name);
+      Map<String, dynamic> resultPCGW = {};
+      if (optionsPCGW.isNotEmpty) {
+        // This is kind of a hack but we will do it legit in the future
+        resultPCGW = await getInfoPCGW(optionsPCGW[0]);
+      }
+      Map<String, dynamic> answersPCGW = {};
+      if (resultPCGW.containsKey('windows')) {
+        if (resultPCGW['windows'].containsKey('OS')) {
+          answersPCGW['OSMinimum'] = resultPCGW['windows']['OS']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          answersPCGW['OSRecommended'] = resultPCGW['windows']['OS']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['osminimum'] = answersPCGW['OSMinimum'];
+          gameData['osrecommended'] = answersPCGW['OSRecommended'];
+        }
+        if (resultPCGW['windows'].containsKey('CPU')) {
+          answersPCGW['CPUMinimum'] = resultPCGW['windows']['CPU']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          answersPCGW['CPURecommended'] = resultPCGW['windows']['CPU']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['cpuminimum'] = answersPCGW['CPUMinimum'];
+          gameData['cpurecommended'] = answersPCGW['CPURecommended'];
+        }
+        if (resultPCGW['windows'].containsKey('RAM')) {
+          answersPCGW['RAMMinimum'] = resultPCGW['windows']['RAM']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          answersPCGW['RAMRecommended'] = resultPCGW['windows']['RAM']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['ramminimum'] = answersPCGW['RAMMinimum'];
+          gameData['ramrecommended'] = answersPCGW['RAMRecommended'];
+        }
+        if (resultPCGW['windows'].containsKey('HDD')) {
+          answersPCGW['HDDMinimum'] = resultPCGW['windows']['HDD']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          answersPCGW['HDDRecommended'] = resultPCGW['windows']['HDD']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['hddminimum'] = answersPCGW['HDDMinimum'];
+          gameData['hddrecommended'] = answersPCGW['HDDRecommended'];
+        }
+        if (resultPCGW['windows'].containsKey('GPU')) {
+          answersPCGW['GPUMinimum'] = resultPCGW['windows']['GPU']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          answersPCGW['GPURecommended'] = resultPCGW['windows']['GPU']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['gpuminimum'] = answersPCGW['GPUMinimum'];
+          gameData['gpurecommended'] = answersPCGW['GPURecommended'];
         }
       }
 
-      if(selectedGame['developers'] != null) {
-        // get the developers of the game
-        List<String> gameCreators = (selectedGame['developers'] as List<dynamic>).map((x) => x.toString()).toList();
-
-        for (String creatorString in gameCreators) {
-          List<Creator> creatorList = CreatorService.instance.items.where((cre) => cre.name == creatorString).toList();
-          Creator? creator;
-          if (creatorList.isEmpty) {
-            // A new developer. Add it to the database
-            creator = Creator(
-              name: creatorString,
-            );
-            creator = await CreatorService.instance.create(creator);
-          }
-
-          await MediaCreatorService.instance.create(MediaCreator(mediaId: nullableGame.mediaId, creatorId: creator!.id));
-        }
+      // Get information from HLTB
+      var optionsHLTB = await getOptionsHLTB(name);
+      Map<String, dynamic> resultHLTB = {};
+      if (optionsHLTB.isNotEmpty) {
+        // This is kind of a hack but we will do it legit in the future
+        resultHLTB = await getInfoHLTB(optionsHLTB[0]);
+      }
+      Map<String, dynamic> answersHLTB = {};
+      if (resultHLTB.containsKey('Main Story')) {
+        answersHLTB['Main Story'] = (double.parse(resultHLTB['Main Story'].split(' Hours')[0]) * 3600).round();
+        gameData['hltbmaininseconds'] = answersHLTB['Main Story'];
+      }
+      if (resultHLTB.containsKey('Main + Sides')) {
+        answersHLTB['Main + Sides'] = (double.parse(resultHLTB['Main + Sides'].split(' Hours')[0]) * 3600).round();
+        gameData['hltbmainsideinseconds'] = answersHLTB['Main + Sides'];
+      }
+      if (resultHLTB.containsKey('Completionist')) {
+        answersHLTB['Completionist'] = (double.parse(resultHLTB['Completionist'].split(' Hours')[0]) * 3600).round();
+        gameData['hltbcompletionistinseconds'] = answersHLTB['Completionist'];
+      }
+      if (resultHLTB.containsKey('All Styles')) {
+        answersHLTB['All Styles'] = (double.parse(resultHLTB['All Styles'].split(' Hours')[0]) * 3600).round();
+        gameData['hltballstylesinseconds'] = answersHLTB['All Styles'];
+      }
+      if (resultHLTB.containsKey('Co-Op')) {
+        answersHLTB['Co-Op'] = (double.parse(resultHLTB['Co-Op'].split(' Hours')[0]) * 3600).round();
+        gameData['hltbcoopinseconds'] = answersHLTB['Co-Op'];
+      }
+      if (resultHLTB.containsKey('Vs.')) {
+        answersHLTB['Vs.'] = (double.parse(resultHLTB['Vs.'].split(' Hours')[0]) * 3600).round();
+        gameData['hltbversusinseconds'] = answersHLTB['Vs.'];
       }
 
-      if(selectedGame['platforms'] != null) {
-        // get the platforms of the game
-        List<dynamic> gamePlatforms = (selectedGame['platforms'] as List<dynamic>).map((x) => x.toString()).toList();
-
-        for (String platformString in gamePlatforms) {
-          // Notat
-          List<Platform> platformList = PlatformService.instance.items.where((pla) => pla.name == platformString).toList();
-          Platform? platform;
-          if (platformList.isEmpty) {
-            // A new platform. Add it to the database
-            platform = Platform(
-              name: platformString,
-            );
-            platform = await PlatformService.instance.create(platform);
-          }
-
-          await MediaPlatformService.instance.create(MediaPlatform(mediaId: nullableGame.mediaId, platformId: platform!.id));
-        }
-      }
-
-      nullableGame = await GameService.instance.create(nullableGame);
+      nullableGame = await GameService.instance.create(gameData);
     }
 
     Game game = nullableGame;
 
-    if (!await mediaAlreadyInLibrary(name)) {
+    if (!mediaAlreadyInLibrary(name)) {
       MediaUser mu = MediaUser(
         mediaId: game.mediaId,
-        userId: UserSystem().currentUser!.id,
+        userId: UserSystem.instance.getCurrentUserId(),
         name: name,
         userScore: -1,
         addedDate: DateTime.now(),
-        coverImage: selectedGame['cover'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
+        coverImage: selectedGame['coverimage'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
         status: 'Plan To Play',
-        series: name, // TODO: Add parameter/call to game series API
-        icon: selectedGame['cover'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
+        series: selectedGame['seriesname'] == null ? name : selectedGame['seriesname'][0],
+        icon: selectedGame['coverimage'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
         backgroundImage: selectedGame['artworks'] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame['artworks'][0],
         lastInteracted: DateTime.now(),
       );
 
-      MediaUserService.instance.create(mu);
+      await MediaUserService.instance.create(mu);
     }
+
+    setState(() {});
   }
 
   Future<Widget> _displayMedia(MT? mt) async {
@@ -1247,8 +1132,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       await mt.media,
       additionalButtons,
       renderNotes(
-        // Notat
-        await Note.getNotes(UserSystem().getCurrentUserId(), mt.getMediaId())
+        NoteService
+          .instance
+          .items
+          .where((note) => note.mediaId == mt.mediaId)
+          .toList()
       ),
     );
   }
@@ -1282,7 +1170,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               onPressed: () async {
                 Note note = Note(
                   mediaId: mediaId,
-                  userId: UserSystem().currentUser!.id,
+                  userId: UserSystem.instance.getCurrentUserId(),
                   content: controller.text,
                   creationDate: DateTime.now(),
                   modifiedDate: DateTime.now(),

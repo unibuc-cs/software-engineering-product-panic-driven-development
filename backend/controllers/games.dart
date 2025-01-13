@@ -41,6 +41,10 @@ RouterPlus gamesRouter() {
       [
         'id',
         'url',
+        'artworks',
+        'genres',
+        'coverimage',
+        'icon',
       ]
     );
     populateBody(body, defaultFields:

@@ -40,6 +40,11 @@ RouterPlus moviesRouter() {
     discardFromBody(body, fields:
       [
         'id',
+        'url',
+        'artworks',
+        'genres',
+        'coverimage',
+        'icon',
         'status',
       ]
     );

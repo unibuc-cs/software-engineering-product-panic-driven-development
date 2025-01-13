@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mediamaster/Models/tag.dart';
+import 'package:mediamaster/Services/media_user_genre_service.dart';
+import 'package:mediamaster/Services/media_user_tag_service.dart';
 import 'package:mediamaster/UserSystem.dart';
 import 'package:mediamaster/Models/game.dart';
 import 'package:mediamaster/Models/genre.dart';
@@ -211,124 +213,117 @@ Future<void> _showSysCheck(Game game, BuildContext context) {
 }
 
 Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function() resetState) async {
-  // TODO: Endpoint this
-  Set<int> mutIds = await MediaUserTag.getAllFor(game.mediaId, UserSystem().getCurrentUserId()); // TODO: Implement this so it returns the set of tag ids for which there exist a MediaUserTag with that tagId
-  Set<int> mugIds = await MediaUserGenre.getAllFor(game.mediaId, UserSystem().getCurrentUserId()); // TODO: Similar to the one above but with Genre
+  Set<int> mutIds = MediaUserTagService.instance.items.where((mut) => mut.mediaId == game.mediaId).map((mut) => mut.tagId).toSet();
+  Set<int> mugIds = MediaUserGenreService.instance.items.where((mug) => mug.mediaId == game.mediaId).map((mug) => mug.genreId).toSet();
 
-  // https://dart.dev/tools/diagnostic-messages?utm_source=dartdev&utm_medium=redir&utm_id=diagcode&utm_content=use_build_context_synchronously#use_build_context_synchronously
-  // If we remove the following if there is a chance that there will be weird crashes and bugs and what not.
-  if (context.mounted) {
-    return showDialog( // TODO: There is a big chance that none of what I did here works (Builder within Builder)
-      context: context,
-      builder: (context) {
-        return FutureBuilder(
-          future: Future.wait([TagService.instance.readAll(), GenreService.instance.readAll()]),
-          builder: (context, snapshot) {
-            return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return AlertDialog(
-                  title: const Text('Game settings'),
-                  content: SizedBox(
-                    height: 400,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Game tags',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+  return showDialog( // TODO: There is a big chance that none of what I did here works (Builder within Builder)
+    context: context,
+    builder: (context) {
+      return FutureBuilder(
+        future: Future.wait([TagService.instance.readAll(), GenreService.instance.readAll()]),
+        builder: (context, snapshot) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                title: const Text('Game settings'),
+                content: SizedBox(
+                  height: 400,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Game tags',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                          for (Tag tag in snapshot.data!.first.map((obj) => obj as Tag))
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: mutIds.contains(tag.id),
-                                  onChanged: (value) {
-                                    setState(() async {
-                                      MediaUserTag mut = MediaUserTag(
-                                        mediaId: game.mediaId,
-                                        userId: UserSystem().currentUser!.id,
-                                        tagId: tag.id,
-                                      );
+                        ),
+                        for (Tag tag in snapshot.data!.first.map((obj) => obj as Tag))
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: mutIds.contains(tag.id),
+                                onChanged: (value) {
+                                  setState(() async {
+                                    MediaUserTag mut = MediaUserTag(
+                                      mediaId: game.mediaId,
+                                      userId: UserSystem.instance.getCurrentUserId(),
+                                      tagId: tag.id,
+                                    );
 
-                                      if (value == true) {
-                                        // TODO: Endpoint this
-                                        await Supabase.instance.client.from('mediausertag').insert(mut.toSupa());
-                                        mutIds.add(mut.tagId);
-                                      } else {
-                                        // TODO: Endpoint this
-                                        await Supabase.instance.client.from('mediausertag').delete().eq('userid', mut.userId).eq('mediaid', mut.mediaId).eq('tagid', mut.tagId);
-                                        mutIds.remove(mut.tagId);
-                                      }
-                                      resetState();
-                                    });
-                                  },
+                                    if (value == true) {
+                                      await MediaUserTagService.instance.create(mut);
+                                      mutIds.add(mut.tagId);
+                                    }
+                                    else {
+                                      await MediaUserTagService.instance.delete(mut);
+                                      mutIds.remove(mut.tagId);
+                                    }
+                                    resetState();
+                                  });
+                                },
+                              ),
+                              Text(
+                                tag.name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                Text(
-                                  tag.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          const Text(
-                            'Game genres',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                              ),
+                            ],
                           ),
-                          for (Genre genre in snapshot.data!.last.map((obj) => obj as Genre))
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: mugIds.contains(genre.id),
-                                  onChanged: (value) {
-                                    setState(() async {
-                                      MediaUserGenre mug = MediaUserGenre(
-                                        mediaId: game.mediaId,
-                                        userId: UserSystem().currentUser!.id,
-                                        genreId: genre.id,
-                                      );
+                        const Text(
+                          'Game genres',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        for (Genre genre in snapshot.data!.last.map((obj) => obj as Genre))
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: mugIds.contains(genre.id),
+                                onChanged: (value) {
+                                  setState(() async {
+                                    MediaUserGenre mug = MediaUserGenre(
+                                      mediaId: game.mediaId,
+                                      userId: UserSystem.instance.getCurrentUserId(),
+                                      genreId: genre.id,
+                                    );
 
-                                      if (value == true) {
-                                        // TODO: Endpoint this
-                                        await Supabase.instance.client.from('mediausergenre').insert(mug.toSupa());
-                                        mugIds.add(mug.genreId);
-                                      } else {
-                                        // TODO: Endpoint this
-                                        await Supabase.instance.client.from('mediausergenre').delete().eq('userid', mug.userId).eq('mediaid', mug.mediaId).eq('genreid', mug.genreId);
-                                        mugIds.remove(mug.genreId);
-                                      }
-                                      resetState();
-                                    });
-                                  },
+                                    if (value == true) {
+                                      await MediaUserGenreService.instance.create(mug);
+                                      mugIds.add(mug.genreId);
+                                    }
+                                    else {
+                                      await MediaUserGenreService.instance.delete(mug);
+                                      mugIds.remove(mug.genreId);
+                                    }
+                                    resetState();
+                                  });
+                                },
+                              ),
+                              Text(
+                                genre.name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                Text(
-                                  genre.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
                   ),
-                );
-              },
-            );
-          },
-        );
-      }
-    );
-  }
+                ),
+              );
+            },
+          );
+        },
+      );
+    }
+  );
 }
 
 Future<void> _showGameRecommendationsDialog(Game game, BuildContext context) async {

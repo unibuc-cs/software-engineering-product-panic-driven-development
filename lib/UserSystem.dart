@@ -1,4 +1,9 @@
 import 'package:mediamaster/Helpers/database.dart';
+import 'package:mediamaster/Models/anime.dart';
+import 'package:mediamaster/Models/book.dart';
+import 'package:mediamaster/Models/manga.dart';
+import 'package:mediamaster/Models/movie.dart';
+import 'package:mediamaster/Models/tv_series.dart';
 import 'package:mediamaster/Services/anime_service.dart';
 import 'package:mediamaster/Services/auth_service.dart';
 import 'package:mediamaster/Services/book_service.dart';
@@ -28,7 +33,11 @@ class UserSystem {
   }
 
   Future<void> login() async {
-    final userData = await AuthService.instance.details();
+    Map<String, dynamic> userData = await AuthService.instance.details();
+
+    while (userData.isEmpty) {
+      userData = await AuthService.instance.details();
+    }
 
     currentUserData = Map<String, dynamic>();
     currentUserData!['id'] = userData['id'];
@@ -39,38 +48,17 @@ class UserSystem {
   Future<void> logout() async {
     await AuthService.instance.logout();
     currentUserData = null;
-    await UnhydrateWithUser();
+    UnhydrateWithUser();
   }
 
-  int getCurrentUserId() {
+  String getCurrentUserId() {
     if (currentUserData != null) {
       return currentUserData!['id'];
     }
-    return -1;
+    return '';
   }
 
-  List<Game> getUserGames() {
-    if (currentUserData == null) {
-      return [];
-    }
-
-    dynamic userId = currentUserData!['id'];
-
-    var ids = MediaUserService
-      .instance
-      .items
-      .where((mu) => mu.userId == userId)
-      .map((mu) => mu.mediaId)
-      .toSet();
-
-    return GameService
-      .instance
-      .items
-      .where((game) => ids.contains(game.mediaId))
-      .toList();
-  }
-
-  List<MediaType> getUserMedia(String type) {
+  List<MediaType> getUserMedia(Type type) {
     if (currentUserData == null) {
       return [];
     }
@@ -86,22 +74,22 @@ class UserSystem {
 
     dynamic service;
 
-    if (type.toLowerCase() == 'game') {
+    if (type == Game) {
       service = GameService.instance;
     }
-    else if (type.toLowerCase() == 'book') {
+    else if (type == Book) {
       service = BookService.instance;
     }
-    else if (type.toLowerCase() == 'anime') {
+    else if (type == Anime) {
       service = AnimeService.instance;
     }
-    else if (type.toLowerCase() == 'manga') {
+    else if (type == Manga) {
       service = MangaService.instance;
     }
-    else if (type.toLowerCase() == 'movie') {
+    else if (type == Movie) {
       service = MovieService.instance;
     }
-    else if (type.toLowerCase() == 'tvseries') {
+    else if (type == TVSeries) {
       service = TVSeriesService.instance;
     }
     else {

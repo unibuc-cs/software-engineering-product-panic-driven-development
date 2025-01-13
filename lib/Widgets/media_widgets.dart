@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mediamaster/UserSystem.dart';
+import 'package:mediamaster/Services/media_user_service.dart';
 import 'package:mediamaster/Models/game.dart';
 import 'package:mediamaster/Models/media.dart';
 import 'package:mediamaster/Models/media_user.dart';
@@ -80,18 +80,18 @@ Widget getReleaseDateWidget(Media media) {
   return getListWidget('Release Date', List.of([media.releaseDate.toString().substring(0, 10)]));
 }
 
-Future<Widget> getPublishersWidget(Media media) async {
-  var pubs = (await media.publishers).map((pub) => pub.name).toList();
+Widget getPublishersWidget(Media media) {
+  var pubs = media.publishers.map((pub) => pub.name).toList();
   return getListWidget('Publisher${pubs.length <= 1 ? '' : 's'}', pubs.isEmpty ? List.of(['N/A']) : pubs);
 }
 
-Future<Widget> getCreatorsWidget(Media media) async{
-  var crts = (await media.creators).map((crt) => crt.name).toList();
+Widget getCreatorsWidget(Media media) {
+  var crts = media.creators.map((crt) => crt.name).toList();
   return getListWidget('Creator${crts.length <= 1 ? '' : 's'}', crts.isEmpty ? List.of(['N/A']) : crts);
 }
 
-Future<Widget> getPlatformsWidget(Media media) async {
-  var plts = (await media.platforms).map((plt) => plt.name).toList();
+Widget getPlatformsWidget(Media media) {
+  var plts = media.platforms.map((plt) => plt.name).toList();
   return getListWidget('Platform${plts.length <= 1 ? '' : 's'}', plts.isEmpty ? List.of(['N/A']) : plts);
 }
 
@@ -115,16 +115,18 @@ Widget getRatingsWidget(Media media) {
   return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
 }
 
-Future<MediaUser> getCustomizations(Media media) async {
-  // TODO: Get the current user's id.
-  int userId=UserSystem().getCurrentUserId();
-  return MediaUser.from(await Supabase.instance.client.from('mediauser').select().eq('mediaid', id).eq('userid', userId).single());
+MediaUser getCustomizations(Media media) {
+  return MediaUserService
+    .instance
+    .items
+    .where((mu) => mu.mediaId == media.id)
+    .first;
 }
 
-Future<Widget> displayMedia(Media media, Widget additionalButtons, Widget notesWidget) async {
-  MediaUser customizations = await getCustomizations(media);
-  String imageUrl = 'https://${customizations.backgroundImage}';
-  String coverUrl = 'https://${customizations.coverImage}';
+Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget) {
+  MediaUser customizations = getCustomizations(media);
+  String imageUrl = 'https:${customizations.backgroundImage}';
+  String coverUrl = 'https:${customizations.coverImage}';
 
   return SizedBox.expand(
     child: Container(
@@ -191,9 +193,9 @@ Future<Widget> displayMedia(Media media, Widget additionalButtons, Widget notesW
                       child: Column(
                         children: [
                           getReleaseDateWidget(media),
-                          await getPublishersWidget(media),
-                          await getCreatorsWidget(media),
-                          await getPlatformsWidget(media),
+                          getPublishersWidget(media),
+                          getCreatorsWidget(media),
+                          getPlatformsWidget(media),
                           getRatingsWidget(media),
                         ],
                       ),

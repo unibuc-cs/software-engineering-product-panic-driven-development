@@ -1,4 +1,14 @@
+import 'package:mediamaster/Models/creator.dart';
+import 'package:mediamaster/Models/platform.dart';
+import 'package:mediamaster/Models/publisher.dart';
+import 'package:mediamaster/Services/creator_service.dart';
+import 'package:mediamaster/Services/media_creator_service.dart';
+import 'package:mediamaster/Services/media_platform_service.dart';
+import 'package:mediamaster/Services/media_publisher_service.dart';
+import 'package:mediamaster/Services/platform_service.dart';
+
 import 'general/model.dart';
+import '../Services/publisher_service.dart';
 
 class Media implements Model {
   // Data
@@ -58,48 +68,45 @@ class Media implements Model {
     );
   }
 
-  // // TODO: Turn this into an endpoint
-  // Future<List<Publisher>> get publishers async {
-  //   final supabase = Supabase.instance.client;
-  //   List<dynamic> publisherIds = await supabase
-  //     .from('mediapublisher')
-  //     .select('publisherid')
-  //     .eq('mediaid', id);
-  //   return (await supabase
-  //     .from('publisher')
-  //     .select()
-  //     .inFilter('id', publisherIds))
-  //     .map(Publisher.from)
-  //     .toList();
-  // }
+  List<Publisher> get publishers {
+    Set<int> ids = MediaPublisherService
+      .instance
+      .items
+      .where((mp) => mp.mediaId == id)
+      .map((mp) => mp.publisherId)
+      .toSet();
+    return PublisherService
+      .instance
+      .items
+      .where((pub) => ids.contains(pub.id))
+      .toList();
+  }
 
-  // // TODO: Turn this into an endpoint
-  // Future<List<Creator>> get creators async {
-  //   final supabase = Supabase.instance.client;
-  //   List<dynamic> creatorsIds = await supabase
-  //     .from('mediacreator')
-  //     .select('creatorid')
-  //     .eq('mediaid', id);
-  //   return (await supabase
-  //     .from('creator')
-  //     .select()
-  //     .inFilter('id', creatorsIds))
-  //     .map(Creator.from)
-  //     .toList();
-  // }
+  List<Creator> get creators {
+    Set<int> ids = MediaCreatorService
+      .instance
+      .items
+      .where((mc) => mc.mediaId == id)
+      .map((mc) => mc.creatorId)
+      .toSet();
+    return CreatorService
+      .instance
+      .items
+      .where((cre) => ids.contains(cre.id))
+      .toList();
+  }
 
-  // // TODO: Turn this into an endpoint
-  // Future<List<Platform>> get platforms async {
-  //   final supabase = Supabase.instance.client;
-  //   List<dynamic> platformsIds = await supabase
-  //     .from('mediaplatform')
-  //     .select('platformid')
-  //     .eq('mediaid', id);
-  //   return (await supabase
-  //     .from('platform')
-  //     .select()
-  //     .inFilter('id', platformsIds))
-  //     .map(Platform.from)
-  //     .toList();
-  // }
+  List<Platform> get platforms {
+    Set<int> ids = MediaPlatformService
+      .instance
+      .items
+      .where((mp) => mp.mediaId == id)
+      .map((mp) => mp.platformId)
+      .toSet();
+    return PlatformService
+      .instance
+      .items
+      .where((pla) => ids.contains(pla.id))
+      .toList();
+  }
 }
