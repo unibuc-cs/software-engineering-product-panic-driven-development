@@ -1,41 +1,37 @@
+import 'dart:async';
+import 'package:pair/pair.dart';
 import 'package:flutter/material.dart';
-import 'Models/anime.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
+
+import 'Helpers/getters.dart';
+import 'Models/tag.dart';
 import 'Models/book.dart';
 import 'Models/game.dart';
+import 'Models/note.dart';
 import 'Models/manga.dart';
-import 'Models/general/media_type.dart';
 import 'Models/movie.dart';
+import 'Models/anime.dart';
+import 'Models/genre.dart';
+import 'Models/media.dart';
+import 'Models/wishlist.dart';
 import 'Models/tv_series.dart';
-import 'Services/anime_service.dart';
-import 'Services/book_service.dart';
+import 'Models/media_user.dart';
+import 'Models/general/media_type.dart';
+import 'Services/tag_service.dart';
 import 'Services/game_service.dart';
+import 'Services/note_service.dart';
 import 'Services/genre_service.dart';
-import 'Services/manga_service.dart';
 import 'Services/media_service.dart';
-import 'Services/media_user_genre_service.dart';
+import 'Services/wishlist_service.dart';
+import 'Services/provider_service.dart';
 import 'Services/media_user_service.dart';
 import 'Services/media_user_tag_service.dart';
-import 'Services/movie_service.dart';
-import 'Services/note_service.dart';
-import 'Services/tag_service.dart';
-import 'package:adaptive_theme/adaptive_theme.dart';
-import 'Models/note.dart';
-import 'Services/tv_series_service.dart';
-import 'Services/wishlist_service.dart';
+import 'Services/media_user_genre_service.dart';
 import 'Widgets/game_widgets.dart';
 import 'Widgets/media_widgets.dart';
-import 'package:pair/pair.dart';
-import 'dart:async';
-import 'Services/provider_service.dart';
 
-import 'Models/genre.dart';
-import 'Models/tag.dart';
-import 'Models/media.dart';
-import 'Models/media_user.dart';
-import 'Models/wishlist.dart';
-
-import 'UserSystem.dart';
 import 'Main.dart';
+import 'UserSystem.dart';
 
 class Library<MT extends MediaType> extends StatefulWidget {
   late final bool isWishlist;
@@ -43,118 +39,6 @@ class Library<MT extends MediaType> extends StatefulWidget {
 
   @override
   LibraryState<MT> createState() => LibraryState<MT>(isWishlist: isWishlist);
-}
-
-dynamic getServiceForType(Type type) {
-  if (type == Game) {
-    return GameService.instance;
-  }
-  if (type == Book) {
-    return BookService.instance;
-  }
-  if (type == Anime) {
-    return AnimeService.instance;
-  }
-  if (type == Manga) {
-    return MangaService.instance;
-  }
-  if (type == Movie) {
-    return MovieService.instance;
-  }
-  if (type == TVSeries) {
-    return TVSeriesService.instance;
-  }
-  throw UnimplementedError('GetServiceForType of type $type is not implemented!');
-}
-
-dynamic getIconForType(Type type) {
-  if (type == Game) {
-    return Icon(Icons.videogame_asset);
-  }
-  else if (type == Book) {
-    return Icon(Icons.book);
-  }
-  else if (type == Anime) {
-    return Icon(Icons.movie);
-  }
-  else if (type == Manga) {
-    return Icon(Icons.auto_stories);
-  }
-  else if (type == Movie) {
-    return Icon(Icons.local_movies);
-  }
-  else if (type == TVSeries) {
-    return Icon(Icons.tv);
-  }
-  else {
-    throw UnimplementedError('Leading Icon for media type $type not declared.');
-  }
-}
-
-String getMediaTypeDbName(Type type) {
-  if (type == Game) {
-    return 'game';
-  }
-  if (type == Book) {
-    return 'book';
-  }
-  if (type == Anime) {
-    return 'anime';
-  }
-  if (type == Manga) {
-    return 'manga';
-  }
-  if (type == Movie) {
-    return 'movie';
-  }
-  if (type == TVSeries) {
-    return 'tv_series';
-  }
-  throw UnimplementedError('Media type db name for $type is not implemented');
-}
-
-String getMediaTypeDbNameCapitalize(Type type) {
-  if (type == Game) {
-    return 'Game';
-  }
-  if (type == Book) {
-    return 'Book';
-  }
-  if (type == Anime) {
-    return 'Anime';
-  }
-  if (type == Manga) {
-    return 'Manga';
-  }
-  if (type == Movie) {
-    return 'Movie';
-  }
-  if (type == TVSeries) {
-    return 'TV Series';
-  }
-  throw UnimplementedError('Media type db name CAPITALIZE for $type is not implemented');
-}
-
-String getMediaTypeDbNamePlural(Type type) {
-  if (type == Game) {
-    return 'games';
-  }
-  if (type == Book) {
-    return 'books';
-  }
-  if (type == Anime) {
-    return 'anime';
-  }
-  if (type == Manga) {
-    return 'manga';
-  }
-  if (type == Movie) {
-    return 'movies';
-  }
-  if (type == TVSeries) {
-    return 'tv_series';
-  }
-  throw UnimplementedError('Media type db name PLURAL for $type is not implemented');
 }
 
 class LibraryState<MT extends MediaType> extends State<Library> {
@@ -234,27 +118,29 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     super.initState();
   }
   
-  dynamic getAdditionalButtonsForType(MT mt) async {
-  if (mt == Game) {
-    return await getAdditionalButtons(mt as Game, context, () {setState(() {});});
-  }
-  if (mt == Book) {
-    return await getAdditionalButtons(mt as Book, context, () {setState(() {});});
-  }
-  if (mt == Anime) {
-    return await getAdditionalButtons(mt as Anime, context, () {setState(() {});});
-  }
-  if (mt == Manga) {
-    return await getAdditionalButtons(mt as Manga, context, () {setState(() {});});
-  }
-  if (mt == Movie) {
-    return await getAdditionalButtons(mt as Movie, context, () {setState(() {});});
-  }
-  if (mt == TVSeries) {
-    return await getAdditionalButtons(mt as TVSeries, context, () {setState(() {});});
-  }
-  throw UnimplementedError('Get additional buttons for this media type is not implemented');
-}
+  // TO DO: this is not working atm
+  // I think its not working because the context is different between here and were the function is called
+  // dynamic getAdditionalButtonsForType(MT mt) async {
+  //   if (MT == Game) {
+  //     return await getAdditionalButtons(mt as Game, context, () {setState(() {});});
+  //   }
+  //   if (MT == Book) {
+  //     return await getAdditionalButtons(mt as Book, context, () {setState(() {});});
+  //   }
+  //   if (MT == Anime) {
+  //     return await getAdditionalButtons(mt as Anime, context, () {setState(() {});});
+  //   }
+  //   if (MT == Manga) {
+  //     return await getAdditionalButtons(mt as Manga, context, () {setState(() {});});
+  //   }
+  //   if (MT == Movie) {
+  //     return await getAdditionalButtons(mt as Movie, context, () {setState(() {});});
+  //   }
+  //   if (MT == TVSeries) {
+  //     return await getAdditionalButtons(mt as TVSeries, context, () {setState(() {});});
+  //   }
+  //   throw UnimplementedError('Get additional buttons for this media type is not implemented');
+  // }
 
   String getCustomName(MT mt) {
     Pair<MediaUser?, Wishlist?> aux = getCustomizations(mt.media, isWishlist);
@@ -270,9 +156,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   Future<ListView> mediaListBuilder(BuildContext context) async {
     List<ListTile> listTiles = List.empty(growable: true);
     List<Pair<MT, int>> mediaIndices = List.empty(growable: true);
-    List<MT> entries = UserSystem
-      .instance
-      .getFromService(MT, isWishlist == false ? 'MediaUser': 'Wishlist')
+    List<MT> entries = getFromService(MT, isWishlist == false ? 'MediaUser': 'Wishlist')
       .map((x) => x as MT)
       .toList();
 
@@ -438,7 +322,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     if (filterQuery == '') {
       butonSearchReset = IconButton(
         onPressed: () {
-          /*TO DO: The search box gets activated only if you hold down at least 2 frames, I do not know the function to activate it when pressing this button. I also do not know if this should be our priority right now*/
+          /*TO DO: The search box gets activated only if you hold down at least 2 frames, 
+          I do not know the function to activate it when pressing this button. 
+          I also do not know if this should be our priority right now*/
         },
         icon: const Icon(Icons.search),
       );
@@ -637,6 +523,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Search dialog for this media type is not implemented, because of $err');
     }
 
+    // TO DO: add loading screen while game is adding
     return showDialog(
       context: context,
       builder: (context) {
@@ -1152,7 +1039,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         // This is kind of a hack but we will do it legit in the future
         resultHLTB = await getInfoHLTB(optionsHLTB[0]);
       }
-      // TO DO: Fix if HLTB returns minutes (Left 4 Dead)
+      // TO DO: Fix if HLTB returns minutes (Left 4 Dead 2)
       if (resultHLTB.containsKey('Main Story')) {
         gameData['hltbmaininseconds'] = (double.parse(resultHLTB['Main Story'].split(' Hours')[0]) * 3600).round();
       }

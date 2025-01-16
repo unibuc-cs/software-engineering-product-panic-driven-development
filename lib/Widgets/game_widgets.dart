@@ -183,9 +183,9 @@ Widget renderPCGW(Game game) {
   );
 }
 
-// TODO: Don't know if we'll get to implement this function
+// TO DO: Don't know if we'll get to implement this function
 void playGame(Game game) {
-  // TODO: This function gets invoked by the play button. For now, until we integrate Steam/Epic/GOG/whatever this will be empty and the play button will do nothing
+  // TO DO: This function gets invoked by the play button. For now, until we integrate Steam/Epic/GOG/whatever this will be empty and the play button will do nothing
 }
 
 Future<void> _showHLTBDialog(Game game, BuildContext context) {
@@ -216,7 +216,7 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
   Set<int> mutIds = MediaUserTagService.instance.items.where((mut) => mut.mediaId == game.mediaId).map((mut) => mut.tagId).toSet();
   Set<int> mugIds = MediaUserGenreService.instance.items.where((mug) => mug.mediaId == game.mediaId).map((mug) => mug.genreId).toSet();
 
-  return showDialog( // TODO: There is a big chance that none of what I did here works (Builder within Builder)
+  return showDialog( // TO DO: There is a big chance that none of what I did here works (Builder within Builder)
     context: context,
     builder: (context) {
       return FutureBuilder(
@@ -330,6 +330,7 @@ Future<void> _showGameRecommendationsDialog(Game game, BuildContext context) asy
   var similarGames = await getRecsIGDB(game.toJson());
   List<Widget> recommendations = [];
 
+  // TO DO: fix similar games
   if (context.mounted) {
     if (similarGames.isEmpty) {
       return showDialog(
@@ -432,9 +433,9 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         child: TextButton(
           style: ButtonStyle(
             backgroundColor:
-                const WidgetStatePropertyAll(Colors.lightGreen), // TODO: MaterialStateProperty was here before. If something does not look alright then this could be the cause
+                const WidgetStatePropertyAll(Colors.lightGreen),
             shape:
-              const WidgetStatePropertyAll(RoundedRectangleBorder( // TODO: MaterialStateProperty was here before. If something does not look alright then this could be the cause
+              const WidgetStatePropertyAll(RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.all(Radius.circular(10)),
                 ),
