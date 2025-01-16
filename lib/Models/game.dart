@@ -1,7 +1,5 @@
-import 'media.dart';
 import 'general/model.dart';
 import 'general/media_type.dart';
-import 'package:mediamaster/Services/media_service.dart';
 import 'package:mediamaster/Services/game_service.dart';
 
 class Game extends MediaType implements Model {
@@ -120,14 +118,6 @@ class Game extends MediaType implements Model {
   }
 
   // Less endpoint calls
-  Media? _media;
-
-  @override
-  Future<Media> get media async {
-    _media ??= await MediaService.instance.readById([mediaId]);
-    return _media!;
-  }
-
   Game? _parentGame;
 
   Future<Game?> get parentGame async {

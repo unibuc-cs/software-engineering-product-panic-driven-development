@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pair/pair.dart';
 import '../Services/media_user_service.dart';
+import '../Services/wishlist_service.dart';
 import '../Models/game.dart';
 import '../Models/media.dart';
 import '../Models/media_user.dart';
+import '../Models/wishlist.dart';
 import '../Models/general/media_type.dart';
 import 'game_widgets.dart';
 
@@ -115,16 +118,40 @@ Widget getRatingsWidget(Media media) {
   return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
 }
 
-MediaUser getCustomizations(Media media) {
-  return MediaUserService
-    .instance
-    .items
-    .where((mu) => mu.mediaId == media.id)
-    .first;
+Pair<MediaUser?, Wishlist?> getCustomizations(Media media, bool isWishlist) {
+  if (isWishlist == false) {
+    return Pair(
+      MediaUserService
+        .instance
+        .items
+        .where((mu) => mu.mediaId == media.id)
+        .first,
+      null
+      );
+  }
+  else {
+    return Pair(
+      null,
+      WishlistService
+        .instance
+        .items
+        .where((wish) => wish.mediaId == media.id)
+        .first
+      );
+  }
 }
 
-Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget) {
-  MediaUser customizations = getCustomizations(media);
+Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, bool isWishlist) {
+  Pair<MediaUser?, Wishlist?> aux = getCustomizations(media, isWishlist);
+  dynamic customizations;
+
+  if (aux.value == null) {
+    customizations = aux.key;
+  }
+  else {
+    customizations = aux.value;
+  }
+
   String imageUrl = 'https:${customizations.backgroundImage}';
   String coverUrl = 'https:${customizations.coverImage}';
 

@@ -45,6 +45,8 @@ RouterPlus gamesRouter() {
         'genres',
         'coverimage',
         'icon',
+        'dlcs',
+        'remasters',
       ]
     );
     populateBody(body, defaultFields:

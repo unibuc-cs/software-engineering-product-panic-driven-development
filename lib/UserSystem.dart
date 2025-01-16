@@ -59,19 +59,30 @@ class UserSystem {
     return '';
   }
 
-  List<MediaType> getUserMedia(Type type) {
+  List<MediaType> getFromService(Type type, String serviceType) {
     if (currentUserData == null) {
       return [];
     }
 
-    dynamic userId = currentUserData!['id'];
+    Set<int> ids = {};
 
-    var ids = MediaUserService
-      .instance
-      .items
-      .where((mu) => mu.userId == userId)
-      .map((mu) => mu.mediaId)
-      .toSet();
+    if (serviceType == 'MediaUser') {
+      ids = MediaUserService
+        .instance
+        .items
+        .map((entry) => entry.mediaId)
+        .toSet();
+    }
+    else if(serviceType == 'Wishlist') {
+      ids = WishlistService
+        .instance
+        .items
+        .map((entry) => entry.mediaId)
+        .toSet();
+    }
+    else {
+      throw UnimplementedError('GetFromService for serviceType $serviceType is not implemented!');
+    }
 
     dynamic service;
 
@@ -94,51 +105,7 @@ class UserSystem {
       service = TVSeriesService.instance;
     }
     else {
-      throw UnimplementedError('GetUserMedia of type $type is not implemented!');
-    }
-
-    return service
-      .items
-      .where((mt) => ids.contains(mt.mediaId))
-      .toList();
-  }
-  
-  List<MediaType> getWishlist(Type type) {
-    if (currentUserData == null) {
-      return [];
-    }
-
-    dynamic userId = currentUserData!['id'];
-
-    var ids = WishlistService
-      .instance
-      .items
-      .where((wish) => wish.userId == userId)
-      .map((wish) => wish.mediaId)
-      .toSet();
-
-    dynamic service;
-
-    if (type == Game) {
-      service = GameService.instance;
-    }
-    else if (type == Book) {
-      service = BookService.instance;
-    }
-    else if (type == Anime) {
-      service = AnimeService.instance;
-    }
-    else if (type == Manga) {
-      service = MangaService.instance;
-    }
-    else if (type == Movie) {
-      service = MovieService.instance;
-    }
-    else if (type == TVSeries) {
-      service = TVSeriesService.instance;
-    }
-    else {
-      throw UnimplementedError('GetWishlist of type $type is not implemented!');
+      throw UnimplementedError('GetFromService of type $type is not implemented!');
     }
 
     return service

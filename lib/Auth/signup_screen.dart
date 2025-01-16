@@ -156,10 +156,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             }
                           : null,
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
+                        backgroundColor: WidgetStateProperty.all<Color>(
                             const Color.fromARGB(219, 10, 94, 87)),
                         foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
+                            WidgetStateProperty.all<Color>(Colors.white),
                       ),
                       child: const Text('Sign up'),
                     ),

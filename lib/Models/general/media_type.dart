@@ -1,8 +1,13 @@
 import '../media.dart';
+import '../../Services/media_service.dart';
 
 abstract class MediaType {
-  Future<Media> get media async {
-    throw UnimplementedError('Getter media was not defined for this type');
+  Media get media {
+    return MediaService
+      .instance
+      .items
+      .where((media) => media.id == getMediaId())
+      .first;
   }
 
   int getMediaId() {

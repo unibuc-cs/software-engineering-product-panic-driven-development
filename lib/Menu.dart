@@ -76,7 +76,7 @@ class MenuState extends State<Menu> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Game>(),
+                  builder: (context) => Library<Game>(isWishlist: false),
                 ));
               },
               style: ButtonStyle(
@@ -89,7 +89,7 @@ class MenuState extends State<Menu> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Book>(),
+                  builder: (context) => Library<Book>(isWishlist: false),
                 ));
               },
               style: ButtonStyle(
@@ -102,7 +102,7 @@ class MenuState extends State<Menu> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Anime>(),
+                  builder: (context) => Library<Anime>(isWishlist: false),
                 ));
               },
               style: ButtonStyle(
@@ -115,7 +115,7 @@ class MenuState extends State<Menu> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Manga>(),
+                  builder: (context) => Library<Manga>(isWishlist: false),
                 ));
               },
               style: ButtonStyle(
@@ -128,7 +128,7 @@ class MenuState extends State<Menu> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Movie>(),
+                  builder: (context) => Library<Movie>(isWishlist: false),
                 ));
               },
               style: ButtonStyle(
@@ -141,7 +141,7 @@ class MenuState extends State<Menu> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<TVSeries>(),
+                  builder: (context) => Library<TVSeries>(isWishlist: false),
                 ));
               },
               style: ButtonStyle(
