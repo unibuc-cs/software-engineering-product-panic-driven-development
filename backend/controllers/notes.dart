@@ -16,12 +16,11 @@ RouterPlus notesRouter() {
     return sendOk(notes);
   });
 
-  router.get('/<mediaId>', (Request req, String mediaId) async {
+  router.get('/<id>', (Request req, String id) async {
     final note = await supabase
       .from('note')
       .select()
-      .eq('mediaid', mediaId)
-      .eq('userid', req.context['userId']!)
+      .eq('id', id)
       .single();
     return sendOk(note);
   });
@@ -47,10 +46,11 @@ RouterPlus notesRouter() {
     return sendCreated(note);
   });
 
-  router.put('/<mediaId>', (Request req, String mediaId) async {
+  router.put('/<id>', (Request req, String id) async {
     final body = await req.body.asJson;
     discardFromBody(body, fields:
       [
+        'id',
         'mediaid',
         'userid',
       ]
@@ -59,19 +59,17 @@ RouterPlus notesRouter() {
     final note = await supabase
       .from('note')
       .update(body)
-      .eq('mediaid', mediaId)
-      .eq('userid', req.context['userId']!)
+      .eq('id', id)
       .select()
       .single();
     return sendOk(note);
   });
 
-  router.delete('/<mediaId>', (Request req, String mediaId) async {
+  router.delete('/<id>', (Request req, String id) async {
     await supabase
       .from('note')
       .delete()
-      .eq('mediaid', mediaId)
-      .eq('userid', req.context['userId']!);
+      .eq('id', id);
     return sendNoContent();
   });
 

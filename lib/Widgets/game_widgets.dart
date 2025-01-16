@@ -512,6 +512,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
           onPressed: () {
             _showGameSettingsDialog(game, context, resetState);
           },
+          // TO DO: there is a bug here, if i press the button for God of War a red screen appears for a second
           icon: const Icon(
             Icons.settings,
             color: Colors.white,

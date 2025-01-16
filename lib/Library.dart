@@ -257,16 +257,15 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       return null;
     }
 
-    dynamic service;
+    dynamic serviceInstance;
     try {
-      service = getServiceForType(MT);
+      serviceInstance = getServiceInstanceForType(MT);
     }
     catch (err) {
       throw UnimplementedError('Media type already in db is not implemented, because of $err');
     }
 
-    return service
-      .instance
+    return serviceInstance
       .items
       .where((entry) => entry.mediaId == media.first)
       .first as MT;
@@ -495,9 +494,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       return null;
     }
 
-    dynamic service = getServiceForType(MT);
+    dynamic serviceInstance = getServiceInstanceForType(MT);
 
-    List<dynamic> mts = service
+    List<dynamic> mts = serviceInstance
       .items
       .where((mt) => mt.mediaId == selectedMediaId)
       .toList();
@@ -1126,6 +1125,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     // TO DO: make this into a function, I tried to but failed
     Widget additionalButtons = Container();
 
+    // TO DO: give the option to change MediaUserTags and Genres only in library (this happens in game_widgets getAdditionalButtons)
     if (MT == Game) {
       additionalButtons = await getAdditionalButtons(mt as Game, context, () {setState(() {});});
     }
@@ -1162,6 +1162,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
+  // TO DO: make it look better
   Future<void> _showNewStickyDialog(int mediaId) {
     TextEditingController controller = TextEditingController();
 
@@ -1189,14 +1190,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             ),
             TextButton(
               onPressed: () async {
-                Note note = Note(
+                await NoteService.instance.create(Note(
                   mediaId: mediaId,
                   userId: UserSystem.instance.getCurrentUserId(),
                   content: controller.text,
                   creationDate: DateTime.now(),
                   modifiedDate: DateTime.now(),
-                );
-                await NoteService.instance.create(note);
+                ));
                 Navigator.of(context).pop();
                 setState(() {});
               },

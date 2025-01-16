@@ -15,7 +15,7 @@ import '../Services/wishlist_service.dart';
 import '../Services/tv_series_service.dart';
 import '../Services/media_user_service.dart';
 
-dynamic getServiceForType(Type type) {
+dynamic getServiceInstanceForType(Type type) {
   if (type == Game) {
     return GameService.instance;
   }
