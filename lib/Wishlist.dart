@@ -31,17 +31,17 @@ import 'Services/provider_service.dart';
 import 'Models/genre.dart';
 import 'Models/tag.dart';
 import 'Models/media.dart';
-import 'Models/media_user.dart';
-import 'Wishlist.dart';
+import 'Models/wishlist.dart';
 
 import 'UserSystem.dart';
 import 'Main.dart';
+import 'Library.dart';
 
-class Library<MT extends MediaType> extends StatefulWidget {
-  const Library({super.key});
+class WishlistPage<MT extends MediaType> extends StatefulWidget {
+  const WishlistPage({super.key});
 
   @override
-  LibraryState<MT> createState() => LibraryState<MT>();
+  WishlistPageState<MT> createState() => WishlistPageState<MT>();
 }
 
 dynamic getServiceForType(Type type) {
@@ -66,7 +66,7 @@ dynamic getServiceForType(Type type) {
   throw UnimplementedError('GetUserMedia of type $type is not implemented!');
 }
 
-class LibraryState<MT extends MediaType> extends State<Library> {
+class WishlistPageState<MT extends MediaType> extends State<WishlistPage> {
   int selectedMediaId = -1;
   String filterQuery = '';
   TextEditingController searchController = TextEditingController();
@@ -148,11 +148,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   // Create and return a list view of the filtered media
   Future<ListView> mediaListBuilder(BuildContext context) async {
     List<ListTile> listTiles = List.empty(growable: true);
-    List<MT> userMedia = UserSystem.instance.getUserMedia(MT).map((x) => x as MT).toList();
+    List<MT> wishlist = UserSystem.instance.getWishlist(MT).map((x) => x as MT).toList();
     List<Pair<MT, int>> mediaIndices = List.empty(growable: true);
 
-    for (int i = 0; i < userMedia.length; ++i) {
-      int id = userMedia.elementAt(i).getMediaId();
+    for (int i = 0; i < wishlist.length; ++i) {
+      int id = wishlist.elementAt(i).getMediaId();
       bool shouldAdd = true;
       if (selectedGenresIds.isNotEmpty || selectedTagsIds.isNotEmpty) {
         int conditionsMet = MediaUserTagService
@@ -179,7 +179,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         }
       }
       if (shouldAdd) {
-        mediaIndices.add(Pair(userMedia.elementAt(i), i));
+        mediaIndices.add(Pair(wishlist.elementAt(i), i));
       }
     }
 
@@ -434,7 +434,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       },
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
-        hintText: 'Search $mediaType in library',
+        hintText: 'Search $mediaType in Wishlist',
         suffixIcon: butonSearchReset,
       ),
     );
@@ -502,10 +502,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           tooltip: 'Toggle dark mode',
                         ),
                         TextButton(
-                          onPressed: () { // TODO: Change the button to switch to wishlist
+                          onPressed: () {
                             Navigator.pop(context);
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => WishlistPage<MT>()
+                                builder: (context) => Library<MT>()
                               )
                             );
                           },
@@ -513,7 +513,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                             backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
                             foregroundColor: WidgetStatePropertyAll(Colors.white),
                           ),
-                          child: const Text('Wishlist'),
+                          child: const Text('Library'),
                         )
                       ],
                     ),
@@ -525,7 +525,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                               _showSearchMediaDialog(context);
                             },
                             icon: const Icon(Icons.add_circle),
-                            tooltip: 'Add $mediaType to library',
+                            tooltip: 'Add $mediaType to wishlist',
                           ),
                         ),
                         Expanded(
@@ -650,11 +650,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                               ...searchResults.map((result) {
                                 String mediaName = result['name'];
 
-                                if (mediaAlreadyInLibrary(mediaName)) {
+                                if (mediaAlreadyInWishlist(mediaName)) {
                                   return ListTile(
                                     title: Text(mediaName),
                                     subtitle: Text(
-                                      '$mediaType is already in library.',
+                                      '$mediaType is already in wishlist.',
                                       style: const TextStyle(
                                         color: Color.fromARGB(255, 255, 0, 0),
                                       ),
@@ -665,11 +665,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                     },
                                   );
                                 }
-                                else if (mediaAlreadyInWishlist(mediaName)) {
+                                else if (mediaAlreadyInLibrary(mediaName)) {
                                   return ListTile(
                                     title: Text(mediaName),
                                     subtitle: Text(
-                                      '$mediaType is in wishlist.',
+                                      '$mediaType is in library.',
                                       style: const TextStyle(
                                         color: Color.fromARGB(255, 255, 0, 0),
                                       ),
@@ -1071,31 +1071,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             ),
             TextButton(
               onPressed: () async {
-                List<Future<void>> toDo = [];
-                MediaUserTagService
-                  .instance
-                  .items
-                  .where((mut) => mut.mediaId == mediaId)
-                  .forEach((mut) =>
-                    toDo.add(
-                      MediaUserTagService
-                        .instance
-                        .delete([mediaId, mut.tagId])
-                    )
-                  );
-                MediaUserGenreService
-                  .instance
-                  .items
-                  .where((mug) => mug.mediaId == mediaId)
-                  .forEach((mug) =>
-                    toDo.add(
-                      MediaUserGenreService
-                        .instance
-                        .delete([mediaId, mug.genreId])
-                    )
-                  );
-                toDo.add(WishlistService.instance.delete(mediaId));
-                await Future.wait(toDo);
+                await WishlistService.instance.delete(mediaId);
                 setState(() {
                   selectedMediaId = -1; // TODO: Might want to move to some random media instead of this
                 });
@@ -1188,8 +1164,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     Game game = nullableGame;
 
-    if (!mediaAlreadyInLibrary(name)) {
-      MediaUser mu = MediaUser(
+    if (!mediaAlreadyInWishlist(name)) {
+      Wishlist wish = Wishlist(
         mediaId: game.mediaId,
         userId: UserSystem.instance.getCurrentUserId(),
         name: name,
@@ -1203,7 +1179,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         lastInteracted: DateTime.now(),
       );
 
-      await MediaUserService.instance.create(mu);
+      await WishlistService.instance.create(wish);
     }
 
     setState(() {});

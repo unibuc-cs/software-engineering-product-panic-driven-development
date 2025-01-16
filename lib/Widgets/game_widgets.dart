@@ -454,7 +454,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
                 textAlign: TextAlign.center,
               ),
               Text(
-                '(currently unnavailable)',
+                '(currently unavailable)',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 12.0,
