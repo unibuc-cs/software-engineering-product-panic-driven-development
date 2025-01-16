@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mediamaster/Services/media_user_service.dart';
-import 'package:mediamaster/Models/game.dart';
-import 'package:mediamaster/Models/media.dart';
-import 'package:mediamaster/Models/media_user.dart';
-import 'package:mediamaster/Widgets/game_widgets.dart';
-import 'package:mediamaster/Models/general/media_type.dart';
+import '../Services/media_user_service.dart';
+import '../Models/game.dart';
+import '../Models/media.dart';
+import '../Models/media_user.dart';
+import '../Models/general/media_type.dart';
+import 'game_widgets.dart';
 
 // TODO: Make this more general
 // Auxilliary function for general list widgets (publishers, creators, ...)

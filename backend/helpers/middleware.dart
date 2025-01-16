@@ -23,7 +23,7 @@ Handler extractUserId(innerHandler) {
 
 Handler requireAuth(innerHandler) {
   return (Request request) async {
-    if (request.method != 'GET' && request.context['userId'] == null) {
+    if (request.context['userId'] == null) {
       return sendUnauthorized('Unauthorized');
     }
     return await innerHandler(request);

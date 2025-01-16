@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:mediamaster/Models/anime.dart';
-import 'package:mediamaster/Models/book.dart';
-import 'package:mediamaster/Models/game.dart';
-import 'package:mediamaster/Models/manga.dart';
-import 'package:mediamaster/Models/general/media_type.dart';
-import 'package:mediamaster/Models/movie.dart';
-import 'package:mediamaster/Models/tv_series.dart';
-import 'package:mediamaster/Services/anime_service.dart';
-import 'package:mediamaster/Services/book_service.dart';
-import 'package:mediamaster/Services/game_service.dart';
-import 'package:mediamaster/Services/genre_service.dart';
-import 'package:mediamaster/Services/manga_service.dart';
-import 'package:mediamaster/Services/media_service.dart';
-import 'package:mediamaster/Services/media_user_genre_service.dart';
-import 'package:mediamaster/Services/media_user_service.dart';
-import 'package:mediamaster/Services/media_user_tag_service.dart';
-import 'package:mediamaster/Services/movie_service.dart';
-import 'package:mediamaster/Services/note_service.dart';
-import 'package:mediamaster/Services/tag_service.dart';
+import 'Models/anime.dart';
+import 'Models/book.dart';
+import 'Models/game.dart';
+import 'Models/manga.dart';
+import 'Models/general/media_type.dart';
+import 'Models/movie.dart';
+import 'Models/tv_series.dart';
+import 'Services/anime_service.dart';
+import 'Services/book_service.dart';
+import 'Services/game_service.dart';
+import 'Services/genre_service.dart';
+import 'Services/manga_service.dart';
+import 'Services/media_service.dart';
+import 'Services/media_user_genre_service.dart';
+import 'Services/media_user_service.dart';
+import 'Services/media_user_tag_service.dart';
+import 'Services/movie_service.dart';
+import 'Services/note_service.dart';
+import 'Services/tag_service.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:mediamaster/Models/note.dart';
-import 'package:mediamaster/Services/tv_series_service.dart';
-import 'package:mediamaster/Services/wishlist_service.dart';
-import 'package:mediamaster/Widgets/game_widgets.dart';
-import 'package:mediamaster/Widgets/media_widgets.dart';
+import 'Models/note.dart';
+import 'Services/tv_series_service.dart';
+import 'Services/wishlist_service.dart';
+import 'Widgets/game_widgets.dart';
+import 'Widgets/media_widgets.dart';
 import 'package:pair/pair.dart';
 import 'dart:async';
 import 'Services/provider_service.dart';
@@ -194,13 +194,27 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     if (MT == Game) {
       leadingIcon = Icon(Icons.videogame_asset);
     }
+    else if (MT == Book) {
+      leadingIcon = Icon(Icons.book);
+    }
+    else if (MT == Anime) {
+      leadingIcon = Icon(Icons.movie);
+    }
+    else if (MT == Manga) {
+      leadingIcon = Icon(Icons.auto_stories);
+    }
+    else if (MT == Movie) {
+      leadingIcon = Icon(Icons.local_movies);
+    }
+    else if (MT == TVSeries) {
+      leadingIcon = Icon(Icons.tv);
+    }
     else {
       throw UnimplementedError('Leading Icon for media type not declared.');
     }
 
     for (int i = 0; i < mediaIndices.length; ++i) {
       final mt = mediaIndices[i].key;
-      final idx = mediaIndices[i].value;
       final mediaName = await getCustomName(mt);
       if (filterQuery == '' || mediaName.toLowerCase().contains(filterQuery)) {
         listTiles.add(
@@ -217,7 +231,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               onPressed: () {
                 _showDeleteConfirmationDialog(
                   context,
-                  idx,
+                  mt.getMediaId(),
                 );
               },
             ),
@@ -282,6 +296,41 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         .instance
         .items
         .where((game) => game.mediaId == media.first)
+        .first as MT;
+    }
+    if (MT == Book) {
+      return BookService
+        .instance
+        .items
+        .where((book) => book.mediaId == media.first)
+        .first as MT;
+    }
+    if (MT == Anime) {
+      return AnimeService
+        .instance
+        .items
+        .where((anime) => anime.mediaId == media.first)
+        .first as MT;
+    }
+    if (MT == Manga) {
+      return MangaService
+        .instance
+        .items
+        .where((manga) => manga.mediaId == media.first)
+        .first as MT;
+    }
+    if (MT == Movie) {
+      return MovieService
+        .instance
+        .items
+        .where((movie) => movie.mediaId == media.first)
+        .first as MT;
+    }
+    if (MT == TVSeries) {
+      return TVSeriesService
+        .instance
+        .items
+        .where((tv_series) => tv_series.mediaId == media.first)
         .first as MT;
     }
 
@@ -511,7 +560,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   // TODO: FIX THIS FUNCTION
-  // TODO: FIX THIS FUNCTION
   Future<void> _showSearchMediaDialog(BuildContext context) async {
     TextEditingController searchController = TextEditingController();
     List<dynamic> searchResults = [];
@@ -521,6 +569,21 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     String mediaType = '';
     if (MT == Game) {
       mediaType = 'Game';
+    }
+    else if (MT == Book) {
+      mediaType = 'Book';
+    }
+    else if (MT == Anime) {
+      mediaType = 'Anime';
+    }
+    else if (MT == Manga) {
+      mediaType = 'Manga';
+    }
+    else if (MT == Movie) {
+      mediaType = 'Movie';
+    }
+    else if (MT == TVSeries) {
+      mediaType = 'TVSeries';
     }
     else {
       throw UnimplementedError('Search dialog for this media type is not implemented');
@@ -532,7 +595,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: const Text('Search for a Game'),
+              title: Text('Search for a $mediaType'),
               content: SizedBox(
                 height: noSearch
                     ? 100
@@ -549,11 +612,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           onPressed: () async {
                             String query = searchController.text;
                             if (query.isNotEmpty) {
+                              // TO DO: implement for other mediaTypes as well
                               searchResults = await getOptionsIGDB(query);
-                              setState(() {
+                              if (context.mounted) {
+                                setState(() {
                                 noSearch = searchResults
                                     .isEmpty; // Update noSearch flag
-                              }); // Trigger rebuild to show results and update flag
+                                }); // Trigger rebuild to show results and update flag
+                              }
                             }
                           },
                         ),
@@ -631,6 +697,21 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     String mediaType = '';
     if (MT == Game) {
       mediaType = 'games';
+    }
+    else if (MT == Book) {
+      mediaType = 'books';
+    }
+    else if (MT == Anime) {
+      mediaType = 'anime';
+    }
+    else if (MT == Manga) {
+      mediaType = 'manga';
+    }
+    else if (MT == Movie) {
+      mediaType = 'movies';
+    }
+    else if (MT == TVSeries) {
+      mediaType = 'TVSeries';
     }
     else {
       throw UnimplementedError('Sorting is not implemented for this media type');
@@ -748,6 +829,21 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     String mediaType = '';
     if (MT == Game) {
       mediaType = 'games';
+    }
+    else if (MT == Book) {
+      mediaType = 'books';
+    }
+    else if (MT == Anime) {
+      mediaType = 'anime';
+    }
+    else if (MT == Manga) {
+      mediaType = 'manga';
+    }
+    else if (MT == Movie) {
+      mediaType = 'movies';
+    }
+    else if (MT == TVSeries) {
+      mediaType = 'TVSeries';
     }
     else {
       throw UnimplementedError('Sorting is not implemented for this media type');
@@ -925,9 +1021,25 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     if (MT == Game) {
       mediaType = 'game';
     }
+    else if (MT == Book) {
+      mediaType = 'book';
+    }
+    else if (MT == Anime) {
+      mediaType = 'anime';
+    }
+    else if (MT == Manga) {
+      mediaType = 'manga';
+    }
+    else if (MT == Movie) {
+      mediaType = 'movie';
+    }
+    else if (MT == TVSeries) {
+      mediaType = 'TVSeries';
+    }
     else {
       throw UnimplementedError('Delete is not implemented for this media type');
     }
+
     return showDialog(
       context: context,
       builder: (context) {
@@ -991,12 +1103,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     Map<String, dynamic> gameData = Map.fromEntries(selectedGame.entries);
     gameData['igdbid'] = gameData['id'];
     String name = selectedGame['originalname'];
+    Game? nullableGame = mediaAlreadyInDB(name) as Game?;
 
     if (name[name.length - 1] == ')' && name.length >= 7) {
       name = name.substring(0, name.length - 7);
     }
-
-    Game? nullableGame = mediaAlreadyInDB(name) as Game?;
 
     if (nullableGame == null) {
       // Get information from PCGamingWiki
@@ -1006,37 +1117,26 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         // This is kind of a hack but we will do it legit in the future
         resultPCGW = await getInfoPCGW(optionsPCGW[0]);
       }
-      Map<String, dynamic> answersPCGW = {};
       if (resultPCGW.containsKey('windows')) {
         if (resultPCGW['windows'].containsKey('OS')) {
-          answersPCGW['OSMinimum'] = resultPCGW['windows']['OS']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
-          answersPCGW['OSRecommended'] = resultPCGW['windows']['OS']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
-          gameData['osminimum'] = answersPCGW['OSMinimum'];
-          gameData['osrecommended'] = answersPCGW['OSRecommended'];
+          gameData['osminimum'] = resultPCGW['windows']['OS']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['osrecommended'] = resultPCGW['windows']['OS']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
         }
         if (resultPCGW['windows'].containsKey('CPU')) {
-          answersPCGW['CPUMinimum'] = resultPCGW['windows']['CPU']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
-          answersPCGW['CPURecommended'] = resultPCGW['windows']['CPU']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
-          gameData['cpuminimum'] = answersPCGW['CPUMinimum'];
-          gameData['cpurecommended'] = answersPCGW['CPURecommended'];
+          gameData['cpuminimum'] = resultPCGW['windows']['CPU']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['cpurecommended'] = resultPCGW['windows']['CPU']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
         }
         if (resultPCGW['windows'].containsKey('RAM')) {
-          answersPCGW['RAMMinimum'] = resultPCGW['windows']['RAM']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
-          answersPCGW['RAMRecommended'] = resultPCGW['windows']['RAM']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
-          gameData['ramminimum'] = answersPCGW['RAMMinimum'];
-          gameData['ramrecommended'] = answersPCGW['RAMRecommended'];
+          gameData['ramminimum'] = resultPCGW['windows']['RAM']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['ramrecommended'] = resultPCGW['windows']['RAM']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
         }
         if (resultPCGW['windows'].containsKey('HDD')) {
-          answersPCGW['HDDMinimum'] = resultPCGW['windows']['HDD']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
-          answersPCGW['HDDRecommended'] = resultPCGW['windows']['HDD']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
-          gameData['hddminimum'] = answersPCGW['HDDMinimum'];
-          gameData['hddrecommended'] = answersPCGW['HDDRecommended'];
+          gameData['hddminimum'] = resultPCGW['windows']['HDD']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['hddrecommended'] = resultPCGW['windows']['HDD']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
         }
         if (resultPCGW['windows'].containsKey('GPU')) {
-          answersPCGW['GPUMinimum'] = resultPCGW['windows']['GPU']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
-          answersPCGW['GPURecommended'] = resultPCGW['windows']['GPU']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
-          gameData['gpuminimum'] = answersPCGW['GPUMinimum'];
-          gameData['gpurecommended'] = answersPCGW['GPURecommended'];
+          gameData['gpuminimum'] = resultPCGW['windows']['GPU']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
+          gameData['gpurecommended'] = resultPCGW['windows']['GPU']['recommended']?.replaceAll(RegExp(r'\s+'), ' ');
         }
       }
 
@@ -1047,30 +1147,24 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         // This is kind of a hack but we will do it legit in the future
         resultHLTB = await getInfoHLTB(optionsHLTB[0]);
       }
-      Map<String, dynamic> answersHLTB = {};
+      // TO DO: Fix if HLTB returns minutes (Left 4 Dead)
       if (resultHLTB.containsKey('Main Story')) {
-        answersHLTB['Main Story'] = (double.parse(resultHLTB['Main Story'].split(' Hours')[0]) * 3600).round();
-        gameData['hltbmaininseconds'] = answersHLTB['Main Story'];
+        gameData['hltbmaininseconds'] = (double.parse(resultHLTB['Main Story'].split(' Hours')[0]) * 3600).round();
       }
       if (resultHLTB.containsKey('Main + Sides')) {
-        answersHLTB['Main + Sides'] = (double.parse(resultHLTB['Main + Sides'].split(' Hours')[0]) * 3600).round();
-        gameData['hltbmainsideinseconds'] = answersHLTB['Main + Sides'];
+        gameData['hltbmainsideinseconds'] = (double.parse(resultHLTB['Main + Sides'].split(' Hours')[0]) * 3600).round();
       }
       if (resultHLTB.containsKey('Completionist')) {
-        answersHLTB['Completionist'] = (double.parse(resultHLTB['Completionist'].split(' Hours')[0]) * 3600).round();
-        gameData['hltbcompletionistinseconds'] = answersHLTB['Completionist'];
+        gameData['hltbcompletionistinseconds'] = (double.parse(resultHLTB['Completionist'].split(' Hours')[0]) * 3600).round();
       }
       if (resultHLTB.containsKey('All Styles')) {
-        answersHLTB['All Styles'] = (double.parse(resultHLTB['All Styles'].split(' Hours')[0]) * 3600).round();
-        gameData['hltballstylesinseconds'] = answersHLTB['All Styles'];
+        gameData['hltballstylesinseconds'] = (double.parse(resultHLTB['All Styles'].split(' Hours')[0]) * 3600).round();
       }
       if (resultHLTB.containsKey('Co-Op')) {
-        answersHLTB['Co-Op'] = (double.parse(resultHLTB['Co-Op'].split(' Hours')[0]) * 3600).round();
-        gameData['hltbcoopinseconds'] = answersHLTB['Co-Op'];
+        gameData['hltbcoopinseconds'] = (double.parse(resultHLTB['Co-Op'].split(' Hours')[0]) * 3600).round();
       }
       if (resultHLTB.containsKey('Vs.')) {
-        answersHLTB['Vs.'] = (double.parse(resultHLTB['Vs.'].split(' Hours')[0]) * 3600).round();
-        gameData['hltbversusinseconds'] = answersHLTB['Vs.'];
+        gameData['hltbversusinseconds'] = (double.parse(resultHLTB['Vs.'].split(' Hours')[0]) * 3600).round();
       }
 
       nullableGame = await GameService.instance.create(gameData);
@@ -1105,6 +1199,21 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     if (MT == Game) {
       mediaType = 'game';
     }
+    else if (MT == Book) {
+      mediaType = 'book';
+    }
+    else if (MT == Anime) {
+      mediaType = 'anime';
+    }
+    else if (MT == Manga) {
+      mediaType = 'manga';
+    }
+    else if (MT == Movie) {
+      mediaType = 'movie';
+    }
+    else if (MT == TVSeries) {
+      mediaType = 'TVSeries';
+    }
     else {
       throw UnimplementedError('Display media for this media type is not implemented');
     }
@@ -1124,6 +1233,21 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     if (MT == Game) {
       additionalButtons = await getAdditionalButtons(mt as Game, context, () {setState(() {});});
     }
+    else if (MT == Book) {
+      additionalButtons = await getAdditionalButtons(mt as Book, context, () {setState(() {});});
+    }
+    else if (MT == Anime) {
+      additionalButtons = await getAdditionalButtons(mt as Anime, context, () {setState(() {});});
+    }
+    else if (MT == Manga) {
+      additionalButtons = await getAdditionalButtons(mt as Manga, context, () {setState(() {});});
+    }
+    else if (MT == Movie) {
+      additionalButtons = await getAdditionalButtons(mt as Movie, context, () {setState(() {});});
+    }
+    else if (MT == TVSeries) {
+      additionalButtons = await getAdditionalButtons(mt as TVSeries, context, () {setState(() {});});
+    }
     else {
       throw UnimplementedError('Get additional buttons for this media type is not implemented');
     }
@@ -1135,7 +1259,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         NoteService
           .instance
           .items
-          .where((note) => note.mediaId == mt.mediaId)
+          .where((note) => note.mediaId == mt.getMediaId())
           .toList()
       ),
     );
