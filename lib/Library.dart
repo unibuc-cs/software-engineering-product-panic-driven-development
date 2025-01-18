@@ -160,7 +160,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   // Create and return a list view of the filtered media
-  Future<ListView> mediaListBuilder(BuildContext context) async {
+  ListView mediaListBuilder(BuildContext context) {
     List<ListTile> listTiles = List.empty(growable: true);
     List<Pair<MT, int>> mediaIndices = List.empty(growable: true);
     List<MT> entries = getAllFromService(MT, isWishlist == false ? 'MediaUser': 'Wishlist')
@@ -211,7 +211,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     for (int i = 0; i < mediaIndices.length; ++i) {
       final mt = mediaIndices[i].key;
-      final mediaName = await getCustomName(mt);
+      final mediaName = getCustomName(mt);
       if (filterQuery == '' || mediaName.toLowerCase().contains(filterQuery)) {
         listTiles.add(
           ListTile(
@@ -396,102 +396,86 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               tooltip: 'Log out'),
         ],
       ),
-      body: FutureBuilder(
-        future: Future.wait([mediaListWidget, _displayMedia(selectedMT)]),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Row(
+      body: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Column(
               children: [
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _showSortMediaDialog(context);
-                            },
-                            icon: const Icon(Icons.sort),
-                            tooltip: 'Sort ${mediaType}s',
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              _showFilterMediaDialog(context);
-                            },
-                            icon: const Icon(Icons.filter_alt),
-                            tooltip: 'Filter ${mediaType}s',
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              AdaptiveTheme.of(context).mode ==
-                                      AdaptiveThemeMode.light
-                                  ? AdaptiveTheme.of(context).setDark()
-                                  : AdaptiveTheme.of(context).setLight();
-                            },
-                            icon: const Icon(Icons.dark_mode),
-                            tooltip: 'Toggle dark mode',
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => Library<MT>(isWishlist: !isWishlist)
-                                )
-                              );
-                            },
-                            style: const ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
-                              foregroundColor: WidgetStatePropertyAll(Colors.white),
-                            ),
-                            child: Text(LibraryWishlistBig),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        _showSortMediaDialog(context);
+                      },
+                      icon: const Icon(Icons.sort),
+                      tooltip: 'Sort ${mediaType}s',
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _showFilterMediaDialog(context);
+                      },
+                      icon: const Icon(Icons.filter_alt),
+                      tooltip: 'Filter ${mediaType}s',
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        AdaptiveTheme.of(context).mode ==
+                                AdaptiveThemeMode.light
+                            ? AdaptiveTheme.of(context).setDark()
+                            : AdaptiveTheme.of(context).setLight();
+                      },
+                      icon: const Icon(Icons.dark_mode),
+                      tooltip: 'Toggle dark mode',
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => Library<MT>(isWishlist: !isWishlist)
                           )
-                        ],
+                        );
+                      },
+                      style: const ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
+                        foregroundColor: WidgetStatePropertyAll(Colors.white),
                       ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            child: IconButton(
-                              onPressed: () {
-                                _showSearchMediaDialog(context);
-                              },
-                              icon: const Icon(Icons.add_circle),
-                              tooltip: 'Add $mediaType to $LibraryWishlistSmall',
-                            ),
-                          ),
-                          Expanded(
-                            child: textField,
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          )
-                        ],
+                      child: Text(LibraryWishlistBig),
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      child: IconButton(
+                        onPressed: () {
+                          _showSearchMediaDialog(context);
+                        },
+                        icon: const Icon(Icons.add_circle),
+                        tooltip: 'Add $mediaType to $LibraryWishlistSmall',
                       ),
-                      Expanded(
-                        child: snapshot.data!.first,
-                      ),
-                    ],
-                  )
+                    ),
+                    Expanded(
+                      child: textField,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    )
+                  ],
                 ),
                 Expanded(
-                  flex: 10,
-                  child: Container(
-                    child: snapshot.data!.elementAt(1),
-                  ),
+                  child: mediaListWidget,
                 ),
               ],
-            );
-          }
-          else {
-            return Center(
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(
-                    color: Color.fromARGB(219, 10, 94, 87)),
-              )
-            );
-          }
-        },
+            )
+          ),
+          Expanded(
+            flex: 10,
+            child: Container(
+              child: _displayMedia(selectedMT),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -514,7 +498,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     return mts.first as MT;
   }
 
-  Future<void> _showSearchMediaDialog(BuildContext context) async {
+  Future<void> _showSearchMediaDialog(BuildContext context) {
     TextEditingController searchController = TextEditingController();
     List<dynamic> searchResults = [];
 
@@ -628,7 +612,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
-  Future<void> _showSortMediaDialog(BuildContext context) async {
+  Future<void> _showSortMediaDialog(BuildContext context) {
     // Helper function, should be called when a variable gets changed
     void resetState() {
       setState(() {});
@@ -745,7 +729,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       });
   }
 
-  Future<void> _showFilterMediaDialog(BuildContext context) async {
+  Future<void> _showFilterMediaDialog(BuildContext context) {
     // Helper function, should be called when a variable gets changed
     void resetState() {
       setState(() {});
@@ -926,7 +910,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
-  Future<void> _showDeleteConfirmationDialog(BuildContext context, int mediaId) async {
+  Future<void> _showDeleteConfirmationDialog(BuildContext context, int mediaId) {
     String mediaType = '';
     try {
       mediaType = getMediaTypeDbName(MT);
@@ -1034,6 +1018,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
       // TODO: this is not working (tested for God of War, Hollow Knight, Aeterna Noctis, Team fortress 2)
       // Get information from HLTB
+      // TODO: currently HLTB broke because of Google's scraping policy. A workaround of this will be implemented in backend then we will fix it here
       var optionsHLTB = await getOptionsHLTB(name);
 
       Map<String, dynamic> resultHLTB = {};
@@ -1136,7 +1121,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     // TODO: Add genres information
   }
 
-  Future<Widget> _displayMedia(MT? mt) async {
+  Widget _displayMedia(MT? mt) {
     String mediaType = '';
     try {
       mediaType = getMediaTypeDbName(MT);
@@ -1159,8 +1144,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     Widget additionalButtons = getAdditionalButtonsForType(mt);
 
-    return await displayMedia(
-      await mt.media,
+    return displayMedia(
+      mt.media,
       additionalButtons,
       renderNotes(
         NoteService

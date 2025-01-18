@@ -9,7 +9,6 @@ import '../Models/wishlist.dart';
 import '../Models/general/media_type.dart';
 import 'game_widgets.dart';
 
-// TODO: Make this more general
 // Auxilliary function for general list widgets (publishers, creators, ...)
 Widget getListWidget(String title, List<String> items) {
   final ScrollController scrollController = ScrollController();
@@ -231,12 +230,6 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
                 ],
               ),
               notesWidget,
-              // TODO: This might be useful when implementing the library
-              /*renderNotes(
-                UserSystem().getUserNotes(
-                  game.media,
-                ),
-              ),*/
             ],
           ),
         ),

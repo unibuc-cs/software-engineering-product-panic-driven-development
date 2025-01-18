@@ -47,10 +47,4 @@ class MediaUserGenre implements Model {
       genreId: json['genreid'],
     );
   }
-
-  // TODO: Endpoint this
-  // Returns a set of tag ids such that there exists a MediaUserTag in the database that has these 3 properties
-  // static Future<Set<int>> getAllFor(int mediaId, int userId) async {
-  //   return (await Supabase.instance.client.from('mediausertag').select('tagid').eq('mediaid', mediaId).eq('userid', userId)).map((x) => x['tagid'] as int).toSet();
-  // }
 }

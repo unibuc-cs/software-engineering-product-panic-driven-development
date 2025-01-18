@@ -6,7 +6,6 @@ import '../UserSystem.dart';
 import '../Models/game.dart';
 import '../Models/genre.dart';
 import '../Models/media_user_tag.dart';
-import '../Models/media_user_genre.dart';
 import '../Services/tag_service.dart';
 import '../Services/genre_service.dart';
 import '../Services/provider_service.dart';
@@ -219,116 +218,83 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
   return showDialog(
     context: context,
     builder: (context) {
-      return FutureBuilder(
-        future: Future.wait([TagService.instance.readAll(), GenreService.instance.readAll()]),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return AlertDialog(
-                  title: const Text('Game settings'),
-                  content: SizedBox(
-                    height: 400,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Game tags',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          for (Tag tag in snapshot.data!.first.map((obj) => obj as Tag))
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: mutIds.contains(tag.id),
-                                  onChanged: (value) async {
-                                    MediaUserTag mut = MediaUserTag(
-                                      mediaId: game.mediaId,
-                                      userId: UserSystem.instance.getCurrentUserId(),
-                                      tagId: tag.id,
-                                    );
-
-                                    if (value == true) {
-                                      await MediaUserTagService.instance.create(mut);
-                                      mutIds.add(mut.tagId);
-                                    }
-                                    else {
-                                      await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
-                                      mutIds.remove(mut.tagId);
-                                    }
-                                    resetState();
-                                    setState(() {});
-                                  },
-                                ),
-                                Text(
-                                  tag.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          const Text(
-                            'Game genres',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          for (Genre genre in snapshot.data!.last.map((obj) => obj as Genre))
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: mugIds.contains(genre.id),
-                                  onChanged: (value) async {
-                                    MediaUserGenre mug = MediaUserGenre(
-                                      mediaId: game.mediaId,
-                                      userId: UserSystem.instance.getCurrentUserId(),
-                                      genreId: genre.id,
-                                    );
-
-                                    if (value == true) {
-                                      await MediaUserGenreService.instance.create(mug);
-                                      mugIds.add(mug.genreId);
-                                    }
-                                    else {
-                                      await MediaUserGenreService.instance.delete([mug.mediaId, mug.genreId]);
-                                      mugIds.remove(mug.genreId);
-                                    }
-                                    resetState();
-                                    setState(() {});
-                                  },
-                                ),
-                                Text(
-                                  genre.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                        ],
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text('Game settings'),
+            content: SizedBox(
+              height: 400,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Game tags',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                );
-              },
-            );
-          }
-          else {
-            return Center(
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(
-                    color: Color.fromARGB(219, 10, 94, 87)),
-              )
-            );
-          }
+                    for (Tag tag in TagService.instance.items)
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: mutIds.contains(tag.id),
+                            onChanged: (value) async {
+                              MediaUserTag mut = MediaUserTag(
+                                mediaId: game.mediaId,
+                                userId: UserSystem.instance.getCurrentUserId(),
+                                tagId: tag.id,
+                              );
+
+                              if (value == true) {
+                                await MediaUserTagService.instance.create(mut);
+                                mutIds.add(mut.tagId);
+                              }
+                              else {
+                                await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
+                                mutIds.remove(mut.tagId);
+                              }
+                              resetState();
+                              setState(() {});
+                            },
+                          ),
+                          Text(
+                            tag.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    const Text(
+                      'Game genres',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    for (Genre genre in GenreService.instance.items)
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: mugIds.contains(genre.id),
+                            onChanged: (value) {},
+                          ),
+                          Text(
+                            genre.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
         },
       );
     }
@@ -339,7 +305,6 @@ Future<void> _showGameRecommendationsDialog(Game game, BuildContext context) asy
   var similarGames = await getRecsIGDB(game.toJson());
   List<Widget> recommendations = [];
 
-  // TODO: fix similar games
   if (context.mounted) {
     if (similarGames.isEmpty) {
       return showDialog(
@@ -397,14 +362,14 @@ Future<void> _showGameRecommendationsDialog(Game game, BuildContext context) asy
             similarGame['name'],
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          trailing: GestureDetector(
-            onTap: () {
+          trailing: IconButton(
+            icon: const Icon(Icons.copy),
+            onPressed: () {
               Clipboard.setData(ClipboardData(text: name));
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('$name copied to clipboard')),
               );
             },
-            child: const Icon(Icons.copy), // Icon to indicate copying
           ),
         ),
       );
@@ -521,7 +486,6 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
           onPressed: () {
             _showGameSettingsDialog(game, context, resetState);
           },
-          // TODO: there is a bug here, if i press the button for God of War a red screen appears for a second
           icon: const Icon(
             Icons.settings,
             color: Colors.white,

@@ -37,9 +37,4 @@ class Tag implements Model {
       name: json['name'],
     );
   }
-
-  // TODO: Endpoint this
-  // static Future<List<Tag>> getAllTags() async {
-  //   return (await Supabase.instance.client.from('tag').select()).map(Tag.from).toList();
-  // }
 }

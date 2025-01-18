@@ -45,14 +45,4 @@ class UserAchievement implements Model {
       unlockDate: DateTime.parse(json['unlockdate']),
     );
   }
-
-  // TODO: Endpoint this
-  // Future<List<AppAchievement>> getAchievements(int userId) async {
-  //   var ids = await Supabase.instance.client.from('userachievements').select('achievementid').eq('userid', userId);
-  //   List<AppAchievement> ans=List.empty();
-  //   for(var json in await Supabase.instance.client.from('appachievement').select().inFilter('id', ids)) {
-  //     ans.add(AppAchievement.from(json));
-  //   }
-  //   return ans;
-  // }
 }

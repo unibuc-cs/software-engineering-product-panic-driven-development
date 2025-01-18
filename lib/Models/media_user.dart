@@ -89,14 +89,4 @@ class MediaUser implements Model {
       nrEpisodesSeen: json['nrepisodesseen'] ?? 0,
     );
   }
-
-  // TODO: Endpoint this
-  // static Future<List<Media>> getUserMedia(int userId, String mediaType) async {
-  //   List<Media> ans = List.empty();
-  //   var ids = await Supabase.instance.client.from('mediauser').select('mediaid').eq('userid', userId);
-  //   for(var json in await Supabase.instance.client.from('media').select().inFilter('mediaid', ids).eq('mediatype', mediaType)) {
-  //     ans.add(Media.from(json));
-  //   }
-  //   return ans;
-  // }
 }

@@ -53,17 +53,4 @@ class Note implements Model {
       modifiedDate: DateTime.parse(json['modifieddate']),
     );
   }
-
-  // TODO: Endpoint this
-  // static Future<List<Note>> getNotes(int userId, int mediaId) async {
-  //   return (await Supabase
-  //     .instance
-  //     .client
-  //     .from('note')
-  //     .select()
-  //     .eq('userid', userId)
-  //     .eq('mediaid', mediaId)
-  //   ).map(Note.from)
-  //    .toList();
-  // }
 }

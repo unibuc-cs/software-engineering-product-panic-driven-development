@@ -77,18 +77,4 @@ class Wishlist implements Model {
       lastInteracted: DateTime.parse(json['lastinteracted']),
     );
   }
-
-  // TODO: Endpoint this
-  // Future<Media> get media async {
-  //   return Media
-  //     .from(
-  //       await Supabase
-  //         .instance
-  //         .client
-  //         .from('media')
-  //         .select()
-  //         .eq('mediaid', mediaId)
-  //         .single()
-  //     );
-  // }
 }
