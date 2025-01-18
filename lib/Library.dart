@@ -45,7 +45,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   late final isWishlist;
   int selectedMediaId = -1;
   String filterQuery = '';
-  final String placeholderImage = 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
+  final String placeholderImage = '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
   TextEditingController searchController = TextEditingController();
   bool increasingSorting = true;
   int selectedSortingMethod = 0;
@@ -1041,7 +1041,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         status: 'Plan To Consume',
         series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0] ?? data['name'],
         icon: data['coverimage'] ?? placeholderImage,
-        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : data['artworks'][0],
+        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : (data['artworks'] is List ? data['artworks'][0] : data['artworks']),
         lastInteracted: DateTime.now(),
       );
 
@@ -1058,7 +1058,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         status: 'Plan To Consume',
         series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0],
         icon: data['coverimage'] ?? placeholderImage,
-        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : data['artworks'][0],
+        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : (data['artworks'] is List ? data['artworks'][0] : data['artworks']),
         lastInteracted: DateTime.now(),
       );
 

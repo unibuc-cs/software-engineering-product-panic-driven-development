@@ -172,10 +172,14 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
     customizations = aux.value;
   }
 
-  // TODO: the image is not rendering when it comes to other mediaTypes than games (try it and check the stack error on the terminal)
-  // the problem is that not every link has https://, check how the providers give the links
-  String imageUrl = 'https:${customizations.backgroundImage}';
-  String coverUrl = 'https:${customizations.coverImage}';
+  // not every link has https:, so first I remove it (when it is the case) and add it manually for all of them
+  String imageUrl = 'https:${customizations.backgroundImage.replaceAll('https:', '')}';
+  String coverUrl = 'https:${customizations.coverImage.replaceAll('https:', '')}';
+
+  if (media.mediaType == 'movie' || media.mediaType == 'tv_series') {
+      imageUrl = 'https://image.tmdb.org/t/p/original${customizations.backgroundImage}';
+      coverUrl = 'https://image.tmdb.org/t/p/original${customizations.coverImage}';
+  }
 
   return SizedBox.expand(
     child: Container(
