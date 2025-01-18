@@ -45,6 +45,9 @@ WORKDIR /home/flutteruser/app
 # Copy the backend code
 COPY backend/ /home/flutteruser/app/
 
+# Copy the assets folder
+COPY assets/ /home/flutteruser/app/assets/
+
 # Copy the root pubspec.yaml from the root
 COPY pubspec.yaml /home/flutteruser/app/
 
