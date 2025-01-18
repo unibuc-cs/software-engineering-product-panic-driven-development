@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import '../provider.dart';
 import 'package:html/dom.dart';
+import 'package:path/path.dart' as p;
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 
@@ -80,7 +81,7 @@ class HowLongToBeat extends Provider {
 
   Future<List<Map<String, dynamic>>> _getGameOptions(String gameName) async {
     try {
-      final scriptPath = '${Directory.current.path}\\backend\\services\\games\\howlongtobeat.py';
+      final scriptPath = p.join(Directory.current.path, 'backend', 'services', 'games', 'howlongtobeat.py');
       var result = await Process.run(
         'python',
         [scriptPath, gameName],
