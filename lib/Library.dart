@@ -45,6 +45,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   late final isWishlist;
   int selectedMediaId = -1;
   String filterQuery = '';
+  final String placeholderImage = '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
   TextEditingController searchController = TextEditingController();
   bool increasingSorting = true;
   int selectedSortingMethod = 0;
@@ -507,7 +508,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     return mts.first as MT;
   }
 
-  // TODO: FIX THIS FUNCTION
   Future<void> _showSearchMediaDialog(BuildContext context) async {
     TextEditingController searchController = TextEditingController();
     List<dynamic> searchResults = [];
@@ -522,7 +522,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Search dialog for this media type is not implemented, because of $err');
     }
 
-    // TODO: add loading screen while game is adding
+    // TODO: add loading screen while media is adding
     return showDialog(
       context: context,
       builder: (context) {
@@ -546,8 +546,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           onPressed: () async {
                             String query = searchController.text;
                             if (query.isNotEmpty) {
-                              // TODO: implement for other mediaTypes as well
-                              searchResults = await getOptionsIGDB(query);
+                              searchResults = await getOptions(MT, query);
                               if (context.mounted) {
                                 setState(() {
                                 noSearch = searchResults
@@ -578,7 +577,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                       ),
                                     ),
                                     onTap: () {
-                                      _addGame(result);
+                                      _addMediaType(result);
                                       Navigator.of(context).pop();
                                     },
                                   );
@@ -593,7 +592,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                       ),
                                     ),
                                     onTap: () {
-                                      _addGame(result);
+                                      _addMediaType(result);
                                       Navigator.of(context).pop();
                                     },
                                   );
@@ -602,7 +601,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                   return ListTile(
                                     title: Text(mediaName),
                                     onTap: () {
-                                      _addGame(result);
+                                      _addMediaType(result);
                                       Navigator.of(context).pop();
                                     },
                                   );
@@ -985,15 +984,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   // TODO: FIX THIS FUNCTION
-  Future<void> _addGame(Map<String, dynamic> result) async {
-    if (UserSystem.instance.currentUserData == null) {
-      return;
-    }
-
-    var selectedGame = await getInfoIGDB(result);
-    Map<String, dynamic> gameData = Map.fromEntries(selectedGame.entries);
+  Future<Pair<Map<String, dynamic>, MT>> _addGame(Map<String, dynamic> option) async {
+    var gameData = await getInfoIGDB(option);
     gameData['igdbid'] = gameData['id'];
-    String name = selectedGame['originalname'];
+    String name = gameData['originalname'];
     Game? nullableGame = mediaAlreadyInDB(name) as Game?;
 
     if (name[name.length - 1] == ')' && name.length >= 7) {
@@ -1061,38 +1055,40 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
       nullableGame = await GameService.instance.create(gameData);
     }
+    gameData['name'] = name;
+    return Pair(gameData, nullableGame as MT);
+  }
 
-    Game game = nullableGame;
-
-    if (isWishlist == false && !mediaAlreadyInLibrary(name)) {
+  Future<void> _addToLibraryOrWishlist(Map<String, dynamic> data, MT mt) async {
+    if (isWishlist == false && !mediaAlreadyInLibrary(data['name'])) {
       MediaUser mu = MediaUser(
-        mediaId: game.mediaId,
+        mediaId: mt.getMediaId(),
         userId: UserSystem.instance.getCurrentUserId(),
-        name: name,
+        name: data['name'],
         userScore: -1,
         addedDate: DateTime.now(),
-        coverImage: selectedGame['coverimage'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
-        status: 'Plan To Play',
-        series: selectedGame['seriesname'] == null ? name : selectedGame['seriesname'][0],
-        icon: selectedGame['coverimage'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
-        backgroundImage: selectedGame['artworks'] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame['artworks'][0],
+        coverImage: data['coverimage'] ?? placeholderImage,
+        status: 'Plan To Consume',
+        series: data['seriesname'] == null ? data['name'] : data['seriesname'][0],
+        icon: data['coverimage'] ?? placeholderImage,
+        backgroundImage: data['artworks'] == null ? placeholderImage : data['artworks'][0],
         lastInteracted: DateTime.now(),
       );
 
       await MediaUserService.instance.create(mu);
     }
-    else if(!mediaAlreadyInWishlist(name)) {
+    else if(!mediaAlreadyInWishlist(data['name'])) {
       Wishlist wish = Wishlist(
-        mediaId: game.mediaId,
+        mediaId: mt.getMediaId(),
         userId: UserSystem.instance.getCurrentUserId(),
-        name: name,
+        name: data['name'],
         userScore: -1,
         addedDate: DateTime.now(),
-        coverImage: selectedGame['coverimage'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
-        status: 'Plan To Play',
-        series: selectedGame['seriesname'] == null ? name : selectedGame['seriesname'][0],
-        icon: selectedGame['coverimage'] ?? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg',
-        backgroundImage: selectedGame['artworks'] == null ? '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg' : selectedGame['artworks'][0],
+        coverImage: data['coverimage'] ?? placeholderImage,
+        status: 'Plan To Consume',
+        series: data['seriesname'] == null ? data['name'] : data['seriesname'][0],
+        icon: data['coverimage'] ?? placeholderImage,
+        backgroundImage: data['artworks'] == null ? placeholderImage : data['artworks'][0],
         lastInteracted: DateTime.now(),
       );
 
@@ -1100,6 +1096,35 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     setState(() {});
+  }
+
+  Future<void> _addMediaType(Map<String, dynamic> option) async {
+    if (UserSystem.instance.currentUserData == null) {
+      return;
+    }
+
+    Pair<Map<String, dynamic>, MT> result;
+
+    if (MT == Game) {
+      result = await _addGame(option);
+    }
+    else if (MT == Anime || MT == Book || MT == Manga || MT == Movie || MT == TVSeries) {
+      var data = await getInfo(MT, option);
+      String name = data['originalname'];
+      MT? nullableMT = mediaAlreadyInDB(name);
+
+      if (nullableMT == null) {
+        nullableMT = await getServiceInstanceForType(MT).create(data);
+      }
+
+      data['name'] = data['originalname'];
+      result = Pair(data, nullableMT as MT);
+    }
+    else {
+      throw UnimplementedError('AddMediaType with for type $MT is not implemented!');
+    }
+
+    _addToLibraryOrWishlist(result.key, result.value);
   }
 
   Future<Widget> _displayMedia(MT? mt) async {

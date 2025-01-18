@@ -136,6 +136,7 @@ Map<String, dynamic> createAttributes(
 }
 
 //TODO: there is a weird bug that appears sometimes when i want to add Minecraft, because it tries to insert a medialink twice
+// It also appears when i want to add My Hero Academia
 Future<Map<String, dynamic>> doCreateTable(
   Map<String, dynamic> body,
   String tableName,
@@ -233,19 +234,21 @@ Future<Map<String, dynamic>> createFromBody(
   final aux = [];
   result['series'] = [];
   for (var entry in body['seriesBody']?['seriesname']) {
-    Map<String, dynamic> entryBody = <String, dynamic>{};
-    final attributes = createAttributes('series', entry);
-    try {
-      entryBody = await getByNameRequest('series', attributes['name']);
-      aux.add(entryBody);
-    }
-    catch (_) {
-      entryBody = await postRequest(
-        attributes,
-        'series',
-      );
-      aux.add(entryBody);
-      result['series'].add(entryBody);
+    if (entry != null) {
+      Map<String, dynamic> entryBody = <String, dynamic>{};
+      final attributes = createAttributes('series', entry);
+      try {
+        entryBody = await getByNameRequest('series', attributes['name']);
+        aux.add(entryBody);
+      }
+      catch (_) {
+        entryBody = await postRequest(
+          attributes,
+          'series',
+        );
+        aux.add(entryBody);
+        result['series'].add(entryBody);
+      }
     }
   }
   if (result['series'].isEmpty) {

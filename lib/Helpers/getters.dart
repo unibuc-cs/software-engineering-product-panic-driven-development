@@ -11,18 +11,19 @@ import '../Services/book_service.dart';
 import '../Services/game_service.dart';
 import '../Services/manga_service.dart';
 import '../Services/movie_service.dart';
+import '../Services/provider_service.dart';
 import '../Services/wishlist_service.dart';
 import '../Services/tv_series_service.dart';
 import '../Services/media_user_service.dart';
 
 dynamic getForType(Type type, String request) {
   Map<Type, dynamic> info = {
-    Game : {
-      'serviceInstance'  : GameService.instance,
-      'icon'             : Icon(Icons.videogame_asset),
-      'dbName'           : 'game',
-      'dbNamePlural'     : 'games',
-      'dbNameCapitalize' : 'Game',
+    Anime : {
+      'serviceInstance'  : AnimeService.instance,
+      'icon'             : Icon(Icons.movie),
+      'dbName'           : 'anime',
+      'dbNamePlural'     : 'anime',
+      'dbNameCapitalize' : 'Anime',
     },
     Book : {
       'serviceInstance'  : BookService.instance,
@@ -31,12 +32,12 @@ dynamic getForType(Type type, String request) {
       'dbNamePlural'     : 'books',
       'dbNameCapitalize' : 'Book',
     },
-    Anime : {
-      'serviceInstance'  : AnimeService.instance,
-      'icon'             : Icon(Icons.movie),
-      'dbName'           : 'anime',
-      'dbNamePlural'     : 'anime',
-      'dbNameCapitalize' : 'Anime',
+    Game : {
+      'serviceInstance'  : GameService.instance,
+      'icon'             : Icon(Icons.videogame_asset),
+      'dbName'           : 'game',
+      'dbNamePlural'     : 'games',
+      'dbNameCapitalize' : 'Game',
     },
     Manga : {
       'serviceInstance'  : MangaService.instance,
@@ -85,6 +86,49 @@ String getMediaTypeDbNamePlural(Type type) {
 
 String getMediaTypeDbNameCapitalize(Type type) {
   return getForType(type, 'dbNameCapitalize');
+}
+
+dynamic getOptions(Type type, String query) async {
+  if (type == Anime) {
+    return await getOptionsAnime(query);
+  }
+  if (type == Book) {
+    return await getOptionsBook(query);
+  }
+  if (type == Game) {
+    return await getOptionsIGDB(query);
+  }
+  if (type == Manga) {
+    return await getOptionsManga(query);
+  }
+  if (type == Movie) {
+    return await getOptionsMovie(query);
+  }
+  if (type == TVSeries) {
+    return await getOptionsSeries(query);
+  }
+  throw UnimplementedError('GetOptions with for type $type is not implemented!');
+  //TODO: return getForType(type, 'options');
+}
+
+dynamic getInfo(Type type, Map<String, dynamic> query) async {
+  if (type == Anime) {
+    return await getInfoAnime(query);
+  }
+  if (type == Book) {
+    return await getInfoBook(query);
+  }
+  if (type == Manga) {
+    return await getInfoManga(query);
+  }
+  if (type == Movie) {
+    return await getInfoMovie(query);
+  }
+  if (type == TVSeries) {
+    return await getInfoSeries(query);
+  }
+  throw UnimplementedError('GetOptions with for type $type is not implemented!');
+  //TODO: return getForType(type, 'info');
 }
 
 List<MediaType> getAllFromService(Type type, String serviceType) {
