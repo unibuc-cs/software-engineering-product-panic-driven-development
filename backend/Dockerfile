@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     python3 \
     python3-pip \
+    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js (which includes npm)
@@ -57,7 +58,12 @@ RUN flutter pub get
 RUN npm install puppeteer
 
 # Install howlongtobeatpy via pip
-RUN python3 -m pip install howlongtobeatpy
+RUN python3 -m venv /home/flutteruser/venv \
+    && /home/flutteruser/venv/bin/pip install --upgrade pip \
+    && /home/flutteruser/venv/bin/pip install howlongtobeatpy
+
+# Set the Python environment for subsequent commands
+ENV PATH="/home/flutteruser/venv/bin:${PATH}"
 
 # Run the backend server
 EXPOSE 8080
