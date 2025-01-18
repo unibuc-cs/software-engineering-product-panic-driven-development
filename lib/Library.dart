@@ -104,7 +104,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                   b.HLTBCompletionistInSeconds);
         },
       ),
-     // TO DO: ADD OTHER SORTING METHODS
+     // TODO: ADD OTHER SORTING METHODS
   ];
   bool filterAll = true;
   Set<Genre> selectedGenresIds = {};
@@ -118,7 +118,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     super.initState();
   }
   
-  // TO DO: this is not working atm
+  // TODO: this is not working atm
   // I think its not working because the context is different between here and were the function is called
   // dynamic getAdditionalButtonsForType(MT mt) async {
   //   if (MT == Game) {
@@ -156,7 +156,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   Future<ListView> mediaListBuilder(BuildContext context) async {
     List<ListTile> listTiles = List.empty(growable: true);
     List<Pair<MT, int>> mediaIndices = List.empty(growable: true);
-    List<MT> entries = getFromService(MT, isWishlist == false ? 'MediaUser': 'Wishlist')
+    List<MT> entries = getAllFromService(MT, isWishlist == false ? 'MediaUser': 'Wishlist')
       .map((x) => x as MT)
       .toList();
 
@@ -321,7 +321,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     if (filterQuery == '') {
       butonSearchReset = IconButton(
         onPressed: () {
-          /*TO DO: The search box gets activated only if you hold down at least 2 frames, 
+          /*TODO: The search box gets activated only if you hold down at least 2 frames, 
           I do not know the function to activate it when pressing this button. 
           I also do not know if this should be our priority right now*/
         },
@@ -371,7 +371,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         title: const Text('MediaMaster'),
         actions: [
           TextButton(
-            onPressed: () {}, // TO DO: profile page
+            onPressed: () {}, // TODO: profile page
             style: const ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
               foregroundColor: WidgetStatePropertyAll(Colors.white),
@@ -507,7 +507,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     return mts.first as MT;
   }
 
-  // TO DO: FIX THIS FUNCTION
+  // TODO: FIX THIS FUNCTION
   Future<void> _showSearchMediaDialog(BuildContext context) async {
     TextEditingController searchController = TextEditingController();
     List<dynamic> searchResults = [];
@@ -522,7 +522,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Search dialog for this media type is not implemented, because of $err');
     }
 
-    // TO DO: add loading screen while game is adding
+    // TODO: add loading screen while game is adding
     return showDialog(
       context: context,
       builder: (context) {
@@ -546,7 +546,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           onPressed: () async {
                             String query = searchController.text;
                             if (query.isNotEmpty) {
-                              // TO DO: implement for other mediaTypes as well
+                              // TODO: implement for other mediaTypes as well
                               searchResults = await getOptionsIGDB(query);
                               if (context.mounted) {
                                 setState(() {
@@ -753,8 +753,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Filtering is not implemented for this media type, because of $err');
     }
 
-    List<Tag> tags = TagService.instance.items; // TO DO: I don't know if we want all tags
-    List<Genre> genres = GenreService.instance.items; // TO DO: I don't know if we want all genres
+    List<Tag> tags = TagService.instance.items; // TODO: I don't know if we want all tags
+    List<Genre> genres = GenreService.instance.items; // TODO: I don't know if we want all genres
 
     return showDialog(
       context: context,
@@ -972,7 +972,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 toDo.add(WishlistService.instance.delete(mediaId));
                 await Future.wait(toDo);
                 setState(() {
-                  selectedMediaId = -1; // TO DO: Might want to move to some random media instead of this
+                  selectedMediaId = -1; // TODO: Might want to move to some random media instead of this
                 });
                 Navigator.of(context).pop();
               },
@@ -984,7 +984,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
-  // TO DO: FIX THIS FUNCTION
+  // TODO: FIX THIS FUNCTION
   Future<void> _addGame(Map<String, dynamic> result) async {
     if (UserSystem.instance.currentUserData == null) {
       return;
@@ -1031,6 +1031,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         }
       }
 
+      // TODO: this is not working (tested for God of War, Hollow Knight, Aeterna Noctis, Team fortress 2)
       // Get information from HLTB
       var optionsHLTB = await getOptionsHLTB(name);
       Map<String, dynamic> resultHLTB = {};
@@ -1038,7 +1039,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         // This is kind of a hack but we will do it legit in the future
         resultHLTB = await getInfoHLTB(optionsHLTB[0]);
       }
-      // TO DO: Fix if HLTB returns minutes (Left 4 Dead 2)
+      // TODO: Fix if HLTB returns minutes (Left 4 Dead 2)
       if (resultHLTB.containsKey('Main Story')) {
         gameData['hltbmaininseconds'] = (double.parse(resultHLTB['Main Story'].split(' Hours')[0]) * 3600).round();
       }
@@ -1122,10 +1123,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
     }
 
-    // TO DO: make this into a function, I tried to but failed
+    // TODO: make this into a function, I tried to but failed
     Widget additionalButtons = Container();
 
-    // TO DO: give the option to change MediaUserTags and Genres only in library (this happens in game_widgets getAdditionalButtons)
+    // TODO: give the option to change MediaUserTags and Genres only in library (this happens in game_widgets getAdditionalButtons)
     if (MT == Game) {
       additionalButtons = await getAdditionalButtons(mt as Game, context, () {setState(() {});});
     }
@@ -1162,7 +1163,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
-  // TO DO: make it look better
+  // TODO: make it look better
   Future<void> _showNewStickyDialog(int mediaId) {
     TextEditingController controller = TextEditingController();
 

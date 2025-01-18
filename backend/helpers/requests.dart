@@ -125,7 +125,7 @@ Map<String, dynamic> createAttributes(
     result['name'] = entry
       .replaceAll('http://', '')
       .replaceAll('https://', '')
-      .split('/')[0]; // TO DO: more complex mapping later
+      .split('/')[0]; // TODO: more complex mapping later
     result['href'] = entry;
   }
   else { // creator, publisher, platform
@@ -135,6 +135,7 @@ Map<String, dynamic> createAttributes(
   return result;
 }
 
+//TODO: there is a weird bug that appears sometimes when i want to add Minecraft, because it tries to insert a medialink twice
 Future<Map<String, dynamic>> doCreateTable(
   Map<String, dynamic> body,
   String tableName,
@@ -204,7 +205,7 @@ Future<Map<String, dynamic>> createFromBody(
     .single();
   partialResult.forEach((key, value) => result[key] = value);
 
-  // Create X=creators/publishers/platforms/links/series and mediaX from body
+  // Create X=creators/publishers/platforms/links/retailers/series and mediaX from body
   final mapToPlural = {
     'creator'  : 'creators',
     'publisher': 'publishers',

@@ -1,44 +1,25 @@
 import 'dart:core';
 import '../general/resource_test.dart';
 import 'package:mediamaster/Models/note.dart';
+import 'package:mediamaster/Models/media.dart';
 import 'package:mediamaster/Models/media_user.dart';
 import 'package:mediamaster/Services/auth_service.dart';
 import 'package:mediamaster/Services/note_service.dart';
+import 'package:mediamaster/Services/media_service.dart';
 import 'package:mediamaster/Services/media_user_service.dart';
 
 void main() async {
-  final Map<String, String> dummyUser = {
-      'name': 'John Doe',
-      'email': 'test@gmail.com',
-      'password': '123456',
-    };
-    try {
-      await AuthService.instance.signup(
-        name: dummyUser['name']!,
-        email: dummyUser['email']!,
-        password: dummyUser['password']!,
-      );
-      print('Dummy user created');
-    }
-    catch (e) {
-      if (!e.toString().contains('a user with this email address has already been registered')) {
-        print('Signup error: $e');
-        return;
-      }
-      print('Dummy user already exists');
-    }
+  await login(AuthService.instance);
 
-    try {
-      await AuthService.instance.login(
-        email: dummyUser['email']!,
-        password: dummyUser['password']!,
-      );
-      print('Logged in');
-    }
-    catch (e) {
-      print('Login error: $e');
-      return;
-    }
+  Media m = Media(
+    originalName: 'Dummy',
+    description: 'Description dummy',
+    releaseDate: DateTime.now(),
+    criticScore: 80,
+    communityScore: 93,
+    mediaType: 'game',
+  );
+  await MediaService.instance.create(m);
 
   MediaUser mu = MediaUser(
     mediaId: 1,

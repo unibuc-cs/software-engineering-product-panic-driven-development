@@ -13,6 +13,44 @@ Future<int> getValidId<T extends Model>({
     : itemList[0].id;
 }
 
+Future<void> login(
+  dynamic authService
+) async {
+  final Map<String, String> dummyUser = {
+    'name': 'John Doe',
+    'email': 'test@gmail.com',
+    'password': '123456',
+  };
+
+  try {
+    await authService.signup(
+      name: dummyUser['name']!,
+      email: dummyUser['email']!,
+      password: dummyUser['password']!,
+    );
+    print('Dummy user created');
+  }
+  catch (e) {
+    if (!e.toString().contains('a user with this email address has already been registered')) {
+      print('Signup error: $e');
+      return;
+    }
+    print('Dummy user already exists');
+  }
+
+  try {
+    await authService.login(
+      email: dummyUser['email']!,
+      password: dummyUser['password']!,
+    );
+    print('Logged in');
+  }
+  catch (e) {
+    print('Login error: $e');
+    return;
+  }
+}
+
 Future<void> runService<T extends Model>({
   required Service<T> service,
   required dynamic dummyItem,
@@ -25,38 +63,7 @@ Future<void> runService<T extends Model>({
   List<int> ids = [];
 
   if (authNeeded) {
-    final Map<String, String> dummyUser = {
-      'name': 'John Doe',
-      'email': 'test@gmail.com',
-      'password': '123456',
-    };
-    try {
-      await authService.signup(
-        name: dummyUser['name']!,
-        email: dummyUser['email']!,
-        password: dummyUser['password']!,
-      );
-      print('Dummy user created');
-    }
-    catch (e) {
-      if (!e.toString().contains('a user with this email address has already been registered')) {
-        print('Signup error: $e');
-        return;
-      }
-      print('Dummy user already exists');
-    }
-
-    try {
-      await authService.login(
-        email: dummyUser['email']!,
-        password: dummyUser['password']!,
-      );
-      print('Logged in');
-    }
-    catch (e) {
-      print('Login error: $e');
-      return;
-    }
+    await login(authService);
   }
 
   try {
