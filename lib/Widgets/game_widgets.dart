@@ -216,35 +216,35 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
   Set<int> mutIds = MediaUserTagService.instance.items.where((mut) => mut.mediaId == game.mediaId).map((mut) => mut.tagId).toSet();
   Set<int> mugIds = MediaUserGenreService.instance.items.where((mug) => mug.mediaId == game.mediaId).map((mug) => mug.genreId).toSet();
 
-  return showDialog( // TODO: There is a big chance that none of what I did here works (Builder within Builder)
+  return showDialog(
     context: context,
     builder: (context) {
       return FutureBuilder(
         future: Future.wait([TagService.instance.readAll(), GenreService.instance.readAll()]),
         builder: (context, snapshot) {
-          return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return AlertDialog(
-                title: const Text('Game settings'),
-                content: SizedBox(
-                  height: 400,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Game tags',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+          if (snapshot.hasData) {
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return AlertDialog(
+                  title: const Text('Game settings'),
+                  content: SizedBox(
+                    height: 400,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Game tags',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        for (Tag tag in snapshot.data!.first.map((obj) => obj as Tag))
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: mutIds.contains(tag.id),
-                                onChanged: (value) {
-                                  setState(() async {
+                          for (Tag tag in snapshot.data!.first.map((obj) => obj as Tag))
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: mutIds.contains(tag.id),
+                                  onChanged: (value) async {
                                     MediaUserTag mut = MediaUserTag(
                                       mediaId: game.mediaId,
                                       userId: UserSystem.instance.getCurrentUserId(),
@@ -256,36 +256,35 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
                                       mutIds.add(mut.tagId);
                                     }
                                     else {
-                                      await MediaUserTagService.instance.delete(mut);
+                                      await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
                                       mutIds.remove(mut.tagId);
                                     }
                                     resetState();
-                                  });
-                                },
-                              ),
-                              Text(
-                                tag.name,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                    setState(() {});
+                                  },
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  tag.name,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          const Text(
+                            'Game genres',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        const Text(
-                          'Game genres',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        for (Genre genre in snapshot.data!.last.map((obj) => obj as Genre))
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: mugIds.contains(genre.id),
-                                onChanged: (value) {
-                                  setState(() async {
+                          for (Genre genre in snapshot.data!.last.map((obj) => obj as Genre))
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: mugIds.contains(genre.id),
+                                  onChanged: (value) async {
                                     MediaUserGenre mug = MediaUserGenre(
                                       mediaId: game.mediaId,
                                       userId: UserSystem.instance.getCurrentUserId(),
@@ -297,29 +296,39 @@ Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function()
                                       mugIds.add(mug.genreId);
                                     }
                                     else {
-                                      await MediaUserGenreService.instance.delete(mug);
+                                      await MediaUserGenreService.instance.delete([mug.mediaId, mug.genreId]);
                                       mugIds.remove(mug.genreId);
                                     }
                                     resetState();
-                                  });
-                                },
-                              ),
-                              Text(
-                                genre.name,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                    setState(() {});
+                                  },
                                 ),
-                              ),
-                            ],
-                          ),
-                      ],
+                                Text(
+                                  genre.name,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-          );
+                );
+              },
+            );
+          }
+          else {
+            return Center(
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(
+                    color: Color.fromARGB(219, 10, 94, 87)),
+              )
+            );
+          }
         },
       );
     }

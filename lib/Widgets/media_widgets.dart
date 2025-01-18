@@ -245,7 +245,7 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
   );
 }
 
-Future<Widget> getAdditionalButtons<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) async {
+Widget getAdditionalButtons<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) {
   if (MT == Game) {
     return getAdditionalButtonsForGame(mt as Game, context, resetState);
   }

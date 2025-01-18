@@ -111,6 +111,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   Set<Genre> selectedGenresIds = {};
   Set<Tag> selectedTagsIds = {};
 
+  Widget loadingWidget = Center(
+    child: const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: CircularProgressIndicator(
+          color: Color.fromARGB(219, 10, 94, 87)),
+    )
+  );
+
   @override
   LibraryState({required this.isWishlist});
 
@@ -119,29 +127,27 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     super.initState();
   }
   
-  // TODO: this is not working atm
-  // I think its not working because the context is different between here and were the function is called
-  // dynamic getAdditionalButtonsForType(MT mt) async {
-  //   if (MT == Game) {
-  //     return await getAdditionalButtons(mt as Game, context, () {setState(() {});});
-  //   }
-  //   if (MT == Book) {
-  //     return await getAdditionalButtons(mt as Book, context, () {setState(() {});});
-  //   }
-  //   if (MT == Anime) {
-  //     return await getAdditionalButtons(mt as Anime, context, () {setState(() {});});
-  //   }
-  //   if (MT == Manga) {
-  //     return await getAdditionalButtons(mt as Manga, context, () {setState(() {});});
-  //   }
-  //   if (MT == Movie) {
-  //     return await getAdditionalButtons(mt as Movie, context, () {setState(() {});});
-  //   }
-  //   if (MT == TVSeries) {
-  //     return await getAdditionalButtons(mt as TVSeries, context, () {setState(() {});});
-  //   }
-  //   throw UnimplementedError('Get additional buttons for this media type is not implemented');
-  // }
+  Widget getAdditionalButtonsForType(MT mt) {
+    if (MT == Game) {
+      return getAdditionalButtons(mt as Game, context, () {setState(() {});});
+    }
+    if (MT == Book) {
+      return getAdditionalButtons(mt as Book, context, () {setState(() {});});
+    }
+    if (MT == Anime) {
+      return getAdditionalButtons(mt as Anime, context, () {setState(() {});});
+    }
+    if (MT == Manga) {
+      return getAdditionalButtons(mt as Manga, context, () {setState(() {});});
+    }
+    if (MT == Movie) {
+      return getAdditionalButtons(mt as Movie, context, () {setState(() {});});
+    }
+    if (MT == TVSeries) {
+      return getAdditionalButtons(mt as TVSeries, context, () {setState(() {});});
+    }
+    throw UnimplementedError('Get additional buttons for this media type is not implemented');
+  }
 
   String getCustomName(MT mt) {
     Pair<MediaUser?, Wishlist?> aux = getCustomizations(mt.media, isWishlist);
@@ -531,6 +537,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             return AlertDialog(
               title: Text('Search for a ${mediaType.toLowerCase()}'),
               content: SizedBox(
+                width: 350,
                 height: noSearch
                     ? 100
                     : 400, // Set height based on the presence of search results
@@ -971,7 +978,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 toDo.add(WishlistService.instance.delete(mediaId));
                 await Future.wait(toDo);
                 setState(() {
-                  selectedMediaId = -1; // TODO: Might want to move to some random media instead of this
+                  selectedMediaId = -1;
                 });
                 Navigator.of(context).pop();
               },
@@ -1028,6 +1035,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       // TODO: this is not working (tested for God of War, Hollow Knight, Aeterna Noctis, Team fortress 2)
       // Get information from HLTB
       var optionsHLTB = await getOptionsHLTB(name);
+
       Map<String, dynamic> resultHLTB = {};
       if (optionsHLTB.isNotEmpty) {
         // This is kind of a hack but we will do it legit in the future
@@ -1124,7 +1132,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('AddMediaType with for type $MT is not implemented!');
     }
 
-    _addToLibraryOrWishlist(result.key, result.value);
+    await _addToLibraryOrWishlist(result.key, result.value);
+    // TODO: Add genres information
   }
 
   Future<Widget> _displayMedia(MT? mt) async {
@@ -1148,31 +1157,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
     }
 
-    // TODO: make this into a function, I tried to but failed
-    Widget additionalButtons = Container();
-
-    // TODO: give the option to change MediaUserTags and Genres only in library (this happens in game_widgets getAdditionalButtons)
-    if (MT == Game) {
-      additionalButtons = await getAdditionalButtons(mt as Game, context, () {setState(() {});});
-    }
-    else if (MT == Book) {
-      additionalButtons = await getAdditionalButtons(mt as Book, context, () {setState(() {});});
-    }
-    else if (MT == Anime) {
-      additionalButtons = await getAdditionalButtons(mt as Anime, context, () {setState(() {});});
-    }
-    else if (MT == Manga) {
-      additionalButtons = await getAdditionalButtons(mt as Manga, context, () {setState(() {});});
-    }
-    else if (MT == Movie) {
-      additionalButtons = await getAdditionalButtons(mt as Movie, context, () {setState(() {});});
-    }
-    else if (MT == TVSeries) {
-      additionalButtons = await getAdditionalButtons(mt as TVSeries, context, () {setState(() {});});
-    }
-    else {
-      throw UnimplementedError('Get additional buttons for this media type is not implemented');
-    }
+    Widget additionalButtons = getAdditionalButtonsForType(mt);
 
     return await displayMedia(
       await mt.media,
@@ -1188,7 +1173,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
-  // TODO: make it look better
   Future<void> _showNewStickyDialog(int mediaId) {
     TextEditingController controller = TextEditingController();
 
@@ -1199,6 +1183,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
           title: const Text('New sticky note'),
           content: SizedBox(
             width: 350,
+            height: 150,
             child: TextFormField(
               controller: controller,
               autocorrect: false,
