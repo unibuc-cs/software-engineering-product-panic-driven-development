@@ -135,8 +135,6 @@ Map<String, dynamic> createAttributes(
   return result;
 }
 
-//TODO: there is a weird bug that appears sometimes when i want to add Minecraft, because it tries to insert a medialink twice
-// It also appears when i want to add My Hero Academia
 Future<Map<String, dynamic>> doCreateTable(
   Map<String, dynamic> body,
   String tableName,

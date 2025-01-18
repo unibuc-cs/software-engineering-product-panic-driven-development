@@ -24,6 +24,8 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'anime',
       'dbNamePlural'     : 'anime',
       'dbNameCapitalize' : 'Anime',
+      'options'          : getOptionsAnime,
+      'info'             : getInfoAnime,
     },
     Book : {
       'serviceInstance'  : BookService.instance,
@@ -31,6 +33,8 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'book',
       'dbNamePlural'     : 'books',
       'dbNameCapitalize' : 'Book',
+      'options'          : getOptionsBook,
+      'info'             : getInfoBook,
     },
     Game : {
       'serviceInstance'  : GameService.instance,
@@ -38,6 +42,8 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'game',
       'dbNamePlural'     : 'games',
       'dbNameCapitalize' : 'Game',
+      'options'          : getOptionsIGDB,
+      'info'             : getInfoIGDB,
     },
     Manga : {
       'serviceInstance'  : MangaService.instance,
@@ -45,6 +51,8 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'manga',
       'dbNamePlural'     : 'manga',
       'dbNameCapitalize' : 'Manga',
+      'options'          : getOptionsManga,
+      'info'             : getInfoManga,
     },
     Movie : {
       'serviceInstance'  : MovieService.instance,
@@ -52,6 +60,8 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'movie',
       'dbNamePlural'     : 'movies',
       'dbNameCapitalize' : 'Movie',
+      'options'          : getOptionsMovie,
+      'info'             : getInfoMovie,
     },
     TVSeries : {
       'serviceInstance'  : TVSeriesService.instance,
@@ -59,13 +69,15 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'tv_series',
       'dbNamePlural'     : 'tv_series',
       'dbNameCapitalize' : 'TV Series',
+      'options'          : getOptionsSeries,
+      'info'             : getInfoSeries,
     },
   };
 
   if (info.containsKey(type) && info[type].containsKey(request)) {
     return info[type][request];
   }
-  throw UnimplementedError('GetForType with request $request is not implemented!');
+  throw UnimplementedError('GetForType with type $type and request $request is not implemented!');
 }
 
 dynamic getServiceInstanceForType(Type type) {
@@ -89,46 +101,11 @@ String getMediaTypeDbNameCapitalize(Type type) {
 }
 
 dynamic getOptions(Type type, String query) async {
-  if (type == Anime) {
-    return await getOptionsAnime(query);
-  }
-  if (type == Book) {
-    return await getOptionsBook(query);
-  }
-  if (type == Game) {
-    return await getOptionsIGDB(query);
-  }
-  if (type == Manga) {
-    return await getOptionsManga(query);
-  }
-  if (type == Movie) {
-    return await getOptionsMovie(query);
-  }
-  if (type == TVSeries) {
-    return await getOptionsSeries(query);
-  }
-  throw UnimplementedError('GetOptions with for type $type is not implemented!');
-  //TODO: return getForType(type, 'options');
+  return getForType(type, 'options')(query);
 }
 
 dynamic getInfo(Type type, Map<String, dynamic> query) async {
-  if (type == Anime) {
-    return await getInfoAnime(query);
-  }
-  if (type == Book) {
-    return await getInfoBook(query);
-  }
-  if (type == Manga) {
-    return await getInfoManga(query);
-  }
-  if (type == Movie) {
-    return await getInfoMovie(query);
-  }
-  if (type == TVSeries) {
-    return await getInfoSeries(query);
-  }
-  throw UnimplementedError('GetOptions with for type $type is not implemented!');
-  //TODO: return getForType(type, 'info');
+  return getForType(type, 'info')(query);
 }
 
 List<MediaType> getAllFromService(Type type, String serviceType) {

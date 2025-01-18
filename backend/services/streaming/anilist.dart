@@ -150,7 +150,7 @@ class Anilist extends Provider {
       'communityscore': media['meanScore'],
       'criticscore': media['averageScore'],
       'status': media['status'],
-      'links': media['externalLinks'].map((link) => link['url']).toList()
+      'links': media['externalLinks'].map((link) => link['url']).toSet().toList()
     };
   }
 

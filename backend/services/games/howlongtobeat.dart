@@ -136,13 +136,13 @@ class HowLongToBeat extends Provider {
     }
   }
 
-  Future<Map<String, dynamic>> _getGameInfo(String gameLink) async {
+  Future<Map<String, dynamic>> _getGameInfo(String gameId) async {
     try
     {
-      final document = await _getDocument(gameLink);
+      final document = await _getDocument('https://howlongtobeat.com/game/$gameId');
 
       if (document == Document.html('')) {
-        return {'error': '$gameLink is a bad query'};
+        return {'error': '$gameId is a bad query'};
       }
 
       return await _gameTimes(document);
@@ -159,8 +159,8 @@ class HowLongToBeat extends Provider {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(String gameLink) async {
-    return instance._getGameInfo(gameLink);
+  Future<Map<String, dynamic>> getInfo(String gameId) async {
+    return instance._getGameInfo(gameId);
   }
 
   @override

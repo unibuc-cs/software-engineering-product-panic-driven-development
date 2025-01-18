@@ -958,8 +958,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           .delete([mediaId, mug.genreId])
                       )
                     );
+                  toDo.add(MediaUserService.instance.delete(mediaId));
                 }
-                toDo.add(WishlistService.instance.delete(mediaId));
+                else {
+                  toDo.add(WishlistService.instance.delete(mediaId));
+                }
                 await Future.wait(toDo);
                 setState(() {
                   selectedMediaId = -1;
@@ -1019,6 +1022,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       // TODO: this is not working (tested for God of War, Hollow Knight, Aeterna Noctis, Team fortress 2)
       // Get information from HLTB
       // TODO: currently HLTB broke because of Google's scraping policy. A workaround of this will be implemented in backend then we will fix it here
+      /*
       var optionsHLTB = await getOptionsHLTB(name);
 
       Map<String, dynamic> resultHLTB = {};
@@ -1045,6 +1049,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       if (resultHLTB.containsKey('Vs.')) {
         gameData['hltbversusinseconds'] = (double.parse(resultHLTB['Vs.'].split(' Hours')[0]) * 3600).round();
       }
+      */
 
       nullableGame = await GameService.instance.create(gameData);
     }

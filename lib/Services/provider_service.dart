@@ -53,7 +53,7 @@ Future<List<Map<String, dynamic>>> getOptionsHLTB(String query) async =>
   await _fetchOptions('howlongtobeat', query);
 
 Future<Map<String, dynamic>> getInfoHLTB(Map<String, dynamic> game) async =>
-  await _fetchInfo('howlongtobeat', game['link']);
+  await _fetchInfo('howlongtobeat', game['id']);
 
 // Steam
 Future<Map<String, dynamic>> getInfoSteam(String userId) async =>

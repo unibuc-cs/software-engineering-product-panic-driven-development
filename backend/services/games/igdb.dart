@@ -488,7 +488,7 @@ class IGDB extends Provider {
 
       if (game['websites'] != null) {
         await _getWebsites(_accessToken, game);
-        game['links'] = _websites;
+        game['links'] = _websites.toSet().toList();
         game.remove('websites');
       }
       return game;
