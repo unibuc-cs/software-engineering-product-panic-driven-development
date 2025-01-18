@@ -97,7 +97,7 @@ class Game extends MediaType implements Model {
       id: json['id'],
       mediaId: json['mediaid'],
       parentGameId: json['parentgameid'] ?? 1,
-      IGDBId: json['igdbid'] ?? 0,
+      IGDBId: json['igdbid'] ?? -1,
       OSMinimum: json['osminimum'] ?? '',
       OSRecommended: json['osrecommended'] ?? '',
       CPUMinimum: json['cpuminimum'] ?? '',

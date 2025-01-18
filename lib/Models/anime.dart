@@ -6,11 +6,13 @@ class Anime extends MediaType implements Model {
   int mediaId;
   int id;
   String language;
+  int anilistId;
 
   Anime({
     this.id = -1,
     required this.mediaId,
     this.language = '',
+    this.anilistId = -1,
   });
 
   static String get endpoint => 'anime';
@@ -36,6 +38,7 @@ class Anime extends MediaType implements Model {
     return {
       'mediaid': mediaId,
       'language': language,
+      'anilistid': anilistId,
     };
   }
 
@@ -45,6 +48,7 @@ class Anime extends MediaType implements Model {
       id: json['id'],
       mediaId: json['mediaid'],
       language: json['language'] ?? '',
+      anilistId: json['anilistid'] ?? -1,
     );
   }
 }

@@ -1,16 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../Models/tag.dart';
-import '../UserSystem.dart';
 import '../Models/game.dart';
-import '../Models/genre.dart';
-import '../Models/media_user_tag.dart';
-import '../Services/tag_service.dart';
-import '../Services/genre_service.dart';
-import '../Services/provider_service.dart';
-import '../Services/media_user_tag_service.dart';
-import '../Services/media_user_genre_service.dart';
+import 'media_widgets.dart';
+
 
 int getMinTimeToBeat(Game game) {
   List<int> times = List.from([
@@ -211,193 +203,6 @@ Future<void> _showSysCheck(Game game, BuildContext context) {
   );
 }
 
-Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function() resetState) async {
-  Set<int> mutIds = MediaUserTagService.instance.items.where((mut) => mut.mediaId == game.mediaId).map((mut) => mut.tagId).toSet();
-  Set<int> mugIds = MediaUserGenreService.instance.items.where((mug) => mug.mediaId == game.mediaId).map((mug) => mug.genreId).toSet();
-
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return AlertDialog(
-            title: const Text('Game settings'),
-            content: SizedBox(
-              height: 400,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const Text(
-                      'Game tags',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    for (Tag tag in TagService.instance.items)
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: mutIds.contains(tag.id),
-                            onChanged: (value) async {
-                              MediaUserTag mut = MediaUserTag(
-                                mediaId: game.mediaId,
-                                userId: UserSystem.instance.getCurrentUserId(),
-                                tagId: tag.id,
-                              );
-
-                              if (value == true) {
-                                await MediaUserTagService.instance.create(mut);
-                                mutIds.add(mut.tagId);
-                              }
-                              else {
-                                await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
-                                mutIds.remove(mut.tagId);
-                              }
-                              resetState();
-                              setState(() {});
-                            },
-                          ),
-                          Text(
-                            tag.name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    const Text(
-                      'Game genres',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    for (Genre genre in GenreService.instance.items)
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: mugIds.contains(genre.id),
-                            onChanged: (value) {},
-                          ),
-                          Text(
-                            genre.name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    }
-  );
-}
-
-Future<void> _showGameRecommendationsDialog(Game game, BuildContext context) async {
-  var similarGames = await getRecsIGDB(game.toJson());
-  List<Widget> recommendations = [];
-
-  if (context.mounted) {
-    if (similarGames.isEmpty) {
-      return showDialog(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return const AlertDialog(
-                title: Text(
-                  'Similar games',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                content: SizedBox(
-                  height: 400,
-                  width: 300,
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.sentiment_dissatisfied,
-                            color: Colors.grey,
-                            size: 50,
-                          ),
-                          SizedBox(height: 20),
-                          Text(
-                            'There are no similar games for this game, sorry!',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      );
-    }
-
-    for (var similarGame in similarGames) {
-      String name = similarGame['name'];
-      if (name[name.length - 1] == ')' && name.length >= 7) {
-        name = name.substring(0, name.length - 7);
-      }
-      recommendations.add(
-        ListTile(
-          leading: const Icon(Icons.videogame_asset),
-          title: Text(
-            similarGame['name'],
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          trailing: IconButton(
-            icon: const Icon(Icons.copy),
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: name));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('$name copied to clipboard')),
-              );
-            },
-          ),
-        ),
-      );
-    }
-
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: const Text('Similar games'),
-              content: SizedBox(
-                height: 400,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: recommendations,
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      }
-    );
-  }
-}
-
 Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() resetState) {
   return Row(
     children: [
@@ -484,7 +289,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         margin: const EdgeInsets.all(10),
         child: IconButton(
           onPressed: () {
-            _showGameSettingsDialog(game, context, resetState);
+            showSettingsDialog(game, context, resetState);
           },
           icon: const Icon(
             Icons.settings,
@@ -502,7 +307,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         margin: const EdgeInsets.all(10),
         child: TextButton(
           onPressed: () {
-            _showGameRecommendationsDialog(game, context);
+            showRecommendationsDialog(game, context);
           },
           style: const ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(

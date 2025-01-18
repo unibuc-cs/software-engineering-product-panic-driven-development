@@ -24,8 +24,11 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'anime',
       'dbNamePlural'     : 'anime',
       'dbNameCapitalize' : 'Anime',
+      'attribute'        : 'anilistid',
+      'oldAttribute'     : 'id',
       'options'          : getOptionsAnime,
       'info'             : getInfoAnime,
+      'recs'             : getRecsAnime,
     },
     Book : {
       'serviceInstance'  : BookService.instance,
@@ -33,8 +36,11 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'book',
       'dbNamePlural'     : 'books',
       'dbNameCapitalize' : 'Book',
+      'attribute'        : 'goodreadslink',
+      'oldAttribute'     : 'link',
       'options'          : getOptionsBook,
       'info'             : getInfoBook,
+      'recs'             : getRecsBook,
     },
     Game : {
       'serviceInstance'  : GameService.instance,
@@ -42,8 +48,11 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'game',
       'dbNamePlural'     : 'games',
       'dbNameCapitalize' : 'Game',
+      'attribute'        : 'igdbid',
+      'oldAttribute'     : 'id',
       'options'          : getOptionsIGDB,
       'info'             : getInfoIGDB,
+      'recs'             : getRecsIGDB,
     },
     Manga : {
       'serviceInstance'  : MangaService.instance,
@@ -51,8 +60,11 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'manga',
       'dbNamePlural'     : 'manga',
       'dbNameCapitalize' : 'Manga',
+      'attribute'        : 'anilistid',
+      'oldAttribute'     : 'id',
       'options'          : getOptionsManga,
       'info'             : getInfoManga,
+      'recs'             : getRecsManga,
     },
     Movie : {
       'serviceInstance'  : MovieService.instance,
@@ -60,8 +72,11 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'movie',
       'dbNamePlural'     : 'movies',
       'dbNameCapitalize' : 'Movie',
+      'attribute'        : 'tmdbid',
+      'oldAttribute'     : 'id',
       'options'          : getOptionsMovie,
       'info'             : getInfoMovie,
+      'recs'             : getRecsMovie,
     },
     TVSeries : {
       'serviceInstance'  : TVSeriesService.instance,
@@ -69,8 +84,11 @@ dynamic getForType(Type type, String request) {
       'dbName'           : 'tv_series',
       'dbNamePlural'     : 'tv_series',
       'dbNameCapitalize' : 'TV Series',
+      'attribute'        : 'tmdbid',
+      'oldAttribute'     : 'id',
       'options'          : getOptionsSeries,
       'info'             : getInfoSeries,
+      'recs'             : getRecsSeries,
     },
   };
 
@@ -100,12 +118,24 @@ String getMediaTypeDbNameCapitalize(Type type) {
   return getForType(type, 'dbNameCapitalize');
 }
 
-dynamic getOptions(Type type, String query) async {
+String getAttributeNameForType(Type type) {
+  return getForType(type, 'attribute');
+}
+
+String getOldAttributeNameForType(Type type) {
+  return getForType(type, 'oldAttribute');
+}
+
+dynamic getOptionsForType(Type type, String query) async {
   return getForType(type, 'options')(query);
 }
 
-dynamic getInfo(Type type, Map<String, dynamic> query) async {
+dynamic getInfoForType(Type type, Map<String, dynamic> query) async {
   return getForType(type, 'info')(query);
+}
+
+dynamic getRecsForType(Type type, Map<String, dynamic> query) async {
+  return getForType(type, 'recs')(query);
 }
 
 List<MediaType> getAllFromService(Type type, String serviceType) {

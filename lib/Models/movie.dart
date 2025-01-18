@@ -7,12 +7,14 @@ class Movie extends MediaType implements Model {
   int id;
   String language;
   int durationInSeconds;
+  int TMDBId;
 
   Movie({
     this.id = -1,
     required this.mediaId,
     this.language = '',
     this.durationInSeconds = 0,
+    this.TMDBId = -1,
   });
 
   static String get endpoint => 'movies';
@@ -39,6 +41,7 @@ class Movie extends MediaType implements Model {
       'mediaid': mediaId,
       'language': language,
       'durationinseconds': durationInSeconds,
+      'tmdbid': TMDBId,
     };
   }
 
@@ -47,8 +50,9 @@ class Movie extends MediaType implements Model {
     return Movie(
       id: json['id'],
       mediaId: json['mediaid'],
-      language: json['language'],
-      durationInSeconds: json['durationinseconds'],
+      language: json['language'] ?? '',
+      durationInSeconds: json['durationinseconds'] ?? 0,
+      TMDBId: json['tmdbid'] ?? -1,
     );
   }
 }

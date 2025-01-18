@@ -8,6 +8,7 @@ class Book extends MediaType implements Model {
   String language;
   int totalPages;
   String format;
+  String goodreadsLink;
 
   Book({
     this.id = -1,
@@ -15,6 +16,7 @@ class Book extends MediaType implements Model {
     this.language = '',
     this.totalPages = 0,
     this.format = '',
+    this.goodreadsLink = '',
   });
 
   static String get endpoint => 'books';
@@ -42,6 +44,7 @@ class Book extends MediaType implements Model {
       'language': language,
       'totalpages': totalPages,
       'format': format,
+      'goodreadslink': goodreadsLink,
     };
   }
 
@@ -53,6 +56,7 @@ class Book extends MediaType implements Model {
       language: json['language'] ?? '',
       totalPages: json['totalpages'] ?? 0,
       format: json['format'] ?? '',
+      goodreadsLink: json['goodreadslink'] ?? '',
     );
   }
 }

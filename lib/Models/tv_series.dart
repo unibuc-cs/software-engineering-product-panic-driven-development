@@ -6,11 +6,13 @@ class TVSeries extends MediaType implements Model {
   int mediaId;
   int id;
   String language;
+  int TMDBId;
 
   TVSeries({
     this.id = -1,
     required this.mediaId,
     this.language = '',
+    this.TMDBId = -1,
   });
 
   static String get endpoint => 'tvseries';
@@ -36,6 +38,7 @@ class TVSeries extends MediaType implements Model {
     return {
       'mediaid': mediaId,
       'language': language,
+      'tmdbid': TMDBId,
     };
   }
 
@@ -45,6 +48,7 @@ class TVSeries extends MediaType implements Model {
       id: json['id'],
       mediaId: json['mediaid'],
       language: json['language'] ?? '',
+      TMDBId: json['tmdbid'] ?? -1,
     );
   }
 }

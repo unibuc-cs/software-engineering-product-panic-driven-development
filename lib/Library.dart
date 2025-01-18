@@ -45,7 +45,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   late final isWishlist;
   int selectedMediaId = -1;
   String filterQuery = '';
-  final String placeholderImage = '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
+  final String placeholderImage = 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
   TextEditingController searchController = TextEditingController();
   bool increasingSorting = true;
   int selectedSortingMethod = 0;
@@ -125,28 +125,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   @override
   void initState() {
     super.initState();
-  }
-  
-  Widget getAdditionalButtonsForType(MT mt) {
-    if (MT == Game) {
-      return getAdditionalButtons(mt as Game, context, () {setState(() {});});
-    }
-    if (MT == Book) {
-      return getAdditionalButtons(mt as Book, context, () {setState(() {});});
-    }
-    if (MT == Anime) {
-      return getAdditionalButtons(mt as Anime, context, () {setState(() {});});
-    }
-    if (MT == Manga) {
-      return getAdditionalButtons(mt as Manga, context, () {setState(() {});});
-    }
-    if (MT == Movie) {
-      return getAdditionalButtons(mt as Movie, context, () {setState(() {});});
-    }
-    if (MT == TVSeries) {
-      return getAdditionalButtons(mt as TVSeries, context, () {setState(() {});});
-    }
-    throw UnimplementedError('Get additional buttons for this media type is not implemented');
   }
 
   String getCustomName(MT mt) {
@@ -537,7 +515,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           onPressed: () async {
                             String query = searchController.text;
                             if (query.isNotEmpty) {
-                              searchResults = await getOptions(MT, query);
+                              searchResults = await getOptionsForType(MT, query);
                               if (context.mounted) {
                                 setState(() {
                                 noSearch = searchResults
@@ -743,8 +721,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Filtering is not implemented for this media type, because of $err');
     }
 
-    List<Tag> tags = TagService.instance.items; // TODO: I don't know if we want all tags
-    List<Genre> genres = GenreService.instance.items; // TODO: I don't know if we want all genres
+    List<Tag> tags = TagService.instance.items;
+    List<Genre> genres = GenreService.instance.items;
 
     return showDialog(
       context: context,
@@ -977,10 +955,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
-  // TODO: FIX THIS FUNCTION
   Future<Pair<Map<String, dynamic>, MT>> _addGame(Map<String, dynamic> option) async {
     var gameData = await getInfoIGDB(option);
-    gameData['igdbid'] = gameData['id'];
+    gameData[getAttributeNameForType(MT)] = gameData[getOldAttributeNameForType(MT)];
     String name = gameData['originalname'];
     Game? nullableGame = mediaAlreadyInDB(name) as Game?;
 
@@ -1019,10 +996,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         }
       }
 
-      // TODO: this is not working (tested for God of War, Hollow Knight, Aeterna Noctis, Team fortress 2)
       // Get information from HLTB
-      // TODO: currently HLTB broke because of Google's scraping policy. A workaround of this will be implemented in backend then we will fix it here
-      /*
       var optionsHLTB = await getOptionsHLTB(name);
 
       Map<String, dynamic> resultHLTB = {};
@@ -1030,7 +1004,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         // This is kind of a hack but we will do it legit in the future
         resultHLTB = await getInfoHLTB(optionsHLTB[0]);
       }
-      // TODO: Fix if HLTB returns minutes (Left 4 Dead 2)
       if (resultHLTB.containsKey('Main Story')) {
         gameData['hltbmaininseconds'] = (double.parse(resultHLTB['Main Story'].split(' Hours')[0]) * 3600).round();
       }
@@ -1049,7 +1022,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       if (resultHLTB.containsKey('Vs.')) {
         gameData['hltbversusinseconds'] = (double.parse(resultHLTB['Vs.'].split(' Hours')[0]) * 3600).round();
       }
-      */
 
       nullableGame = await GameService.instance.create(gameData);
     }
@@ -1067,9 +1039,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         addedDate: DateTime.now(),
         coverImage: data['coverimage'] ?? placeholderImage,
         status: 'Plan To Consume',
-        series: data['seriesname'] == null ? data['name'] : data['seriesname'][0],
+        series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0] ?? data['name'],
         icon: data['coverimage'] ?? placeholderImage,
-        backgroundImage: data['artworks'] == null ? placeholderImage : data['artworks'][0],
+        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : data['artworks'][0],
         lastInteracted: DateTime.now(),
       );
 
@@ -1084,9 +1056,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         addedDate: DateTime.now(),
         coverImage: data['coverimage'] ?? placeholderImage,
         status: 'Plan To Consume',
-        series: data['seriesname'] == null ? data['name'] : data['seriesname'][0],
+        series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0],
         icon: data['coverimage'] ?? placeholderImage,
-        backgroundImage: data['artworks'] == null ? placeholderImage : data['artworks'][0],
+        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : data['artworks'][0],
         lastInteracted: DateTime.now(),
       );
 
@@ -1101,13 +1073,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       return;
     }
 
+    // TODO: when adding a mediaType, you also add the others in the series, which are added with minimum content,
+    // so if the media is already in db but has minimum content, we should still do the api calls at this stage
     Pair<Map<String, dynamic>, MT> result;
 
     if (MT == Game) {
       result = await _addGame(option);
     }
     else if (MT == Anime || MT == Book || MT == Manga || MT == Movie || MT == TVSeries) {
-      var data = await getInfo(MT, option);
+      var data = await getInfoForType(MT, option);
+      data[getAttributeNameForType(MT)] = data[getOldAttributeNameForType(MT)];
       String name = data['originalname'];
       MT? nullableMT = mediaAlreadyInDB(name);
 
@@ -1147,7 +1122,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
     }
 
-    Widget additionalButtons = getAdditionalButtonsForType(mt);
+    Widget additionalButtons = getAdditionalButtons(mt, context, () {setState(() {});});
 
     return displayMedia(
       mt.media,

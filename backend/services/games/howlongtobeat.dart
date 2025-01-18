@@ -20,12 +20,12 @@ class HowLongToBeat extends Provider {
 
   // HLTB links to ignore
   // example: https://howlongtobeat.com/game/5203/reviews/latest/1
-  final _badLinks = [
-    'forum',
-    'reviews',
-    'lists',
-    'completions'
-  ];
+  // final _badLinks = [
+  //   'forum',
+  //   'reviews',
+  //   'lists',
+  //   'completions'
+  // ];
 
   // Private constructor
   HowLongToBeat._();

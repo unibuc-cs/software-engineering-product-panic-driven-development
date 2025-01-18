@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pair/pair.dart';
-import '../Services/media_user_service.dart';
-import '../Services/wishlist_service.dart';
+import '../Helpers/getters.dart';
+import '../Models/tag.dart';
+import '../Models/book.dart';
 import '../Models/game.dart';
+import '../Models/anime.dart';
+import '../Models/genre.dart';
+import '../Models/manga.dart';
 import '../Models/media.dart';
-import '../Models/media_user.dart';
+import '../Models/movie.dart';
 import '../Models/wishlist.dart';
+import '../Models/tv_series.dart';
+import '../Models/media_user.dart';
+import '../Models/media_user_tag.dart';
+import '../Models/general/model.dart';
 import '../Models/general/media_type.dart';
+import '../Services/wishlist_service.dart';
+import '../Services/tag_service.dart';
+import '../Services/genre_service.dart';
+import '../Services/media_user_service.dart';
+import '../Services/media_user_tag_service.dart';
+import '../Services/media_user_genre_service.dart';
+import '../UserSystem.dart';
 import 'game_widgets.dart';
+import 'book_widgets.dart';
+import 'anime_widgets.dart';
+import 'manga_widgets.dart';
+import 'movie_widgets.dart';
+import 'tv_series_widgets.dart';
 
 // Auxilliary function for general list widgets (publishers, creators, ...)
 Widget getListWidget(String title, List<String> items) {
@@ -151,6 +172,8 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
     customizations = aux.value;
   }
 
+  // TODO: the image is not rendering when it comes to other mediaTypes than games (try it and check the stack error on the terminal)
+  // the problem is that not every link has https://, check how the providers give the links
   String imageUrl = 'https:${customizations.backgroundImage}';
   String coverUrl = 'https:${customizations.coverImage}';
 
@@ -175,7 +198,7 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
           child: Column(
             children: [
               Center(
-                // Game name;
+                // MediaType name;
                 child: Text(
                   customizations.name,
                   style: const TextStyle(color: Colors.white, fontSize: 24.0),
@@ -238,9 +261,215 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
   );
 }
 
+Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) async {
+  Set<int> mutIds = MediaUserTagService.instance.items.where((mut) => mut.mediaId == mt.getMediaId()).map((mut) => mut.tagId).toSet();
+  Set<int> mugIds = MediaUserGenreService.instance.items.where((mug) => mug.mediaId == mt.getMediaId()).map((mug) => mug.genreId).toSet();
+
+  String mediaType = getMediaTypeDbNameCapitalize(MT);
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: Text('$mediaType settings'),
+            content: SizedBox(
+              height: 400,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text(
+                      '$mediaType tags',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    for (Tag tag in TagService.instance.items)
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: mutIds.contains(tag.id),
+                            onChanged: (value) async {
+                              MediaUserTag mut = MediaUserTag(
+                                mediaId: mt.getMediaId(),
+                                userId: UserSystem.instance.getCurrentUserId(),
+                                tagId: tag.id,
+                              );
+
+                              if (value == true) {
+                                await MediaUserTagService.instance.create(mut);
+                                mutIds.add(mut.tagId);
+                              }
+                              else {
+                                await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
+                                mutIds.remove(mut.tagId);
+                              }
+                              resetState();
+                              setState(() {});
+                            },
+                          ),
+                          Text(
+                            tag.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    Text(
+                      '$mediaType genres',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    for (Genre genre in GenreService.instance.items) // TODO: for now, the user cannot change the genres (i think this is intended)
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: mugIds.contains(genre.id),
+                            onChanged: (value) {},
+                          ),
+                          Text(
+                            genre.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+  );
+}
+
+Future<void> showRecommendationsDialog<MT extends MediaType>(MT mt, BuildContext context) async {
+  var similarEntries = await getRecsForType(MT, (mt as Model).toJson());
+  List<Widget> recommendations = [];
+
+  String mediaType = getMediaTypeDbName(MT);
+  String mediaTypePlural = getMediaTypeDbNamePlural(MT);
+
+  if (context.mounted) {
+    if (similarEntries.isEmpty) {
+      return showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                title: Text(
+                  'Similar $mediaTypePlural',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                content: SizedBox(
+                  height: 400,
+                  width: 300,
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.sentiment_dissatisfied,
+                            color: Colors.grey,
+                            size: 50,
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            'There are no similar $mediaTypePlural for this $mediaType, sorry!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      );
+    }
+
+    for (var similarEntry in similarEntries) {
+      String name = similarEntry['name'];
+      if (name[name.length - 1] == ')' && name.length >= 7) {
+        name = name.substring(0, name.length - 7);
+      }
+      recommendations.add(
+        ListTile(
+          leading: const Icon(Icons.videogame_asset),
+          title: Text(
+            similarEntry['name'],
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.copy),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: name));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('$name copied to clipboard')),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('Similar $mediaTypePlural'),
+              content: SizedBox(
+                height: 400,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: recommendations,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      }
+    );
+  }
+}
+
 Widget getAdditionalButtons<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) {
+  if (MT == Anime) {
+    return getAdditionalButtonsForAnime(mt as Anime, context, resetState);
+  }
+  if (MT == Book) {
+    return getAdditionalButtonsForBook(mt as Book, context, resetState);
+  }
   if (MT == Game) {
     return getAdditionalButtonsForGame(mt as Game, context, resetState);
+  }
+  if (MT == Manga) {
+    return getAdditionalButtonsForManga(mt as Manga, context, resetState);
+  }
+  if (MT == Movie) {
+    return getAdditionalButtonsForMovie(mt as Movie, context, resetState);
+  }
+  if (MT == TVSeries) {
+    return getAdditionalButtonsForTVSeries(mt as TVSeries, context, resetState);
   }
   throw UnimplementedError('getAdditionalButtons was not defined for this type');
 }
