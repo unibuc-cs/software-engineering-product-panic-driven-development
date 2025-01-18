@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     libx11-xcb1 \
     libgbm1 \
     ca-certificates \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js (which includes npm)
@@ -53,6 +55,9 @@ RUN flutter pub get
 
 # Install Puppeteer
 RUN npm install puppeteer
+
+# Install howlongtobeatpy via pip
+RUN python3 -m pip install howlongtobeatpy
 
 # Run the backend server
 EXPOSE 8080

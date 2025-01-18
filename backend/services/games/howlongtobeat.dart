@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import '../provider.dart';
 import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
@@ -76,60 +78,28 @@ class HowLongToBeat extends Provider {
     }
   }
 
-  Future<List<String>> _getLinks(String gameName) async {
-    try {
-      final encodedGameName = Uri.encodeQueryComponent('how long to beat $gameName');
-
-      final document = await _getDocument('https://www.google.com/search?q=$encodedGameName');
-
-      if (document == Document.html('')) {
-        return [];
-      }
-
-      final linkList = document.querySelectorAll('a[href*="howlongtobeat.com/game/"]');
-
-      // Add the links to a set to remove duplicates
-      var linkSet = <String>{};
-
-      for (var item in linkList) {
-        String link = item.attributes['href'].toString();
-
-        // Remove google and bad howlongtobeat links
-        if (link.contains('www.google') || _badLinks.any((element) => link.contains(element))) {
-          continue;
-        }
-
-        // /url?q=https://howlongtobeat.com/game/[id]&[other_stuff] -> https://howlongtobeat.com/game/[id]
-        link = link.split('/url?q=').last.split('&').first;
-        linkSet.add(link);
-      }
-
-      return linkSet.toList();
-    }
-    catch (e) {
-      return [];
-    }
-  }
-
   Future<List<Map<String, dynamic>>> _getGameOptions(String gameName) async {
     try {
-      final links = await _getLinks(gameName);
-      final options = <Map<String, dynamic>>[];
-      final fetches = links.map((link) async {
-        final document = await _getDocument(link);
-        if (document != Document.html('')) {
-          final actualGameName = document.querySelector('.GameHeader_profile_header__q_PID')?.text;
-          if (actualGameName != null) {
-            options.add({
-              'name': actualGameName,
-              'link': link
-            });
-          }
-        }
-      });
+      final scriptPath = '${Directory.current.path}\\backend\\services\\games\\howlongtobeat.py';
+      var result = await Process.run(
+        'python',
+        [scriptPath, gameName],
+      );
 
-      await Future.wait(fetches);
-      return options;
+      if (result.exitCode == 0) {
+        Map<String, dynamic> gameData = jsonDecode(result.stdout.trim().replaceAll("'", '"'));
+        List<Map<String, dynamic>> options = [];
+        gameData.forEach((name, id) {
+          options.add({
+            'name': name,
+            'id': id,
+          });
+        });
+        return options;
+      }
+      else {
+        throw Exception('Error running Python script: ${result.stderr}');
+      }
     }
     catch (e) {
       return [{'error': e.toString()}];
