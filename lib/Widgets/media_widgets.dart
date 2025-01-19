@@ -21,7 +21,7 @@ import '../Services/tag_service.dart';
 import '../Services/genre_service.dart';
 import '../Services/media_user_service.dart';
 import '../Services/media_user_tag_service.dart';
-import '../Services/media_user_genre_service.dart';
+import '../Services/media_genre_service.dart';
 import '../UserSystem.dart';
 import 'game_widgets.dart';
 import 'book_widgets.dart';
@@ -267,7 +267,7 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
 
 Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) async {
   Set<int> mutIds = MediaUserTagService.instance.items.where((mut) => mut.mediaId == mt.getMediaId()).map((mut) => mut.tagId).toSet();
-  Set<int> mugIds = MediaUserGenreService.instance.items.where((mug) => mug.mediaId == mt.getMediaId()).map((mug) => mug.genreId).toSet();
+  Set<int> mugIds = MediaGenreService.instance.items.where((mug) => mug.mediaId == mt.getMediaId()).map((mug) => mug.genreId).toSet();
 
   String mediaType = getMediaTypeDbNameCapitalize(MT);
   return showDialog(

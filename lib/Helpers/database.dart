@@ -16,7 +16,7 @@ import '../Services/media_publisher_service.dart';
 import '../Services/media_retailer_service.dart';
 import '../Services/media_series_service.dart';
 import '../Services/media_service.dart';
-import '../Services/media_user_genre_service.dart';
+import '../Services/media_genre_service.dart';
 import '../Services/media_user_service.dart';
 import '../Services/media_user_tag_service.dart';
 import '../Services/movie_service.dart';
@@ -112,6 +112,7 @@ Future<void> HydrateWithoutUser() async {
     MangaService.instance,
     MediaService.instance,
     MediaCreatorService.instance,
+    MediaGenreService.instance,
     MediaLinkService.instance,
     MediaPlatformService.instance,
     MediaPublisherService.instance,
@@ -133,7 +134,6 @@ Future<void> HydrateWithoutUser() async {
 Future<void> HydrateWithUser() async {
   List<Service> services = [
     MediaUserService.instance,
-    MediaUserGenreService.instance,
     MediaUserTagService.instance,
     NoteService.instance,
     UserAchievementService.instance,
@@ -146,7 +146,6 @@ Future<void> HydrateWithUser() async {
 void UnhydrateWithUser() {
   List<Service> services = [
     MediaUserService.instance,
-    MediaUserGenreService.instance,
     MediaUserTagService.instance,
     NoteService.instance,
     UserAchievementService.instance,

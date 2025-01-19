@@ -1,31 +1,28 @@
 import 'general/model.dart';
 
-class MediaUserGenre implements Model {
+class MediaGenre implements Model {
   // Data
   int mediaId;
-  String userId;
   int genreId;
 
-  MediaUserGenre({
+  MediaGenre({
     required this.mediaId,
-    required this.userId,
     required this.genreId
   });
 
-  static String get endpoint => 'mediausergenres';
+  static String get endpoint => 'mediagenres';
 
   @override
   bool operator ==(Object other) {
     if (runtimeType != other.runtimeType) {
       return false;
     }
-    return mediaId == (other as MediaUserGenre).mediaId &&
-        userId == other.userId &&
+    return mediaId == (other as MediaGenre).mediaId &&
         genreId == other.genreId;
   }
 
   @override
-  int get hashCode => Object.hash(mediaId, userId, genreId);
+  int get hashCode => Object.hash(mediaId, genreId);
 
   @override
   dynamic get id => [mediaId, genreId];
@@ -34,16 +31,14 @@ class MediaUserGenre implements Model {
   Map<String, dynamic> toJson() {
     return {
       'mediaid': mediaId,
-      'userid': userId,
       'genreid': genreId,
     };
   }
 
   @override
-  factory MediaUserGenre.from(Map<String, dynamic> json) {
-    return MediaUserGenre(
+  factory MediaGenre.from(Map<String, dynamic> json) {
+    return MediaGenre(
       mediaId: json['mediaid'],
-      userId: json['userid'],
       genreId: json['genreid'],
     );
   }

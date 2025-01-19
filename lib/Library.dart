@@ -26,7 +26,7 @@ import 'Services/wishlist_service.dart';
 import 'Services/provider_service.dart';
 import 'Services/media_user_service.dart';
 import 'Services/media_user_tag_service.dart';
-import 'Services/media_user_genre_service.dart';
+import 'Services/media_genre_service.dart';
 import 'Widgets/game_widgets.dart';
 import 'Widgets/media_widgets.dart';
 
@@ -166,12 +166,12 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             selectedTagsIds.contains(mut.tagId)
           )
           .length +
-          MediaUserGenreService
+          MediaGenreService
             .instance
             .items
-            .where((mug) =>
-              mug.mediaId == id &&
-              selectedGenresIds.contains(mug.genreId)
+            .where((mg) =>
+              mg.mediaId == id &&
+              selectedGenresIds.contains(mg.genreId)
             )
             .length;
         if (filterAll) {
@@ -499,100 +499,111 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Search dialog for this media type is not implemented, because of $err');
     }
 
+    bool isChosen = false;
+    bool isDone = false;
+
     // TODO: add loading screen while media is adding
     return showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: Text('Search for a ${mediaType.toLowerCase()}'),
-              content: SizedBox(
-                width: 350,
-                height: noSearch
-                    ? 100
-                    : 400, // Set height based on the presence of search results
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        labelText: '$mediaType name',
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.search),
-                          onPressed: () async {
-                            String query = searchController.text;
-                            if (query.isNotEmpty) {
-                              searchResults = await getOptionsForType(MT, query);
-                              if (context.mounted) {
-                                setState(() {
-                                noSearch = searchResults
-                                    .isEmpty; // Update noSearch flag
-                                }); // Trigger rebuild to show results and update flag
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    if (searchResults.isNotEmpty)
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 2),
-                              ...searchResults.map((result) {
-                                String mediaName = result['name'];
+            if (isDone) {
+              Navigator.of(context).pop();
+            }
+            else if (isChosen) {
 
-                                if (mediaAlreadyInLibrary(mediaName)) {
-                                  return ListTile(
-                                    title: Text(mediaName),
-                                    subtitle: Text(
-                                      '$mediaType is already in library.',
-                                      style: const TextStyle(
-                                        color: Color.fromARGB(255, 255, 0, 0),
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      _addMediaType(result);
-                                      Navigator.of(context).pop();
-                                    },
-                                  );
+            }
+            else {
+              return AlertDialog(
+                title: Text('Search for a ${mediaType.toLowerCase()}'),
+                content: SizedBox(
+                  width: 350,
+                  height: noSearch
+                      ? 100
+                      : 400, // Set height based on the presence of search results
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                          labelText: '$mediaType name',
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.search),
+                            onPressed: () async {
+                              String query = searchController.text;
+                              if (query.isNotEmpty) {
+                                searchResults = await getOptionsForType(MT, query);
+                                if (context.mounted) {
+                                  setState(() {
+                                  noSearch = searchResults
+                                      .isEmpty; // Update noSearch flag
+                                  }); // Trigger rebuild to show results and update flag
                                 }
-                                else if (mediaAlreadyInWishlist(mediaName)) {
-                                  return ListTile(
-                                    title: Text(mediaName),
-                                    subtitle: Text(
-                                      '$mediaType is already in wishlist.',
-                                      style: const TextStyle(
-                                        color: Color.fromARGB(255, 255, 0, 0),
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      _addMediaType(result);
-                                      Navigator.of(context).pop();
-                                    },
-                                  );
-                                }
-                                else {
-                                  return ListTile(
-                                    title: Text(mediaName),
-                                    onTap: () {
-                                      _addMediaType(result);
-                                      Navigator.of(context).pop();
-                                    },
-                                  );
-                                }
-                              }),
-                            ],
+                              }
+                            },
                           ),
                         ),
                       ),
-                  ],
+                      if (searchResults.isNotEmpty)
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 2),
+                                ...searchResults.map((result) {
+                                  String mediaName = result['name'];
+
+                                  if (mediaAlreadyInLibrary(mediaName)) {
+                                    return ListTile(
+                                      title: Text(mediaName),
+                                      subtitle: Text(
+                                        '$mediaType is already in library.',
+                                        style: const TextStyle(
+                                          color: Color.fromARGB(255, 255, 0, 0),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        _addMediaType(result);
+                                        Navigator.of(context).pop();
+                                      },
+                                    );
+                                  }
+                                  else if (mediaAlreadyInWishlist(mediaName)) {
+                                    return ListTile(
+                                      title: Text(mediaName),
+                                      subtitle: Text(
+                                        '$mediaType is already in wishlist.',
+                                        style: const TextStyle(
+                                          color: Color.fromARGB(255, 255, 0, 0),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        _addMediaType(result);
+                                        Navigator.of(context).pop();
+                                      },
+                                    );
+                                  }
+                                  else {
+                                    return ListTile(
+                                      title: Text(mediaName),
+                                      onTap: () {
+                                        _addMediaType(result);
+                                        Navigator.of(context).pop();
+                                      },
+                                    );
+                                  }
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            );
+              );
+            }
           },
         );
       },
@@ -934,15 +945,15 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           .delete([mediaId, mut.tagId])
                       )
                     );
-                  MediaUserGenreService
+                  MediaGenreService
                     .instance
                     .items
-                    .where((mug) => mug.mediaId == mediaId)
-                    .forEach((mug) =>
+                    .where((mg) => mg.mediaId == mediaId)
+                    .forEach((mg) =>
                       toDo.add(
-                        MediaUserGenreService
+                        MediaGenreService
                           .instance
-                          .delete([mediaId, mug.genreId])
+                          .delete([mediaId, mg.genreId])
                       )
                     );
                   toDo.add(MediaUserService.instance.delete(mediaId));
