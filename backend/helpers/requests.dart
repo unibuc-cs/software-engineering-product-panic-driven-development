@@ -135,44 +135,32 @@ Future<Map<String, dynamic>> createEntriesHelper(
     return result;
   }
 
-  var lambda = (entry) {
-    return () async {
-      Map<String, dynamic> entryBody = <String, dynamic>{};
-      final attributes = createAttributes(tableName, entry);
-      try {
-        entryBody = await getByNameRequest(attributes['href'] ?? attributes['name'], endpoint);
-      }
-      catch (_) {
-        entryBody = await postRequest(
-          attributes,
-          endpoint,
-        );
-        await mutex.protect(() async {
-            result[endpoint].add(entryBody);
-          }
-        );
-      }
-      finally {
-        final response = await postRequest(
-          {
-            'mediaid': mediaId,
-            '${tableName}id': entryBody['id'],
-          },
-          'media$endpoint',
-        );
-        await mutex.protect(() async {
-            result['media$endpoint'].add(response);
-          }
-        );
-      }
-    };
-  };
-
-  List<Future<void>> tasks = [];
+  List<Future<dynamic>> tasks = [];
   for (var entry in body[endpoint]) {
-    tasks.add(lambda(entry)());
-  }
+    tasks.add(() async {
+      Future<void> addToResult(String key, dynamic value) async {
+        await mutex.protect(() async => result[key].add(value));
+      }
 
+      final attributes = createAttributes(tableName, entry);
+      Map<String, dynamic> entryBody = await getByNameRequest(attributes['href'] ?? attributes['name'], endpoint)
+        .catchError((_) async {
+          final body = await postRequest(attributes, endpoint);
+          await addToResult(endpoint, body);
+          return body;
+        })
+        .then((value) => value as Map<String, dynamic>);
+
+      final response = await postRequest(
+        {
+          'mediaid': mediaId,
+          '${tableName}id': entryBody['id'],
+        },
+        'media$endpoint',
+      );
+      await addToResult('media$endpoint', response);
+    }());
+  }
   await Future.wait(tasks);
 
   return result;
@@ -216,37 +204,20 @@ Future<Map<String, dynamic>> createFromBody(
     'genre'    : 'genres',
   };
   final mutex = Mutex();
-  // print((mapToPlural.entries.map((entry) => () async {
-  //       final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);
-  //       await mutex.protect(
-  //         () async {
-  //           result[entry.value] = response[entry.value];
-  //           result['media${entry.value}'] = response['media${entry.value}'];
-  //           if (result[entry.value].isEmpty) {
-  //             result.remove(entry.value);
-  //           }
-  //           if (result['media${entry.value}'].isEmpty) {
-  //             result.remove('media${entry.value}');
-  //           }
-  //         }
-  //       );
-  //     }()
-  //   )).runtimeType);
+
   await Future.wait(
     mapToPlural.entries.map((entry) => () async {
         final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);
-        await mutex.protect(
-          () async {
-            result[entry.value] = response[entry.value];
-            result['media${entry.value}'] = response['media${entry.value}'];
-            if (result[entry.value].isEmpty) {
-              result.remove(entry.value);
-            }
-            if (result['media${entry.value}'].isEmpty) {
-              result.remove('media${entry.value}');
-            }
+        await mutex.protect(() async {
+          result[entry.value] = response[entry.value];
+          result['media${entry.value}'] = response['media${entry.value}'];
+          if (result[entry.value].isEmpty) {
+            result.remove(entry.value);
           }
-        );
+          if (result['media${entry.value}'].isEmpty) {
+            result.remove('media${entry.value}');
+          }
+        });
       }()
     )
   );
@@ -262,7 +233,7 @@ Future<Map<String, dynamic>> createFromBody(
     if (entry == null) {
       continue;
     }
-    
+
     Map<String, dynamic> entryBody = <String, dynamic>{};
     final attributes = createAttributes('series', entry);
     try {
