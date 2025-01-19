@@ -6,7 +6,6 @@ import '../Models/tag.dart';
 import '../Models/book.dart';
 import '../Models/game.dart';
 import '../Models/anime.dart';
-import '../Models/genre.dart';
 import '../Models/manga.dart';
 import '../Models/media.dart';
 import '../Models/movie.dart';
@@ -18,10 +17,8 @@ import '../Models/general/model.dart';
 import '../Models/general/media_type.dart';
 import '../Services/wishlist_service.dart';
 import '../Services/tag_service.dart';
-import '../Services/genre_service.dart';
 import '../Services/media_user_service.dart';
 import '../Services/media_user_tag_service.dart';
-import '../Services/media_genre_service.dart';
 import '../UserSystem.dart';
 import 'game_widgets.dart';
 import 'book_widgets.dart';
@@ -116,6 +113,11 @@ Widget getCreatorsWidget(Media media) {
 Widget getPlatformsWidget(Media media) {
   var plts = media.platforms.map((plt) => plt.name).toList();
   return getListWidget('Platform${plts.length <= 1 ? '' : 's'}', plts.isEmpty ? List.of(['N/A']) : plts);
+}
+
+Widget getGenresWidget(Media media) {
+  var gens = media.genres.map((gen) => gen.name).toList();
+  return getListWidget('Genre${gens.length <= 1 ? '' : 's'}', gens.isEmpty ? List.of(['N/A']) : gens);
 }
 
 Widget getRatingsWidget(Media media) {
@@ -248,6 +250,7 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
                           getReleaseDateWidget(media),
                           getPublishersWidget(media),
                           getCreatorsWidget(media),
+                          getGenresWidget(media),
                           getPlatformsWidget(media),
                           getRatingsWidget(media),
                         ],
@@ -267,7 +270,6 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
 
 Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) async {
   Set<int> mutIds = MediaUserTagService.instance.items.where((mut) => mut.mediaId == mt.getMediaId()).map((mut) => mut.tagId).toSet();
-  Set<int> mugIds = MediaGenreService.instance.items.where((mug) => mug.mediaId == mt.getMediaId()).map((mug) => mug.genreId).toSet();
 
   String mediaType = getMediaTypeDbNameCapitalize(MT);
   return showDialog(
@@ -322,22 +324,6 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                           ),
                         ],
                       ),
-                    Text(
-                      '$mediaType genres',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    for (Genre genre in GenreService.instance.items) // TODO: for now, the user cannot change the genres (i think this is intended)
-                      if (mugIds.contains(genre.id))
-                        Text(
-                          genre.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                   ],
                 ),
               ),

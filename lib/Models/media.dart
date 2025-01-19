@@ -1,8 +1,11 @@
 import 'package:mediamaster/Models/creator.dart';
+import 'package:mediamaster/Models/genre.dart';
 import 'package:mediamaster/Models/platform.dart';
 import 'package:mediamaster/Models/publisher.dart';
 import 'package:mediamaster/Services/creator_service.dart';
+import 'package:mediamaster/Services/genre_service.dart';
 import 'package:mediamaster/Services/media_creator_service.dart';
+import 'package:mediamaster/Services/media_genre_service.dart';
 import 'package:mediamaster/Services/media_platform_service.dart';
 import 'package:mediamaster/Services/media_publisher_service.dart';
 import 'package:mediamaster/Services/platform_service.dart';
@@ -107,6 +110,20 @@ class Media implements Model {
       .instance
       .items
       .where((pla) => ids.contains(pla.id))
+      .toList();
+  }
+
+  List<Genre> get genres {
+    Set<int> ids = MediaGenreService
+      .instance
+      .items
+      .where((mg) => mg.mediaId == id)
+      .map((mg) => mg.genreId)
+      .toSet();
+    return GenreService
+      .instance
+      .items
+      .where((gen) => ids.contains(gen.id))
       .toList();
   }
 }
