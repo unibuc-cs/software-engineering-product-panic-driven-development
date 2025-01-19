@@ -49,11 +49,10 @@ Widget getListWidget(String title, List<String> items) {
           SizedBox(height: 4),
           Container(
             constraints: const BoxConstraints(
-              maxHeight: 70.0,
+              maxHeight: 85.0,
             ),
-            child: RawScrollbar(
+            child: Scrollbar(
               controller: scrollController,
-              thumbColor: Colors.white,
               radius: const Radius.circular(8.0),
               thickness: 6.0,
               thumbVisibility: true,
@@ -210,41 +209,54 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
                   style: const TextStyle(color: Colors.white, fontSize: 24.0),
                 ),
               ),
-              additionalButtons,
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      // Cover
-                      margin: const EdgeInsets.all(
-                        20,
-                      ),
-                      child: Image(
-                        image: NetworkImage(
-                          coverUrl,
-                        ),
+              Container(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          additionalButtons,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Container(
+                                  // Cover
+                                  margin: const EdgeInsets.all(
+                                    20,
+                                  ),
+                                  child: Image(
+                                    image: NetworkImage(
+                                      coverUrl,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 4,
+                                child: Container(
+                                  // Description
+                                  margin: const EdgeInsets.fromLTRB(20, 30, 20, 0),
+                                  child: Text(
+                                    media.description,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 5,
-                    child: Container(
-                      // Description
-                      margin: const EdgeInsets.all(10),
-                      child: Text(
-                        media.description,
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Container(
+                    Container(
                       // Data (publisher, retailer, etc.)
+                      constraints: BoxConstraints(
+                        maxWidth: 200,
+                      ),
                       margin: const EdgeInsets.all(10),
                       child: Column(
                         children: [
@@ -257,8 +269,8 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
                         ],
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               notesWidget,
             ],
