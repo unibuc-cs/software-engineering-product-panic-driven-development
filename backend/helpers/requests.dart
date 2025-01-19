@@ -1,5 +1,6 @@
 import 'config.dart';
 import 'dart:convert';
+import 'package:mutex/mutex.dart';
 import 'package:http/http.dart' as http;
 
 Future<Map<String, dynamic>> makeRequest(
@@ -15,22 +16,6 @@ Future<Map<String, dynamic>> makeRequest(
     throw Exception('Failed to $method $endpoint: ${response.statusCode}');
   }
   return json.decode(response.body);
-}
-
-Future<Map<String,dynamic>> makePostRequest(
-  Map<String, dynamic> body,
-  String endpoint,
-  final axios
-) async {
-  return await makeRequest('POST', '/$endpoint', axios, body);
-}
-
-Future<Map<String,dynamic>> makeGetByNameRequest(
-  String endpoint,
-  String name,
-  final axios
-) async {
-  return await makeRequest('GET', '/$endpoint/name?query=$name', axios);
 }
 
 void discardFromBody(Map<String, dynamic> body, {required List<String> fields}) {
@@ -119,59 +104,76 @@ Map<String, dynamic> createAttributes(
   String tableName,
   dynamic entry
 ) {
-  final result = <String, dynamic> {};
+  if (tableName != 'link') {
+    return {'name' : entry};
+  }
 
-  if (tableName == 'link') {
-    result['name'] = entry
+  return {
+    'href' : entry,
+    'name' : entry
       .replaceAll('http://', '')
       .replaceAll('https://', '')
-      .split('/')[0]; // TODO: more complex mapping later
-    result['href'] = entry;
-  }
-  else { // creator, publisher, platform
-      result['name'] = entry;
-  }
-
-  return result;
+      .split('/')[0], // TODO: more complex mapping later,
+  };
 }
 
-Future<Map<String, dynamic>> doCreateTable(
+Future<Map<String, dynamic>> createEntriesHelper(
   Map<String, dynamic> body,
   String tableName,
-  String tableEndpoint,
+  String endpoint,
   int mediaId,
   Future<Map<String, dynamic>> Function(dynamic, dynamic) postRequest,
   Future<Map<String, dynamic>> Function(dynamic, dynamic) getByNameRequest
 ) async {
   final result = <String, dynamic> {};
 
-  result[tableEndpoint] = [];
-  result['media$tableEndpoint'] = [];
-  dynamic entries = body[tableEndpoint];
-  for (var entry in entries) {
-    Map<String, dynamic> entryBody = <String, dynamic>{};
-    final attributes = createAttributes(tableName, entry);
-    try {
-      entryBody = await getByNameRequest(tableEndpoint, attributes['href'] ?? attributes['name']);
-    }
-    catch (_) {
-      entryBody = await postRequest(
-        attributes,
-        tableEndpoint,
-      );
-      result[tableEndpoint].add(entryBody);
-    }
-    finally {
-      final response = await postRequest(
-        {
-          'mediaid': mediaId,
-          '${tableName}id': entryBody['id'],
-        },
-        'media$tableEndpoint',
-      );
-      result['media$tableEndpoint'].add(response);
-    }
+  result[endpoint] = [];
+  result['media$endpoint'] = [];
+  final mutex = Mutex();
+
+  if (body[endpoint].isEmpty) {
+    return result;
   }
+
+  var lambda = (entry) {
+    return () async {
+      Map<String, dynamic> entryBody = <String, dynamic>{};
+      final attributes = createAttributes(tableName, entry);
+      try {
+        entryBody = await getByNameRequest(attributes['href'] ?? attributes['name'], endpoint);
+      }
+      catch (_) {
+        entryBody = await postRequest(
+          attributes,
+          endpoint,
+        );
+        await mutex.protect(() async {
+            result[endpoint].add(entryBody);
+          }
+        );
+      }
+      finally {
+        final response = await postRequest(
+          {
+            'mediaid': mediaId,
+            '${tableName}id': entryBody['id'],
+          },
+          'media$endpoint',
+        );
+        await mutex.protect(() async {
+            result['media$endpoint'].add(response);
+          }
+        );
+      }
+    };
+  };
+
+  List<Future<void>> tasks = [];
+  for (var entry in body[endpoint]) {
+    tasks.add(lambda(entry)());
+  }
+
+  await Future.wait(tasks);
 
   return result;
 }
@@ -185,17 +187,17 @@ Future<Map<String, dynamic>> createFromBody(
   final axios = Config().axios;
   Map<String, dynamic> result = <String, dynamic>{};
 
-  Future<Map<String, dynamic>> postRequest(body, table) async =>
-    await makePostRequest(body, table, axios);
-  Future<Map<String, dynamic>> getByNameRequest(table, name) async =>
-    await makeGetByNameRequest(table, name, axios);
-  Future<Map<String, dynamic>> createTable(body, tableName, tableEndpoint, mediaId) async =>
-    await doCreateTable(body, tableName, tableEndpoint, mediaId, postRequest, getByNameRequest);
+  Future<Map<String, dynamic>> postRequest(body, endpoint) async =>
+    await makeRequest('POST', '/$endpoint', axios, body);
+  Future<Map<String, dynamic>> getByNameRequest(name, endpoint) async =>
+    await makeRequest('GET', '/$endpoint/name?query=$name', axios);
+  Future<Map<String, dynamic>> createTable(body, tableName, endpoint, mediaId) async =>
+    await createEntriesHelper(body, tableName, endpoint, mediaId, postRequest, getByNameRequest);
 
-  // Create media from body
+  // Create Media from body
   result['media'] = await postRequest(body['mediaBody']!, 'medias');
 
-  // Create mediaType from body
+  // Create MediaType from body
   body['${mediaType}Body']?['mediaid'] = result['media']?['id'];
   Map<String, dynamic> partialResult = await supabase
     .from(mediaType)
@@ -213,17 +215,41 @@ Future<Map<String, dynamic>> createFromBody(
     'retailer' : 'retailers',
     'genre'    : 'genres',
   };
-  for (MapEntry<String, dynamic> entry in mapToPlural.entries) {
-    final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);
-    result[entry.value] = response[entry.value];
-    result['media${entry.value}'] = response['media${entry.value}'];
-    if (result[entry.value].isEmpty) {
-      result.remove(entry.value);
-    }
-    if (result['media${entry.value}'].isEmpty) {
-      result.remove('media${entry.value}');
-    }
-  }
+  final mutex = Mutex();
+  // print((mapToPlural.entries.map((entry) => () async {
+  //       final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);
+  //       await mutex.protect(
+  //         () async {
+  //           result[entry.value] = response[entry.value];
+  //           result['media${entry.value}'] = response['media${entry.value}'];
+  //           if (result[entry.value].isEmpty) {
+  //             result.remove(entry.value);
+  //           }
+  //           if (result['media${entry.value}'].isEmpty) {
+  //             result.remove('media${entry.value}');
+  //           }
+  //         }
+  //       );
+  //     }()
+  //   )).runtimeType);
+  await Future.wait(
+    mapToPlural.entries.map((entry) => () async {
+        final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);
+        await mutex.protect(
+          () async {
+            result[entry.value] = response[entry.value];
+            result['media${entry.value}'] = response['media${entry.value}'];
+            if (result[entry.value].isEmpty) {
+              result.remove(entry.value);
+            }
+            if (result['media${entry.value}'].isEmpty) {
+              result.remove('media${entry.value}');
+            }
+          }
+        );
+      }()
+    )
+  );
 
   if (body['seriesBody'] == null) {
     return result;
@@ -233,21 +259,23 @@ Future<Map<String, dynamic>> createFromBody(
   final aux = [];
   result['series'] = [];
   for (var entry in body['seriesBody']?['seriesname']) {
-    if (entry != null) {
-      Map<String, dynamic> entryBody = <String, dynamic>{};
-      final attributes = createAttributes('series', entry);
-      try {
-        entryBody = await getByNameRequest('series', attributes['name']);
-        aux.add(entryBody);
-      }
-      catch (_) {
-        entryBody = await postRequest(
-          attributes,
-          'series',
-        );
-        aux.add(entryBody);
-        result['series'].add(entryBody);
-      }
+    if (entry == null) {
+      continue;
+    }
+    
+    Map<String, dynamic> entryBody = <String, dynamic>{};
+    final attributes = createAttributes('series', entry);
+    try {
+      entryBody = await getByNameRequest(attributes['name'], 'series');
+      aux.add(entryBody);
+    }
+    catch (_) {
+      entryBody = await postRequest(
+        attributes,
+        'series',
+      );
+      aux.add(entryBody);
+      result['series'].add(entryBody);
     }
   }
   if (result['series'].isEmpty) {
@@ -268,7 +296,7 @@ Future<Map<String, dynamic>> createFromBody(
 
     // Create media
     try {
-      entryBody = await getByNameRequest('medias', entry['name']);
+      entryBody = await getByNameRequest(entry['name'], 'medias');
     }
     catch (_) {
       entryBody = await postRequest(
@@ -285,7 +313,7 @@ Future<Map<String, dynamic>> createFromBody(
 
     // Create mediaType
     try {
-      entryBody = await getByNameRequest(mediaTypePlural, mediaId.toString());
+      entryBody = await getByNameRequest(mediaId.toString(), mediaTypePlural);
     }
     catch (_) {
       entryBody = await supabase

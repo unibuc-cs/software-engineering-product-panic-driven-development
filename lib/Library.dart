@@ -501,7 +501,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     bool isChosen = false;
 
-    // TODO: add loading screen while media is adding
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -1007,13 +1006,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     if (nullableGame == null) {
+      var options = await Future.wait([getOptionsPCGW(name), getOptionsHLTB(name)]);
+      var optionsPCGW = options.first;
+      var optionsHLTB = options.elementAt(1);
+      var results = await Future.wait([
+        optionsPCGW.isEmpty ? Future.value(Map<String, dynamic>()) : getInfoPCGW(options[0][0]),
+        optionsHLTB.isEmpty ? Future.value(Map<String, dynamic>()) : getInfoHLTB(options[1][0]),
+      ]);
+      
       // Get information from PCGamingWiki
-      var optionsPCGW = await getOptionsPCGW(name);
-      Map<String, dynamic> resultPCGW = {};
-      if (optionsPCGW.isNotEmpty) {
-        // This is kind of a hack but we will do it legit in the future
-        resultPCGW = await getInfoPCGW(optionsPCGW[0]);
-      }
+      Map<String, dynamic> resultPCGW = results[0];
       if (resultPCGW.containsKey('windows')) {
         if (resultPCGW['windows'].containsKey('OS')) {
           gameData['osminimum'] = resultPCGW['windows']['OS']['minimum']?.replaceAll(RegExp(r'\s+'), ' ');
@@ -1038,13 +1040,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       }
 
       // Get information from HLTB
-      var optionsHLTB = await getOptionsHLTB(name);
-
-      Map<String, dynamic> resultHLTB = {};
-      if (optionsHLTB.isNotEmpty) {
-        // This is kind of a hack but we will do it legit in the future
-        resultHLTB = await getInfoHLTB(optionsHLTB[0]);
-      }
+      Map<String, dynamic> resultHLTB = results[1];
       if (resultHLTB.containsKey('Main Story')) {
         gameData['hltbmaininseconds'] = (double.parse(resultHLTB['Main Story'].split(' Hours')[0]) * 3600).round();
       }
