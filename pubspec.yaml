@@ -83,13 +83,13 @@ scripts:
   test:manga          : dart --define=LOCAL=true test/resources/manga_test.dart
   test:media          : dart --define=LOCAL=true test/resources/media_test.dart
   test:mediacreator   : dart --define=LOCAL=true test/resources/media_creator_test.dart
+  test:mediagenre     : dart --define=LOCAL=true test/resources/media_genre_test.dart
   test:medialink      : dart --define=LOCAL=true test/resources/media_link_test.dart
   test:mediaplatform  : dart --define=LOCAL=true test/resources/media_platform_test.dart
   test:mediapublisher : dart --define=LOCAL=true test/resources/media_publisher_test.dart
   test:mediaretailer  : dart --define=LOCAL=true test/resources/media_retailer_test.dart
   test:mediaseries    : dart --define=LOCAL=true test/resources/media_series_test.dart
   test:mediauser      : dart --define=LOCAL=true test/resources/media_user_test.dart
-  test:mediausergenre : dart --define=LOCAL=true test/resources/media_user_genre_test.dart
   test:mediausertag   : dart --define=LOCAL=true test/resources/media_user_tag_test.dart
   test:movie          : dart --define=LOCAL=true test/resources/movie_test.dart
   test:note           : dart --define=LOCAL=true test/resources/note_test.dart
