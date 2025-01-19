@@ -71,7 +71,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     Pair<String, dynamic>(
       'By release date',
       (MT a, MT b, int increasing) {
-        return increasing * a.media.releaseDate.compareTo(b.media.releaseDate);
+        if (a.media.releaseDate == null && b.media.releaseDate == null) {
+          return false;
+        }
+        if (a.media.releaseDate == null) {
+          return increasing;
+        }
+        if (b.media.releaseDate == null) {
+          return -increasing;
+        }
+        return increasing * a.media.releaseDate!.compareTo(b.media.releaseDate!);
       },
     ),
     if (MT == Game)

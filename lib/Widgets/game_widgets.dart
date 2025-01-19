@@ -117,7 +117,7 @@ Widget renderPCGW(Game game) {
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
-                details,
+                details == '' ? 'N/A' : details,
                 textAlign: TextAlign.left,
               ),
             ),
@@ -127,50 +127,53 @@ Widget renderPCGW(Game game) {
     );
   }
 
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      formatPCGWRow(
-        'OS minimum',
-        game.OSMinimum,
-      ),
-      formatPCGWRow(
-        'OS recommended',
-        game.OSRecommended,
-      ),
-      formatPCGWRow(
-        'CPU minimum',
-        game.CPUMinimum,
-      ),
-      formatPCGWRow(
-        'CPU recommended',
-        game.CPURecommended,
-      ),
-      formatPCGWRow(
-        'RAM minimum',
-        game.RAMMinimum,
-      ),
-      formatPCGWRow(
-        'RAM recommended',
-        game.RAMRecommended,
-      ),
-      formatPCGWRow(
-        'HDD minimum',
-        game.HDDMinimum,
-      ),
-      formatPCGWRow(
-        'HDD recommended',
-        game.HDDRecommended,
-      ),
-      formatPCGWRow(
-        'GPU minimum',
-        game.GPUMinimum,
-      ),
-      formatPCGWRow(
-        'GPU recommended',
-        game.GPURecommended,
-      ),
-    ],
+  return SizedBox(
+    width: 400,
+    child:   Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        formatPCGWRow(
+          'OS minimum',
+          game.OSMinimum,
+        ),
+        formatPCGWRow(
+          'OS recommended',
+          game.OSRecommended,
+        ),
+        formatPCGWRow(
+          'CPU minimum',
+          game.CPUMinimum,
+        ),
+        formatPCGWRow(
+          'CPU recommended',
+          game.CPURecommended,
+        ),
+        formatPCGWRow(
+          'RAM minimum',
+          game.RAMMinimum,
+        ),
+        formatPCGWRow(
+          'RAM recommended',
+          game.RAMRecommended,
+        ),
+        formatPCGWRow(
+          'HDD minimum',
+          game.HDDMinimum,
+        ),
+        formatPCGWRow(
+          'HDD recommended',
+          game.HDDRecommended,
+        ),
+        formatPCGWRow(
+          'GPU minimum',
+          game.GPUMinimum,
+        ),
+        formatPCGWRow(
+          'GPU recommended',
+          game.GPURecommended,
+        ),
+      ],
+    )
   );
 }
 

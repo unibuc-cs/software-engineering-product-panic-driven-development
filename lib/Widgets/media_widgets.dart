@@ -97,7 +97,7 @@ Widget getListWidget(String title, List<String> items) {
 }
 
 Widget getReleaseDateWidget(Media media) {
-  if (media.releaseDate == DateTime(1800)) {
+  if (media.releaseDate == null) {
     return getListWidget('Release Date', List.of(['N/A']));
   }
   return getListWidget('Release Date', List.of([media.releaseDate.toString().substring(0, 10)]));

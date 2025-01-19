@@ -15,7 +15,7 @@ class Media implements Model {
   int id;
   String originalName;
   String description;
-  DateTime releaseDate;
+  DateTime? releaseDate;
   int criticScore;
   int communityScore;
   String mediaType;
@@ -24,7 +24,7 @@ class Media implements Model {
     this.id = -1,
     required this.originalName,
     this.description = '',
-    required this.releaseDate,
+    this.releaseDate,
     this.criticScore = 0,
     this.communityScore = 0,
     required this.mediaType
@@ -48,7 +48,7 @@ class Media implements Model {
     return {
       'originalname': originalName,
       'description': description,
-      'releasedate': releaseDate.toIso8601String(),
+      'releasedate': releaseDate?.toIso8601String(),
       'criticscore': criticScore,
       'communityscore': communityScore,
       'mediatype': mediaType,
@@ -61,7 +61,7 @@ class Media implements Model {
       id: json['id'],
       originalName: json['originalname'],
       description: json['description'] ?? '',
-      releaseDate: DateTime.parse(json['releasedate']),
+      releaseDate: json['releasedate'] == null ? null : DateTime.parse(json['releasedate']),
       criticScore: json['criticscore'] ?? 0,
       communityScore: json['communityscore'] ?? 0,
       mediaType: json['mediatype'],
