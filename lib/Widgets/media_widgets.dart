@@ -330,21 +330,14 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                       ),
                     ),
                     for (Genre genre in GenreService.instance.items) // TODO: for now, the user cannot change the genres (i think this is intended)
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: mugIds.contains(genre.id),
-                            onChanged: (value) {},
+                      if (mugIds.contains(genre.id))
+                        Text(
+                          genre.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            genre.name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
                   ],
                 ),
               ),
