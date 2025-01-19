@@ -212,6 +212,7 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
               ),
               additionalButtons,
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     flex: 2,

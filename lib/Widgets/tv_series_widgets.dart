@@ -27,7 +27,7 @@ Widget getAdditionalButtonsForTVSeries(TVSeries tv_series, BuildContext context,
         ),
       ),
       Container(
-        // Settings button
+        // Recommendations button
         margin: const EdgeInsets.all(10),
         child: TextButton(
           onPressed: () {

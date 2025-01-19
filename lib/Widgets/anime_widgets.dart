@@ -27,7 +27,7 @@ Widget getAdditionalButtonsForAnime(Anime anime, BuildContext context, Function(
         ),
       ),
       Container(
-        // Settings button
+        // Recommendations button
         margin: const EdgeInsets.all(10),
         child: TextButton(
           onPressed: () {

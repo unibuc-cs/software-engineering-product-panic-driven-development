@@ -27,7 +27,7 @@ Widget getAdditionalButtonsForMovie(Movie movie, BuildContext context, Function(
         ),
       ),
       Container(
-        // Settings button
+        // Recommendations button
         margin: const EdgeInsets.all(10),
         child: TextButton(
           onPressed: () {

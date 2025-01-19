@@ -500,23 +500,35 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     bool isChosen = false;
-    bool isDone = false;
 
     // TODO: add loading screen while media is adding
     return showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            if (isDone) {
-              Navigator.of(context).pop();
-            }
-            else if (isChosen) {
-
+            if (isChosen) {
+              return AlertDialog(
+                content: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: loadingWidget
+                ),
+              );
             }
             else {
               return AlertDialog(
-                title: Text('Search for a ${mediaType.toLowerCase()}'),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Search for a ${mediaType.toLowerCase()}'),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.close),
+                    ),
+                  ],
+                ),
                 content: SizedBox(
                   width: 350,
                   height: noSearch
@@ -565,7 +577,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                         ),
                                       ),
                                       onTap: () {
-                                        _addMediaType(result);
+                                        // _addMediaType(result);
                                         Navigator.of(context).pop();
                                       },
                                     );
@@ -579,18 +591,27 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                           color: Color.fromARGB(255, 255, 0, 0),
                                         ),
                                       ),
-                                      onTap: () {
-                                        _addMediaType(result);
-                                        Navigator.of(context).pop();
+                                      onTap: () async {
+                                        // TODO: When you add something from wishlist we should move everything into library
+                                        isChosen = true;
+                                        setState(() {});
+                                        await _addMediaType(result);
+                                        if (context.mounted) {
+                                          Navigator.of(context).pop();
+                                        }
                                       },
                                     );
                                   }
                                   else {
                                     return ListTile(
                                       title: Text(mediaName),
-                                      onTap: () {
-                                        _addMediaType(result);
-                                        Navigator.of(context).pop();
+                                      onTap: () async {
+                                        isChosen = true;
+                                        setState(() {});
+                                        await _addMediaType(result);
+                                        if (context.mounted) {
+                                          Navigator.of(context).pop();
+                                        }
                                       },
                                     );
                                   }
@@ -1143,6 +1164,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     Widget additionalButtons = getAdditionalButtons(mt, context, () {setState(() {});});
+
+    // TODO: Notes button
+    // return StatefulBuilder(
+    //   builder: (context, setState) {
+        
+    //   },
+    // );
 
     return displayMedia(
       mt.media,
