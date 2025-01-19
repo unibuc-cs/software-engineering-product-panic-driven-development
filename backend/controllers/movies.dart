@@ -42,7 +42,6 @@ RouterPlus moviesRouter() {
         'id',
         'url',
         'artworks',
-        'genres',
         'coverimage',
         'icon',
         'status',
@@ -57,6 +56,7 @@ RouterPlus moviesRouter() {
         'retailers': [],
         'seriesname': [],
         'series': [],
+        'genres': [],
       },
     );
 

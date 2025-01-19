@@ -14,6 +14,17 @@ RouterPlus genresRouter() {
     return sendOk(genres);
   });
 
+  router.get('/name', (Request req) async {
+    final queryParams = req.url.queryParameters;
+    final name = queryParams['query'] ?? '';
+    final genre = await supabase
+      .from('genre')
+      .select()
+      .ilike('name', name)
+      .single();
+    return sendOk(genre);
+  });
+
   router.get('/<id>', (Request req, String id) async {
     final genre = await supabase
       .from('genre')

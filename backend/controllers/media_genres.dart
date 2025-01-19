@@ -4,27 +4,25 @@ import '../helpers/validators.dart';
 import '../helpers/db_connection.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
-RouterPlus mediaUserGenresRouter() {
+RouterPlus mediaGenresRouter() {
   final router = Router().plus;
   final supabase = SupabaseClientSingleton.client;
 
   router.get('/', (Request req) async {
-    final mediaUserGenres = await supabase
-      .from('mediausergenre')
-      .select()
-      .eq('userid', req.context['userId']!);
-    return sendOk(mediaUserGenres);
+    final mediaGenres = await supabase
+      .from('mediagenre')
+      .select();
+    return sendOk(mediaGenres);
   });
 
   router.get('/<mediaId>/<genreId>', (Request req, String mediaId, String genreId) async {
-    final mediaUserGenre = await supabase
-      .from('mediausergenre')
+    final mediaGenre = await supabase
+      .from('mediagenre')
       .select()
       .eq('mediaid', mediaId)
       .eq('genreid', genreId)
-      .eq('userid', req.context['userId']!)
       .single();
-    return sendOk(mediaUserGenre);
+    return sendOk(mediaGenre);
   });
 
   router.post('/', (Request req) async {
@@ -37,23 +35,21 @@ RouterPlus mediaUserGenresRouter() {
     );
     await validateExistence(body['mediaid'], 'media', supabase);
     await validateExistence(body['genreid'], 'genre', supabase);
-    body['userid'] = req.context['userId'];
 
-    final mediaUserGenre = await supabase
-      .from('mediausergenre')
+    final mediaGenre = await supabase
+      .from('mediagenre')
       .insert(body)
       .select()
       .single();
-    return sendCreated(mediaUserGenre);
+    return sendCreated(mediaGenre);
   });
 
   router.delete('/<mediaId>/<genreId>', (Request req, String mediaId, String genreId) async {
     await supabase
-      .from('mediausergenre')
+      .from('mediagenre')
       .delete()
       .eq('mediaid', mediaId)
-      .eq('genreid', genreId)
-      .eq('userid', req.context['userId']!);
+      .eq('genreid', genreId);
     return sendNoContent();
   });
 

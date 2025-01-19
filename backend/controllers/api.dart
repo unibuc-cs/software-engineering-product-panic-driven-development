@@ -24,7 +24,7 @@ import 'media_creators.dart';
 import 'media_user_tags.dart';
 import 'media_retailers.dart';
 import 'media_platforms.dart';
-import 'media_user_genres.dart';
+import 'media_genres.dart';
 import 'app_achievements.dart';
 import 'media_publishers.dart';
 import '../helpers/utils.dart';
@@ -57,6 +57,7 @@ RouterPlus apiRouter() {
   router.mount('/retailers', retailersRouter().call);
   router.mount('/publishers', publishersRouter().call);
   router.mount('/medialinks', mediaLinksRouter().call);
+  router.mount('/mediagenres', mediaGenresRouter().call);
   router.mount('/mediaseries', mediaSeriesRouter().call);
   router.mount('/notes', requireAuth(notesRouter().call));
   router.mount('/mediacreators', mediaCreatorsRouter().call);
@@ -68,7 +69,6 @@ RouterPlus apiRouter() {
   router.mount('/gameachievements', gameAchievementsRouter().call);
   router.mount('/mediausers', requireAuth(mediaUsersRouter().call));
   router.mount('/mediausertags', requireAuth(mediaUserTagsRouter().call));
-  router.mount('/mediausergenres', requireAuth(mediaUserGenresRouter().call));
   router.mount('/userachievements', requireAuth(userAchievementsRouter().call));
 
   router.get('/health', (Request request) {

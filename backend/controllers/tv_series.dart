@@ -42,7 +42,6 @@ RouterPlus TVSeriesRouter() {
         'id',
         'url',
         'artworks',
-        'genres',
         'coverimage',
         'icon',
         'status',
@@ -57,6 +56,7 @@ RouterPlus TVSeriesRouter() {
         'retailers': [],
         'seriesname': [],
         'series': [],
+        'genres': [],
       },
     );
 

@@ -42,7 +42,6 @@ RouterPlus mangaRouter() {
         'id',
         'url',
         'artworks',
-        'genres',
         'coverimage',
         'icon',
         'status',
@@ -58,6 +57,7 @@ RouterPlus mangaRouter() {
         'retailers': [],
         'seriesname': [],
         'series': [],
+        'genres': [],
       },
     );
 

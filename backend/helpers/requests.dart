@@ -96,7 +96,7 @@ Map<String, Map<String, dynamic>> splitBody(
     //   'icon',
     //   'backgroundimage', // the user chooses from the artworks provided by the api and the backend only receives one image
     // ],
-    // 'genresBody': ['genres'],
+    'genresBody': ['genres'],
     'creatorsBody': ['creators'],
     'publishersBody': ['publishers'],
     'platformsBody': ['platforms'],
@@ -210,7 +210,8 @@ Future<Map<String, dynamic>> createFromBody(
     'publisher': 'publishers',
     'platform' : 'platforms',
     'link'     : 'links',
-    'retailer' : 'retailers'
+    'retailer' : 'retailers',
+    'genre'    : 'genres',
   };
   for (MapEntry<String, dynamic> entry in mapToPlural.entries) {
     final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);

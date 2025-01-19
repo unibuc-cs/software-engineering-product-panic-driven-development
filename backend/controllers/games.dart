@@ -42,7 +42,6 @@ RouterPlus gamesRouter() {
         'id',
         'url',
         'artworks',
-        'genres',
         'coverimage',
         'icon',
         'dlcs',
@@ -58,6 +57,7 @@ RouterPlus gamesRouter() {
         'retailers': [],
         'seriesname': [],
         'series': [],
+        'genres': [],
       },
     );
 

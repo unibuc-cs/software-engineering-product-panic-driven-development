@@ -42,7 +42,6 @@ RouterPlus booksRouter() {
         'id',
         'url',
         'artworks',
-        'genres',
         'coverimage',
         'icon',
       ]
@@ -56,6 +55,7 @@ RouterPlus booksRouter() {
         'retailers': [],
         'seriesname': [],
         'series': [],
+        'genres': [],
       },
     );
 

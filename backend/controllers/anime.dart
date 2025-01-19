@@ -42,7 +42,6 @@ RouterPlus animeRouter() {
         'id',
         'url',
         'artworks',
-        'genres',
         'coverimage',
         'icon',
         'status',
@@ -59,6 +58,7 @@ RouterPlus animeRouter() {
         'retailers': [],
         'seriesname': [],
         'series': [],
+        'genres': [],
       },
     );
 
