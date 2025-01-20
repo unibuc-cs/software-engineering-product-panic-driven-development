@@ -217,6 +217,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                   mt.getMediaId(),
                 );
               },
+              style: ButtonStyle(
+                foregroundColor: WidgetStateProperty.all(
+                  Color(0xFFFF0000)
+                ),
+              ),
             ),
           ),
         );
@@ -928,6 +933,43 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
+  Future<void> _removeMedia(int mediaId) async {
+    List<Future<void>> toDo = [];
+    if (isWishlist == false) {
+      MediaUserTagService
+        .instance
+        .items
+        .where((mut) => mut.mediaId == mediaId)
+        .forEach((mut) =>
+          toDo.add(
+            MediaUserTagService
+              .instance
+              .delete([mediaId, mut.tagId])
+          )
+        );
+      MediaGenreService
+        .instance
+        .items
+        .where((mg) => mg.mediaId == mediaId)
+        .forEach((mg) =>
+          toDo.add(
+            MediaGenreService
+              .instance
+              .delete([mediaId, mg.genreId])
+          )
+        );
+      toDo.add(MediaUserService.instance.delete(mediaId));
+    }
+    else {
+      toDo.add(WishlistService.instance.delete(mediaId));
+    }
+    await Future.wait(toDo);
+    Navigator.of(context).pop();
+    setState(() {
+      selectedMediaId = -1;
+    });
+  }
+
   Future<void> _showDeleteConfirmationDialog(BuildContext context, int mediaId) {
     String mediaType = '';
     try {
@@ -952,42 +994,17 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             ),
             TextButton(
               onPressed: () async {
-                List<Future<void>> toDo = [];
-                if (isWishlist == false) {
-                  MediaUserTagService
-                    .instance
-                    .items
-                    .where((mut) => mut.mediaId == mediaId)
-                    .forEach((mut) =>
-                      toDo.add(
-                        MediaUserTagService
-                          .instance
-                          .delete([mediaId, mut.tagId])
-                      )
-                    );
-                  MediaGenreService
-                    .instance
-                    .items
-                    .where((mg) => mg.mediaId == mediaId)
-                    .forEach((mg) =>
-                      toDo.add(
-                        MediaGenreService
-                          .instance
-                          .delete([mediaId, mg.genreId])
-                      )
-                    );
-                  toDo.add(MediaUserService.instance.delete(mediaId));
-                }
-                else {
-                  toDo.add(WishlistService.instance.delete(mediaId));
-                }
-                await Future.wait(toDo);
-                setState(() {
-                  selectedMediaId = -1;
-                });
-                Navigator.of(context).pop();
+                _removeMedia(mediaId);
               },
               child: const Text('Delete'),
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(
+                  Color(0xFFFF0000)
+                ),
+                foregroundColor: WidgetStateProperty.all(
+                  Color(0xFFFFFFFF)
+                ),
+              ),
             ),
           ],
         );
@@ -1276,7 +1293,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               child: IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: removeNote,
-                color: const Color.fromARGB(255, 192, 0, 0),
+                color: const Color.fromARGB(255, 255, 0, 0),
               ),
             ),
         ],
