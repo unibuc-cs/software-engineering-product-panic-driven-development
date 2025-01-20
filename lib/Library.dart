@@ -1155,7 +1155,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     // TODO: Add genres information
   }
 
-  Widget _displayMedia(MT? mt) {
+  Widget _displayMedia(MT? mt) {  
     String mediaType = '';
     try {
       mediaType = getMediaTypeDbName(MT);
