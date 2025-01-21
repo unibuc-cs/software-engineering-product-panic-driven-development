@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 
 import 'Helpers/getters.dart';
+import 'Helpers/steam_import.dart';
 import 'Models/tag.dart';
 import 'Models/book.dart';
 import 'Models/game.dart';
@@ -433,7 +434,17 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         foregroundColor: WidgetStatePropertyAll(Colors.white),
                       ),
                       child: Text('Go to $LibraryWishlistBig'),
-                    )
+                    ),
+                    if (!isWishlist && MT == Game) // Steam import button
+                      IconButton(
+                        onPressed: () async {
+                          await importSteam(context);
+                        },
+                        icon: Icon(
+                          Icons.library_add_outlined,
+                        ),
+                        tooltip: 'Import from Steam',
+                      ),
                   ],
                 ),
                 Row(
