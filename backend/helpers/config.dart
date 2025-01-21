@@ -38,7 +38,7 @@ class Config {
 
   String get steamKey => getEnv('API_KEY_STEAM');
 
-  String get secret => getEnv('SECRET') ?? 'secret';
+  String get secret => getEnv('SECRET');
 
   String get supabaseUrl => getEnv('URL_SUPABASE');
 

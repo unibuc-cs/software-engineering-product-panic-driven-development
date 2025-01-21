@@ -94,14 +94,13 @@ Future<void> importSteam(BuildContext context) {
                       ),
                     ),
                   ),
-                  SingleChildScrollView(
-                    child: Column(
+                  if (searchResults.isNotEmpty)
+                    ListView(
                       children: [
                         for (var entry in searchResults.entries)
                           Text(entry.key),
                       ],
                     ),
-                  ),
                 ],
               ),
             ),

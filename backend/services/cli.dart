@@ -21,7 +21,7 @@ String encodeWithDateTime(Map<String, dynamic> data) => const JsonEncoder
   .convert(data.map((key, value) =>
     value is DateTime
       ? MapEntry(key, value.toString().substring(0, 10))
-      : MapEntry(key, value);
+      : MapEntry(key, value)
   ));
 
 int getUserInput(List<Map<String, dynamic>> options) {

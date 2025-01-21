@@ -1,5 +1,4 @@
-import 'package:supabase/supabase.dart';
-import 'db_connection.dart';
+import 'db.dart';
 
 Future<void> validateExistence(dynamic id, String table) async {
   try {

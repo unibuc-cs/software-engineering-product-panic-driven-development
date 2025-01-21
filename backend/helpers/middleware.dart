@@ -2,7 +2,7 @@ import 'io.dart';
 import 'jwt.dart';
 import 'utils.dart';
 import 'responses.dart';
-import 'db_connection.dart';
+import 'db.dart';
 import 'package:shelf/shelf.dart';
 
 Handler extractUserId(innerHandler) {

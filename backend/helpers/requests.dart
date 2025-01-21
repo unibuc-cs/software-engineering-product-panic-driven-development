@@ -1,7 +1,7 @@
 import 'config.dart';
 import 'dart:convert';
 import 'responses.dart';
-import 'db_connection.dart';
+import 'db.dart';
 import 'package:mutex/mutex.dart';
 import 'package:http/http.dart' as http;
 import 'package:shelf_plus/shelf_plus.dart';
@@ -133,7 +133,7 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
             await addToResult(endpoint, body);
             return body;
           })
-          .then((value) => value as Map<String, dynamic>);
+          .then((value) => value);
 
         final response = await postRequest(
           {

@@ -1,7 +1,7 @@
 import '../helpers/jwt.dart';
 import '../helpers/requests.dart';
 import '../helpers/responses.dart';
-import '../helpers/db_connection.dart';
+import '../helpers/db.dart';
 import 'package:supabase/supabase.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
