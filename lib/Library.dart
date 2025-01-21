@@ -432,7 +432,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
                         foregroundColor: WidgetStatePropertyAll(Colors.white),
                       ),
-                      child: Text(LibraryWishlistBig),
+                      child: Text('Go to $LibraryWishlistBig'),
                     )
                   ],
                 ),
@@ -933,41 +933,38 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
-  Future<void> _removeMedia(int mediaId) async {
+  Future<void> _removeMediaCascade(int mediaId) async {
     List<Future<void>> toDo = [];
-    if (isWishlist == false) {
-      MediaUserTagService
-        .instance
-        .items
-        .where((mut) => mut.mediaId == mediaId)
-        .forEach((mut) =>
-          toDo.add(
-            MediaUserTagService
-              .instance
-              .delete([mediaId, mut.tagId])
-          )
-        );
-      MediaGenreService
-        .instance
-        .items
-        .where((mg) => mg.mediaId == mediaId)
-        .forEach((mg) =>
-          toDo.add(
-            MediaGenreService
-              .instance
-              .delete([mediaId, mg.genreId])
-          )
-        );
-      toDo.add(MediaUserService.instance.delete(mediaId));
-    }
-    else {
+    MediaUserTagService
+      .instance
+      .items
+      .where((mut) => mut.mediaId == mediaId)
+      .forEach((mut) =>
+        toDo.add(
+          MediaUserTagService
+            .instance
+            .delete([mediaId, mut.tagId])
+        )
+      );
+    MediaGenreService
+      .instance
+      .items
+      .where((mg) => mg.mediaId == mediaId)
+      .forEach((mg) =>
+        toDo.add(
+          MediaGenreService
+            .instance
+            .delete([mediaId, mg.genreId])
+        )
+      );
+    if (isWishlist) {
       toDo.add(WishlistService.instance.delete(mediaId));
     }
+    else {
+      toDo.add(MediaUserService.instance.delete(mediaId));
+    }
     await Future.wait(toDo);
-    Navigator.of(context).pop();
-    setState(() {
-      selectedMediaId = -1;
-    });
+    setState(() {});
   }
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context, int mediaId) {
@@ -994,7 +991,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             ),
             TextButton(
               onPressed: () async {
-                _removeMedia(mediaId);
+                await _removeMediaCascade(mediaId);
+                Navigator.of(context).pop();
+                setState(() {
+                  if (selectedMediaId == mediaId) {
+                    selectedMediaId = -1;
+                  }
+                });
               },
               child: const Text('Delete'),
               style: ButtonStyle(
@@ -1084,24 +1087,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   Future<void> _addToLibraryOrWishlist(Map<String, dynamic> data, MT mt) async {
-    if (isWishlist == false && !mediaAlreadyInLibrary(data['name'])) {
-      MediaUser mu = MediaUser(
-        mediaId: mt.getMediaId(),
-        userId: UserSystem.instance.getCurrentUserId(),
-        name: data['name'],
-        userScore: -1,
-        addedDate: DateTime.now(),
-        coverImage: data['coverimage'] ?? placeholderImage,
-        status: 'Plan To Consume',
-        series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0] ?? data['name'],
-        icon: data['coverimage'] ?? placeholderImage,
-        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : (data['artworks'] is List ? data['artworks'][0] : data['artworks']),
-        lastInteracted: DateTime.now(),
-      );
+    if (isWishlist) {
+      if (mediaAlreadyInLibrary(data['originalname']) || mediaAlreadyInWishlist(data['originalname'])) {
+        return;
+      }
 
-      await MediaUserService.instance.create(mu);
-    }
-    else if(!mediaAlreadyInWishlist(data['name'])) {
       Wishlist wish = Wishlist(
         mediaId: mt.getMediaId(),
         userId: UserSystem.instance.getCurrentUserId(),
@@ -1118,10 +1108,36 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
       await WishlistService.instance.create(wish);
     }
+    else {
+      if (mediaAlreadyInLibrary(data['originalname'])) {
+        return;
+      }
+
+      if (mediaAlreadyInWishlist(data['originalname'])) {
+        await WishlistService.instance.delete(mt.getMediaId());
+      }
+
+      MediaUser mu = MediaUser(
+        mediaId: mt.getMediaId(),
+        userId: UserSystem.instance.getCurrentUserId(),
+        name: data['originalname'],
+        userScore: -1,
+        addedDate: DateTime.now(),
+        coverImage: data['coverimage'] ?? placeholderImage,
+        status: 'Plan To Consume',
+        series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0] ?? data['name'],
+        icon: data['coverimage'] ?? placeholderImage,
+        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : (data['artworks'] is List ? data['artworks'][0] : data['artworks']),
+        lastInteracted: DateTime.now(),
+      );
+
+      await MediaUserService.instance.create(mu);
+    }
 
     setState(() {});
   }
 
+  // This function creates the Media object and the speciffic MediaType object in the database. After that it connects the user to the MediaType object with either MediaUser or Wishlist
   Future<void> _addMediaType(Map<String, dynamic> option) async {
     if (UserSystem.instance.currentUserData == null) {
       return;
