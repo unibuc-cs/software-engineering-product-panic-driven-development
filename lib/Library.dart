@@ -494,7 +494,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     TextEditingController searchController = TextEditingController();
     List<dynamic> searchResults = [];
 
-    bool noSearch = true; // Flag to track if there are no search results
+    bool noSearchResults = true; // Flag to track if there are no search results
 
     String mediaType = '';
     try {
@@ -505,6 +505,24 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     bool isChosen = false;
+    bool searchMade = false; // Flag to track if there was a search made or not.
+
+    List<Widget> noResultsWidgets = [
+      Text(
+        'There are no results that match the search',
+        style: TextStyle(
+          fontSize: 16,
+        ),
+        textAlign: TextAlign.center,
+      ),
+      SizedBox(
+        height: 20,
+      ),
+      Icon(
+        Icons.sentiment_dissatisfied_rounded,
+        size: 50,
+      ),
+    ];
 
     return showDialog(
       context: context,
@@ -535,9 +553,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 ),
                 content: SizedBox(
                   width: 350,
-                  height: noSearch
-                      ? 100
-                      : 400, // Set height based on the presence of search results
+                  height: searchMade
+                      ? (noSearchResults
+                        ? 170
+                        : 400)
+                      : 100, // Set height based on the presence of search results
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -553,8 +573,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                 searchResults = await getOptionsForType(MT, query);
                                 if (context.mounted) {
                                   setState(() {
-                                  noSearch = searchResults
-                                      .isEmpty; // Update noSearch flag
+                                    searchMade = true;
+                                    noSearchResults = searchResults
+                                      .isEmpty; // Update noSearchResults flag
                                   }); // Trigger rebuild to show results and update flag
                                 }
                               }
@@ -562,68 +583,69 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           ),
                         ),
                       ),
-                      if (searchResults.isNotEmpty)
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 2),
-                                ...searchResults.map((result) {
-                                  String mediaName = result['name'];
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              if (searchMade && noSearchResults)
+                                ...noResultsWidgets,
+                              ...searchResults.map((result) {
+                                String mediaName = result['name'];
 
-                                  if (mediaAlreadyInLibrary(mediaName)) {
-                                    return ListTile(
-                                      title: Text(mediaName),
-                                      subtitle: Text(
-                                        '$mediaType is already in library.',
-                                        style: const TextStyle(
-                                          color: Color.fromARGB(255, 255, 0, 0),
-                                        ),
+                                if (mediaAlreadyInLibrary(mediaName)) {
+                                  return ListTile(
+                                    title: Text(mediaName),
+                                    subtitle: Text(
+                                      '$mediaType is already in library.',
+                                      style: const TextStyle(
+                                        color: Color.fromARGB(255, 255, 0, 0),
                                       ),
-                                      onTap: () {
-                                        // _addMediaType(result);
+                                    ),
+                                    onTap: () {
+                                      // _addMediaType(result);
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                }
+                                else if (mediaAlreadyInWishlist(mediaName)) {
+                                  return ListTile(
+                                    title: Text(mediaName),
+                                    subtitle: Text(
+                                      '$mediaType is already in wishlist.',
+                                      style: const TextStyle(
+                                        color: Color.fromARGB(255, 255, 0, 0),
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      // TODO: When you add something from wishlist we should move everything into library
+                                      isChosen = true;
+                                      setState(() {});
+                                      await _addMediaType(result);
+                                      if (context.mounted) {
                                         Navigator.of(context).pop();
-                                      },
-                                    );
-                                  }
-                                  else if (mediaAlreadyInWishlist(mediaName)) {
-                                    return ListTile(
-                                      title: Text(mediaName),
-                                      subtitle: Text(
-                                        '$mediaType is already in wishlist.',
-                                        style: const TextStyle(
-                                          color: Color.fromARGB(255, 255, 0, 0),
-                                        ),
-                                      ),
-                                      onTap: () async {
-                                        // TODO: When you add something from wishlist we should move everything into library
-                                        isChosen = true;
-                                        setState(() {});
-                                        await _addMediaType(result);
-                                        if (context.mounted) {
-                                          Navigator.of(context).pop();
-                                        }
-                                      },
-                                    );
-                                  }
-                                  else {
-                                    return ListTile(
-                                      title: Text(mediaName),
-                                      onTap: () async {
-                                        isChosen = true;
-                                        setState(() {});
-                                        await _addMediaType(result);
-                                        if (context.mounted) {
-                                          Navigator.of(context).pop();
-                                        }
-                                      },
-                                    );
-                                  }
-                                }),
-                              ],
-                            ),
+                                      }
+                                    },
+                                  );
+                                }
+                                else {
+                                  return ListTile(
+                                    title: Text(mediaName),
+                                    onTap: () async {
+                                      isChosen = true;
+                                      setState(() {});
+                                      await _addMediaType(result);
+                                      if (context.mounted) {
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                                  );
+                                }
+                              }),
+                            ],
                           ),
                         ),
+                      ),
                     ],
                   ),
                 ),

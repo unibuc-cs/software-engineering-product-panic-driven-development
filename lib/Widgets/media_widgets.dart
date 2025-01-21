@@ -293,7 +293,6 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
           return AlertDialog(
             title: Text('$mediaType settings'),
             content: SizedBox(
-              height: 400,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
