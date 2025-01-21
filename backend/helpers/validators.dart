@@ -1,6 +1,10 @@
-Future<void> validateExistence(dynamic id, String table, dynamic supabase) async {
+import 'package:supabase/supabase.dart';
+import 'db_connection.dart';
+
+Future<void> validateExistence(dynamic id, String table) async {
   try {
-    await supabase
+    await SupabaseManager
+      .client
       .from(table)
       .select()
       .eq('id', id)

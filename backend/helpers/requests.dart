@@ -1,21 +1,17 @@
 import 'config.dart';
 import 'dart:convert';
+import 'responses.dart';
+import 'db_connection.dart';
 import 'package:mutex/mutex.dart';
 import 'package:http/http.dart' as http;
+import 'package:shelf_plus/shelf_plus.dart';
 
-Future<Map<String, dynamic>> makeRequest(
-  String method,
-  String endpoint,
-  final axios,
-  [Map<String, dynamic>? body]
-) async {
-  http.Response response = method == 'GET' ?
-    await axios.get(endpoint) :
-    await axios.post(endpoint, body, headers: {'Content-Type': 'application/json'});
-  if (response.statusCode < 200 || response.statusCode > 299) {
-    throw Exception('Failed to $method $endpoint: ${response.statusCode}');
-  }
-  return json.decode(response.body);
+void populateBody(Map<String, dynamic> body, {required Map<String, dynamic> defaultFields}) {
+  defaultFields.forEach((key, value) {
+    if (body[key] == null) {
+      body[key] = value;
+    }
+  });
 }
 
 void discardFromBody(Map<String, dynamic> body, {required List<String> fields}) {
@@ -24,10 +20,7 @@ void discardFromBody(Map<String, dynamic> body, {required List<String> fields}) 
   }
 }
 
-void validateBody(
-  Map<String, dynamic> body,
-  {required List<String> fields}
-) {
+void validateFromBody(Map<String, dynamic> body, {required List<String> fields}) {
   for (String field in fields) {
     if (body[field] == null) {
       throw Exception('$field is required');
@@ -38,194 +31,169 @@ void validateBody(
   }
 }
 
-void populateBody(
-  Map<String, dynamic> body,
-  {required Map<String, dynamic> defaultFields}
-) {
-  defaultFields.forEach((key,value) {
-    if (body[key] == null) {
-      body[key] = value;
-    }
-  });
-}
-
-Map<String, dynamic> extractFromBody(
-  Map<String, dynamic> body,
-  {required List<String> fields}
-) {
-  final extracted = <String, dynamic>{};
-  for (String field in fields) {
-    if (body[field] != null) {
-      extracted[field] = body[field];
-      body.remove(field);
-    }
-  }
-  return extracted;
-}
-
-Map<String, Map<String, dynamic>> splitBody(
-  Map<String, dynamic> body,
-  {required String mediaType}
-) {
-  final mapping = {
-    'mediaBody': [
-      'originalname',
-      'description',
-      'releasedate',
-      'criticscore',
-      'communityscore',
-      'mediatype',
-    ],
-    // 'mediauserBody': [
-    //   'coverimage',
-    //   'icon',
-    //   'backgroundimage', // the user chooses from the artworks provided by the api and the backend only receives one image
-    // ],
-    'genresBody': ['genres'],
-    'creatorsBody': ['creators'],
-    'publishersBody': ['publishers'],
-    'platformsBody': ['platforms'],
-    'linksBody': ['links'],
-    'retailersBody': ['retailers'],
-    'seriesBody': ['seriesname'],
-    'mediaseriesBody': ['series'],
-  };
-
-  final result = <String, Map<String, dynamic>>{};
-  mapping.forEach((key, value) {
-    result[key] = extractFromBody(body, fields: value);
-  });
-  result['${mediaType}Body'] = body;
-
-  return result;
-}
-
-Map<String, dynamic> createAttributes(
-  String tableName,
-  dynamic entry
-) {
-  if (tableName != 'link') {
-    return {'name' : entry};
-  }
-
-  return {
-    'href' : entry,
-    'name' : entry
-      .replaceAll('http://', '')
-      .replaceAll('https://', '')
-      .split('/')[0], // TODO: more complex mapping later,
-  };
-}
-
-Future<Map<String, dynamic>> createEntriesHelper(
-  Map<String, dynamic> body,
-  String tableName,
+Future<Map<String, dynamic>> _makeRequest(
+  String method,
   String endpoint,
-  int mediaId,
-  Future<Map<String, dynamic>> Function(dynamic, dynamic) postRequest,
-  Future<Map<String, dynamic>> Function(dynamic, dynamic) getByNameRequest
+  [Map<String, dynamic>? body]
 ) async {
-  final result = <String, dynamic> {};
+  final axios = Config.instance.axios;
+  http.Response response = method == 'GET' ?
+    await axios.get(endpoint) :
+    await axios.post(endpoint, body, headers: {'Content-Type': 'application/json'});
+  if (response.statusCode < 200 || response.statusCode > 299) {
+    throw Exception('Failed to $method $endpoint: ${response.statusCode}');
+  }
+  return json.decode(response.body);
+}
 
-  result[endpoint] = [];
-  result['media$endpoint'] = [];
-  final mutex = Mutex();
+Future<Map<String, dynamic>> postRequest(body, endpoint) async =>
+  await _makeRequest('POST', '/$endpoint', body);
 
-  if (body[endpoint].isEmpty) {
+Future<Map<String, dynamic>> getByNameRequest(name, endpoint) async =>
+  await _makeRequest('GET', '/$endpoint/name?query=$name');
+
+String _extractLinkName(String entry) => entry.replaceAll(RegExp(r'^https?://'), '').split('/')[0];
+
+Map<String, dynamic> createAttributes(String tableName, dynamic entry) => tableName == 'link'
+  ? {'name': _extractLinkName(entry), 'href': entry}
+  : {'name': entry};
+
+Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
+  String getPlural(String mediaType) =>
+    {
+      'book' : 'books',
+      'game' : 'games',
+      'movie': 'movies',
+    }[mediaType] ?? mediaType;
+
+  void removeIfEmpty(Map<String, dynamic> result, String key) {
+    if (result[key] != null && result[key]!.isEmpty) {
+      result.remove(key);
+    }
+  }
+
+  Map<String, Map<String, dynamic>> splitBody(Map<String, dynamic> body) {
+    final result = <String, Map<String, dynamic>>{};
+    final mediaType = body['mediatype'] as String;
+    final mapping = {
+      'genresBody'     : ['genres'],
+      'creatorsBody'   : ['creators'],
+      'publishersBody' : ['publishers'],
+      'platformsBody'  : ['platforms'],
+      'linksBody'      : ['links'],
+      'retailersBody'  : ['retailers'],
+      'seriesBody'     : ['seriesname'],
+      'mediaseriesBody': ['series'],
+      'mediaBody'      : [
+        'originalname',
+        'description',
+        'releasedate',
+        'criticscore',
+        'communityscore',
+        'mediatype',
+      ],
+    };
+
+    mapping.forEach((key, fields) {
+      result[key] = <String, dynamic>{};
+      for (String field in fields) {
+        if (body[field] != null) {
+          result[key]![field] = body[field];
+          body.remove(field);
+        }
+      }
+    });
+    result['${mediaType}Body'] = body;
+
     return result;
   }
 
-  List<Future<dynamic>> tasks = [];
-  for (var entry in body[endpoint]) {
-    tasks.add(() async {
-      Future<void> addToResult(String key, dynamic value) async {
-        await mutex.protect(() async => result[key].add(value));
-      }
+  Future<Map<String, dynamic>> createResources(Map<String, dynamic> body, int mediaId, String endpoint) async {
+    final result = <String, dynamic> {};
+    if (body[endpoint].isEmpty) {
+      return result;
+    }
 
-      final attributes = createAttributes(tableName, entry);
-      Map<String, dynamic> entryBody = await getByNameRequest(attributes['href'] ?? attributes['name'], endpoint)
-        .catchError((_) async {
-          final body = await postRequest(attributes, endpoint);
-          await addToResult(endpoint, body);
-          return body;
-        })
-        .then((value) => value as Map<String, dynamic>);
+    final tableName = endpoint.substring(0, endpoint.length - 1);
+    final mutex = Mutex();
+    result[endpoint] = [];
+    result['media$endpoint'] = [];
 
-      final response = await postRequest(
-        {
-          'mediaid': mediaId,
-          '${tableName}id': entryBody['id'],
-        },
-        'media$endpoint',
-      );
-      await addToResult('media$endpoint', response);
-    }());
+    List<Future<dynamic>> tasks = [];
+    for (var entry in body[endpoint]) {
+      tasks.add(() async {
+        Future<void> addToResult(String key, dynamic value) async {
+          await mutex.protect(() async => result[key].add(value));
+        }
+
+        final attributes = createAttributes(tableName, entry);
+        Map<String, dynamic> entryBody = await getByNameRequest(attributes['href'] ?? attributes['name'], endpoint)
+          .catchError((_) async {
+            final body = await postRequest(attributes, endpoint);
+            await addToResult(endpoint, body);
+            return body;
+          })
+          .then((value) => value as Map<String, dynamic>);
+
+        final response = await postRequest(
+          {
+            'mediaid': mediaId,
+            '${tableName}id': entryBody['id'],
+          },
+          'media$endpoint',
+        );
+        await addToResult('media$endpoint', response);
+      }());
+    }
+    await Future.wait(tasks);
+
+    return result;
   }
-  await Future.wait(tasks);
 
-  return result;
-}
-
-Future<Map<String, dynamic>> createFromBody(
-  Map<String, Map<String, dynamic>> body,
-  final supabase,
-  {required String mediaType,
-  required String mediaTypePlural}
-) async {
-  final axios = Config().axios;
+  final mediaType = initialBody['mediatype'] as String;
+  final endpoints = {
+    'creators',
+    'publishers',
+    'platforms',
+    'links',
+    'retailers',
+    'genres',
+  };
+  final mutex = Mutex();
   Map<String, dynamic> result = <String, dynamic>{};
-
-  Future<Map<String, dynamic>> postRequest(body, endpoint) async =>
-    await makeRequest('POST', '/$endpoint', axios, body);
-  Future<Map<String, dynamic>> getByNameRequest(name, endpoint) async =>
-    await makeRequest('GET', '/$endpoint/name?query=$name', axios);
-  Future<Map<String, dynamic>> createTable(body, tableName, endpoint, mediaId) async =>
-    await createEntriesHelper(body, tableName, endpoint, mediaId, postRequest, getByNameRequest);
+  Map<String, Map<String, dynamic>> body = splitBody(initialBody);
 
   // Create Media from body
   result['media'] = await postRequest(body['mediaBody']!, 'medias');
 
   // Create MediaType from body
   body['${mediaType}Body']?['mediaid'] = result['media']?['id'];
-  Map<String, dynamic> partialResult = await supabase
+  (await SupabaseManager
+    .client
     .from(mediaType)
     .insert(body['${mediaType}Body']!)
     .select()
-    .single();
-  partialResult.forEach((key, value) => result[key] = value);
+    .single()
+  ).forEach((key, value) => result[key] = value);
 
   // Create X=creators/publishers/platforms/links/retailers/series and mediaX from body
-  final mapToPlural = {
-    'creator'  : 'creators',
-    'publisher': 'publishers',
-    'platform' : 'platforms',
-    'link'     : 'links',
-    'retailer' : 'retailers',
-    'genre'    : 'genres',
-  };
-  final mutex = Mutex();
-
-  await Future.wait(
-    mapToPlural.entries.map((entry) => () async {
-        final response = await createTable(body['${entry.value}Body']!, entry.key, entry.value, result['media']?['id']);
-        await mutex.protect(() async {
-          result[entry.value] = response[entry.value];
-          result['media${entry.value}'] = response['media${entry.value}'];
-          if (result[entry.value].isEmpty) {
-            result.remove(entry.value);
-          }
-          if (result['media${entry.value}'].isEmpty) {
-            result.remove('media${entry.value}');
-          }
-        });
-      }()
-    )
+  await Future.wait(endpoints
+    .map((endpoint) => () async {
+      final response = await createResources(body['${endpoint}Body']!, result['media']?['id'], endpoint);
+      await mutex.protect(() async {
+        result[endpoint] = response[endpoint];
+        removeIfEmpty(result, endpoint);
+        result['media${endpoint}'] = response['media${endpoint}'];
+        removeIfEmpty(result, 'media$endpoint');
+      });
+    }())
   );
 
   if (body['seriesBody'] == null) {
-    return result;
+    return sendOk(result);
   }
 
+  // TODO: make this concurrent and improve the code
   // Create series and mediaseries from body
   final aux = [];
   result['series'] = [];
@@ -249,12 +217,10 @@ Future<Map<String, dynamic>> createFromBody(
       result['series'].add(entryBody);
     }
   }
-  if (result['series'].isEmpty) {
-    result.remove('series');
-  }
+  removeIfEmpty(result, 'series');
 
-  if(body['mediaseriesBody']?['series'].length == 0) {
-    return result;
+  if (body['mediaseriesBody']?['series'].length == 0) {
+    return sendOk(result);
   }
 
   // Check here in case of errors with the series
@@ -284,10 +250,11 @@ Future<Map<String, dynamic>> createFromBody(
 
     // Create mediaType
     try {
-      entryBody = await getByNameRequest(mediaId.toString(), mediaTypePlural);
+      entryBody = await getByNameRequest(mediaId.toString(), getPlural(mediaType));
     }
     catch (_) {
-      entryBody = await supabase
+      entryBody = await SupabaseManager
+        .client
         .from(mediaType)
         .insert({'mediaid' : mediaId})
         .select()
@@ -310,15 +277,9 @@ Future<Map<String, dynamic>> createFromBody(
     catch (_) {}
   }
 
-  if (result['new_related_medias'].isEmpty) {
-    result.remove('new_related_medias');
-  }
-  if (result['new_related_$mediaType'].isEmpty) {
-    result.remove('new_related_$mediaType');
-  }
-  if (result['mediaseries'].isEmpty) {
-    result.remove('mediaseries');
-  }
+  removeIfEmpty(result, 'new_related_medias');
+  removeIfEmpty(result, 'new_related_$mediaType');
+  removeIfEmpty(result, 'mediaseries');
 
-  return result;
+  return sendOk(result);
 }

@@ -3,14 +3,19 @@ import 'package:dotenv/dotenv.dart';
 import 'package:axios_package/axios_package.dart';
 
 class Config {
-  final _dotenv = DotEnv();
-  final baseUrl = const bool.fromEnvironment('LOCAL', defaultValue: false)
-    ? 'http://localhost:3007/api'
-    : 'https://mediamaster.fly.dev/api';
+  final DotEnv _dotenv = DotEnv();
+  late final String _baseUrl;
 
-  Config() {
+  Config._() {
+    _baseUrl = const bool.fromEnvironment('LOCAL', defaultValue: false)
+      ? 'http://localhost:3007/api'
+      : 'https://mediamaster.fly.dev/api';
     _loadEnvFile();
   }
+
+  static final Config _instance = Config._();
+
+  static Config get instance => _instance;
 
   void _loadEnvFile() {
     final envFile = File('.env');
@@ -19,49 +24,27 @@ class Config {
     }
   }
 
-  Axios get axios => Axios(baseUrl: baseUrl);
+  String getEnv(String key, [String fallback = '']) => _dotenv[key] ?? Platform.environment[key] ?? fallback;
 
-  String? getEnv(String key) {
-    return _dotenv[key] ?? Platform.environment[key];
-  }
+  Axios get axios => Axios(baseUrl: _baseUrl);
 
-  String get igdbId {
-    return getEnv('CLIENT_ID_IGDB') ?? '';
-  }
+  String get igdbId => getEnv('CLIENT_ID_IGDB');
 
-  String get igdbSecret {
-    return getEnv('CLIENT_SECRET_IGDB') ?? '';
-  }
+  String get igdbSecret => getEnv('CLIENT_SECRET_IGDB');
 
-  String get goodreadsAgents {
-    return getEnv('USER_AGENTS_GOODREADS') ?? '';
-  }
+  String get goodreadsAgents => getEnv('USER_AGENTS_GOODREADS');
 
-  String get tmdbToken {
-    return getEnv('ACCESS_TOKEN_TMDB') ?? '';
-  }
+  String get tmdbToken => getEnv('ACCESS_TOKEN_TMDB');
 
-  String get steamKey {
-    return getEnv('API_KEY_STEAM') ?? '';
-  }
+  String get steamKey => getEnv('API_KEY_STEAM');
 
-  String get secret {
-    return getEnv('SECRET') ?? 'secret';
-  }
+  String get secret => getEnv('SECRET') ?? 'secret';
 
-  String get supabaseUrl {
-    return getEnv('URL_SUPABASE') ?? '';
-  }
+  String get supabaseUrl => getEnv('URL_SUPABASE');
 
-  String get supabaseKey {
-    return getEnv('ANON_KEY_SUPABASE') ?? '';
-  }
+  String get supabaseKey => getEnv('ANON_KEY_SUPABASE');
 
-  String get supabaseServiceKey {
-    return getEnv('SERVICE_KEY_SUPABASE') ?? '';
-  }
+  String get supabaseServiceKey => getEnv('SERVICE_KEY_SUPABASE');
 
-  int get port {
-    return int.parse(getEnv('PORT') ?? '8080');
-  }
+  int get port => int.parse(getEnv('PORT', '8080'));
 }

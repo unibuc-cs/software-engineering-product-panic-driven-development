@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 
 Response sendResponse(dynamic data, String status) {
-  final headersJson = {'Content-Type': 'application/json'};
+  final headersJson = { 'Content-Type': 'application/json' };
   final dataBody = jsonEncode(data);
-  final errBody = jsonEncode({'error': data});
+  final errBody = jsonEncode({ 'error': data });
 
   switch (status) {
     case '200':

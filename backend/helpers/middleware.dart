@@ -1,3 +1,4 @@
+import 'io.dart';
 import 'jwt.dart';
 import 'utils.dart';
 import 'responses.dart';
@@ -10,7 +11,7 @@ Handler extractUserId(innerHandler) {
     if (token != null && token.isNotEmpty) {
       try {
         final userId = getPayload(token)['id'];
-        await SupabaseClientSingleton.client.auth.admin.getUserById(userId);
+        await SupabaseManager.client.auth.admin.getUserById(userId);
         return await innerHandler(request.change(context: {'userId': userId }));
       }
       catch (e) {

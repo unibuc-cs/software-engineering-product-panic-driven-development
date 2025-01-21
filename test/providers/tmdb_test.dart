@@ -32,7 +32,7 @@ void main() {
         });
         expect(movie_info, isNotNull);
         expect(movie_info['originalname'], contains('Harry Potter and the Philosopher\'s Stone'));
-        expect(movie_info['series'], 'Harry Potter Collection');
+        expect(movie_info['seriesname'], 'Harry Potter Collection');
         expect(movie_info['releasedate'], '2001-11-16');
         expect(movie_info['creators'][0], contains('Warner Bros'));
         expect(movie_info['duration'], 152);

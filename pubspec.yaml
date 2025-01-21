@@ -64,7 +64,7 @@ scripts:
   server:dev          : dart run --define=RELOAD=true --define=LOCAL=true --enable-vm-service backend/main.dart
   server:node         : nodemon -x "dart run --define=LOCAL=true backend/main.dart" -e dart
   deploy              : fly deploy
-  cli                 : dart backend/providers/cli.dart
+  cli                 : dart backend/services/cli.dart
   test:steam          : dart --define=LOCAL=true test/providers/steam_test.dart
   test:igdb           : dart --define=LOCAL=true test/providers/igdb_test.dart
   test:hltb           : dart --define=LOCAL=true test/providers/hltb_test.dart
@@ -100,7 +100,7 @@ scripts:
   test:season         : dart --define=LOCAL=true test/resources/season_test.dart
   test:series         : dart --define=LOCAL=true test/resources/series_test.dart
   test:tag            : dart --define=LOCAL=true test/resources/tag_test.dart
-  test:tv_series      : dart --define=LOCAL=true test/resources/tv_series_test.dart
+  test:tvseries       : dart --define=LOCAL=true test/resources/tv_series_test.dart
   test:userachievement: dart --define=LOCAL=true test/resources/user_achievement_test.dart
   test:wishlist       : dart --define=LOCAL=true test/resources/wishlist_test.dart
   test:resources      : dart test/resources/run_tests.dart

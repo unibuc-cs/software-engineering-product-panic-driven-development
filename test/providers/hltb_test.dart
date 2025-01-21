@@ -8,7 +8,7 @@ double getHours(String time) {
 
 void main() {
   group('HowLongToBeat', () {
-    /*
+
     test('getOptions for several valid games', () async {
       final games = [
         'Hollow Knight',
@@ -21,7 +21,7 @@ void main() {
         expect(options, isNotEmpty);
         for (var option in options) {
           expect(option['name'], isNotEmpty);
-          expect(option['link'], isNotEmpty);
+          expect(option['id'], isA<int>());
         }
       }
     });
@@ -30,7 +30,6 @@ void main() {
       final options = await getOptionsHLTB('reddit');
       expect(options, isEmpty);
     });
-    */
 
     test('getInfo for a singleplayer game', () async {
       // game: Hollow Knight
