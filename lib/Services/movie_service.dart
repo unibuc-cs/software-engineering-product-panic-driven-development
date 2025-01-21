@@ -39,7 +39,7 @@ class MovieService extends Service<Movie> {
     SeriesService.instance.addToItems(body['series']);
     MediaSeriesService.instance.addToItems(body['mediaseries']);
     MediaService.instance.addToItems(body['related_medias']);
-    MovieService.instance.addToItems(body['related_movie']);
+    MovieService.instance.addToItems(body['related_movies']);
     MovieService.instance.addToItems(body);
 
     return Movie.from(body);

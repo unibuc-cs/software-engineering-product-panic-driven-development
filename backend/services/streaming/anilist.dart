@@ -65,6 +65,9 @@ class Anilist extends Provider {
                 romaji
                 english
               }
+              startDate {
+                year
+              }
             }
           }
         }
@@ -76,10 +79,12 @@ class Anilist extends Provider {
       }
 
       return (response['Page']['media'] as List).map((media) {
+        final releaseDate = media['startDate']['year'].toString() ?? '';
         return {
           'id': media['id'],
           // Prefer the English title, fallback to the Japanese one
-          'name': _removeBadItems(media['title']['english'] ?? media['title']['romaji'])
+          'name': _removeBadItems(media['title']['english'] ?? media['title']['romaji']) +
+                  (releaseDate.isNotEmpty ? ' ($releaseDate)' : ''),
         };
       }).toList();
     }

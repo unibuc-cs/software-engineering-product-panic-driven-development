@@ -48,9 +48,12 @@ class Tmdb extends Provider {
       }
 
       return (response['results'] as List).map((media) {
+        final date = media[_mediaType == 'movie' ? 'release_date' : 'first_air_date'] ?? '';
+        final releaseDate = date.length >= 4 ? date.substring(0, 4) : '';
         return {
           'id': media['id'],
-          'name': media[_mediaType == 'movie' ? 'title' : 'name']
+          'name': media[_mediaType == 'movie' ? 'title' : 'name'] +
+                  (releaseDate.isNotEmpty ? ' ($releaseDate)' : ''),
         };
       }).toList();
     }

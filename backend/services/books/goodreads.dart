@@ -55,9 +55,18 @@ class GoodReads extends Provider {
          .querySelectorAll('tr[itemtype="http://schema.org/Book"]')
          .map((book) {
             final titleElement = book.querySelector('a.bookTitle');
+            final releaseDate = book
+              .querySelector('span.uitext')
+              ?.text
+              .trim()
+              .split('—')
+              .elementAtOrNull(2)
+              ?.split('published')
+              .elementAtOrNull(1)
+              ?.trim() ?? '';
             if (titleElement != null) {
               return {
-                'name': titleElement.text.split('(')[0].trim(),
+                'name': titleElement.text.split('(')[0].trim() + (releaseDate.isNotEmpty ? ' (${releaseDate})' : ''),
                 'link': 'https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}'
               };
             }
