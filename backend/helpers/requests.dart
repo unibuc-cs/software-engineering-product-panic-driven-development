@@ -72,9 +72,19 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     }
   }
 
+  Future<void> addToList(List<dynamic> list, dynamic value, Mutex mutex) async {
+    await mutex.protect(() async => list.add(value));
+  }
+
+  Future<void> setInResultIfNotEmpty(Map<String, dynamic> result, String key, dynamic value, Mutex mutex) async {
+    if (value != null && value!.isNotEmpty) {
+      await mutex.protect(() async => result[key] = value);
+    }
+  }
+
   Map<String, Map<String, dynamic>> splitBody(Map<String, dynamic> body) {
     final result = <String, Map<String, dynamic>>{};
-    final mediaType = body['mediatype'] as String;
+    final mediaType = body['mediatype'];
     final mapping = {
       'genresBody'     : ['genres'],
       'creatorsBody'   : ['creators'],
@@ -109,40 +119,38 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
   }
 
   Future<Map<String, dynamic>> createResources(Map<String, dynamic> body, int mediaId, String endpoint) async {
-    final result = <String, dynamic> {};
+    final result = <String, dynamic> {
+      endpoint        : [],
+      'media$endpoint': [],
+    };
     if (body[endpoint].isEmpty) {
       return result;
     }
 
     final tableName = endpoint.substring(0, endpoint.length - 1);
     final mutex = Mutex();
-    result[endpoint] = [];
-    result['media$endpoint'] = [];
-
     List<Future<dynamic>> tasks = [];
+
     for (var entry in body[endpoint]) {
       tasks.add(() async {
-        Future<void> addToResult(String key, dynamic value) async {
-          await mutex.protect(() async => result[key].add(value));
-        }
-
         final attributes = createAttributes(tableName, entry);
-        Map<String, dynamic> entryBody = await getByNameRequest(attributes['href'] ?? attributes['name'], endpoint)
+        dynamic id = (await getByNameRequest(attributes['href'] ?? attributes['name'], endpoint)
           .catchError((_) async {
             final body = await postRequest(attributes, endpoint);
-            await addToResult(endpoint, body);
+            await addToList(result[endpoint], body, mutex);
             return body;
           })
-          .then((value) => value);
+          .then((value) => value)
+        )['id'];
 
         final response = await postRequest(
           {
             'mediaid': mediaId,
-            '${tableName}id': entryBody['id'],
+            '${tableName}id': id,
           },
           'media$endpoint',
         );
-        await addToResult('media$endpoint', response);
+        await addToList(result['media$endpoint'], response, mutex);
       }());
     }
     await Future.wait(tasks);
@@ -150,18 +158,24 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     return result;
   }
 
-  final mediaType = initialBody['mediatype'] as String;
-  final endpoints = {
+  final mediaType = initialBody['mediatype'];
+  final mediaTypePlural = getPlural(mediaType);
+  final endpoints = [
     'creators',
     'publishers',
     'platforms',
     'links',
     'retailers',
     'genres',
+  ];
+  final result = <String, dynamic>{
+    'series'                  : [],
+    'related_medias'          : [],
+    'related_$mediaTypePlural': [],
+    'mediaseries'             : [],
   };
-  final mutex = Mutex();
-  Map<String, dynamic> result = <String, dynamic>{};
-  Map<String, Map<String, dynamic>> body = splitBody(initialBody);
+  final body = splitBody(initialBody);
+  final Mutex resultMutex = Mutex();
 
   // Create Media from body
   result['media'] = await postRequest(body['mediaBody']!, 'medias');
@@ -180,12 +194,8 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
   await Future.wait(endpoints
     .map((endpoint) => () async {
       final response = await createResources(body['${endpoint}Body']!, result['media']?['id'], endpoint);
-      await mutex.protect(() async {
-        result[endpoint] = response[endpoint];
-        removeIfEmpty(result, endpoint);
-        result['media${endpoint}'] = response['media${endpoint}'];
-        removeIfEmpty(result, 'media$endpoint');
-      });
+      await setInResultIfNotEmpty(result, endpoint, response[endpoint], resultMutex);
+      await setInResultIfNotEmpty(result, 'media${endpoint}', response['media${endpoint}'], resultMutex);
     }())
   );
 
@@ -193,30 +203,28 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     return sendOk(result);
   }
 
-  // TODO: make this concurrent and improve the code
   // Create series and mediaseries from body
-  final aux = [];
-  result['series'] = [];
+  final seriesList = [];
+  final Mutex seriesListMutex = Mutex();
+  final List<Future<dynamic>> tasks = [];
+
   for (var entry in body['seriesBody']?['seriesname']) {
     if (entry == null) {
       continue;
     }
 
-    Map<String, dynamic> entryBody = <String, dynamic>{};
-    final attributes = createAttributes('series', entry);
-    try {
-      entryBody = await getByNameRequest(attributes['name'], 'series');
-      aux.add(entryBody);
-    }
-    catch (_) {
-      entryBody = await postRequest(
-        attributes,
-        'series',
-      );
-      aux.add(entryBody);
-      result['series'].add(entryBody);
-    }
+    tasks.add(() async {
+      final attributes = createAttributes('series', entry);
+      await getByNameRequest(attributes['name'], 'series')
+        .catchError((_) async {
+          final body = await postRequest(attributes, 'series');
+          await addToList(result['series'], body, resultMutex);
+          return body;
+        })
+        .then((value) async => await addToList(seriesList, value, seriesListMutex));
+    }());
   }
+  await Future.wait(tasks);
   removeIfEmpty(result, 'series');
 
   if (body['mediaseriesBody']?['series'].length == 0) {
@@ -224,61 +232,58 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
   }
 
   // Check here in case of errors with the series
-  int mediaId = 0, seriesId = aux[0]['id'];
-  result['new_related_medias'] = [];
-  result['new_related_$mediaType'] = [];
-  result['mediaseries'] = [];
+  int seriesId = seriesList[0]['id'];
+  tasks.clear();
+
   for (var entry in body['mediaseriesBody']?['series']) {
-    Map<String, dynamic> entryBody = <String, dynamic>{};
+    tasks.add(() async {
+      // Create media
+      int mediaId = (await getByNameRequest(entry['name'], 'medias')
+        .catchError((_) async {
+          final body = await postRequest(
+            {
+              'originalname': entry['name'],
+              'releasedate': DateTime.now().toIso8601String(),
+              'mediatype': mediaType,
+            },
+            'medias',
+          );
+          await addToList(result['related_medias'], body, resultMutex);
+          return body;
+        })
+        .then((value) => value)
+      )['id'];
 
-    // Create media
-    try {
-      entryBody = await getByNameRequest(entry['name'], 'medias');
-    }
-    catch (_) {
-      entryBody = await postRequest(
-        {
-          'originalname': entry['name'],
-          'releasedate': DateTime.now().toIso8601String(),
-          'mediatype': mediaType,
-        },
-        'medias',
-      );
-      result['new_related_medias'].add(entryBody);
-    }
-    mediaId = entryBody['id'];
+      // Create mediaType
+      await getByNameRequest(mediaId.toString(), mediaTypePlural)
+        .catchError((_) async {
+          final body = await SupabaseManager
+            .client
+            .from(mediaType)
+            .insert({'mediaid' : mediaId})
+            .select()
+            .single();
+          await addToList(result['related_$mediaTypePlural'], body, resultMutex);
+          return body;
+        });
 
-    // Create mediaType
-    try {
-      entryBody = await getByNameRequest(mediaId.toString(), getPlural(mediaType));
-    }
-    catch (_) {
-      entryBody = await SupabaseManager
-        .client
-        .from(mediaType)
-        .insert({'mediaid' : mediaId})
-        .select()
-        .single();
-      result['new_related_$mediaType'].add(entryBody);
-    }
-
-    // Create mediaseries
-    try {
-      entryBody = await postRequest(
+      // Create mediaseries
+      await postRequest(
         {
           'mediaid' : mediaId,
           'seriesid': seriesId,
           'index'   : entry['index'],
         },
         'mediaseries',
-      );
-      result['mediaseries'].add(entryBody);
-    }
-    catch (_) {}
+      )
+      .then((value) async => await addToList(result['mediaseries'], value, resultMutex))
+      .catchError((_) => {});
+    }());
   }
+  await Future.wait(tasks);
 
-  removeIfEmpty(result, 'new_related_medias');
-  removeIfEmpty(result, 'new_related_$mediaType');
+  removeIfEmpty(result, 'related_medias');
+  removeIfEmpty(result, 'related_$mediaTypePlural');
   removeIfEmpty(result, 'mediaseries');
 
   return sendOk(result);

@@ -11,11 +11,11 @@ final discardInCreate = [
 ];
 
 RouterPlus moviesRouter() => RouterDefault(
-  endpoint          : 'movie',
-  isMediaType       : true,
-  nameField         : 'mediaid',
-  discardInCreate   : discardInCreate,
-  validateInCreate  : [],
-  discardInUpdate   : ['id', 'mediaid'],
-  noDelete          : true,
+  resource        : 'movie',
+  isMediaType     : true,
+  nameField       : 'mediaid',
+  discardInCreate : discardInCreate,
+  validateInCreate: [],
+  discardInUpdate : ['id', 'mediaid'],
+  noDelete        : true,
 ).router;

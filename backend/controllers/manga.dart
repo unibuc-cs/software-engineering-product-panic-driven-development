@@ -12,11 +12,11 @@ final discardInCreate = [
 ];
 
 RouterPlus mangaRouter() => RouterDefault(
-  endpoint          : 'manga',
-  isMediaType       : true,
-  nameField         : 'mediaid',
-  discardInCreate   : discardInCreate,
-  validateInCreate  : [],
-  discardInUpdate   : ['id', 'mediaid'],
-  noDelete          : true,
+  resource        : 'manga',
+  isMediaType     : true,
+  nameField       : 'mediaid',
+  discardInCreate : discardInCreate,
+  validateInCreate: [],
+  discardInUpdate : ['id', 'mediaid'],
+  noDelete        : true,
 ).router;

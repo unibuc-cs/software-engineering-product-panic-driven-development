@@ -10,7 +10,7 @@ class SupabaseManager {
   );
   late SupabaseQueryBuilder _tableQuery;
 
-  SupabaseManager(String tableName): _tableQuery = _client.from(tableName);
+  SupabaseManager(String resource): _tableQuery = _client.from(resource);
 
   static SupabaseClient get client => _client;
 

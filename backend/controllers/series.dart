@@ -2,5 +2,5 @@ import '../helpers/routers.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
 RouterPlus seriesRouter() => RouterDefault(
-  endpoint: 'series',
+  resource: 'series',
 ).router;

@@ -9,12 +9,12 @@ class RouterBase {
 
   RouterPlus get router => _router;
 
-  RouterBase(String endpoint): _manager = SupabaseManager(endpoint);
+  RouterBase(String resource): _manager = SupabaseManager(resource);
 }
 
 class RouterDefault extends RouterBase {
   RouterDefault({
-    required String endpoint,
+    required String resource,
     bool requiresUser                     = false,
     bool isMediaType                      = false,
     String idField                        = 'id',
@@ -26,7 +26,7 @@ class RouterDefault extends RouterBase {
     List<String> discardInUpdate          = const ['id'],
     bool dependencyInDelete               = true,
     bool noDelete                         = false,
-  }): super(endpoint) {
+  }): super(resource) {
     Map<String, dynamic> _filters(Request req, [Map<String, dynamic> filters = const {}]) => {
       ...filters,
       if (requiresUser) 'userid': req.context['userId']!,
@@ -76,7 +76,7 @@ class RouterDefault extends RouterBase {
       return isMediaType
         ? await createMediaType({
             ...body,
-            'mediatype': endpoint,
+            'mediatype': resource,
           })
         : await _manager.create(body);
     });
@@ -100,8 +100,8 @@ class RouterDefault extends RouterBase {
       }
 
       if (dependencyInDelete) {
-        await SupabaseManager('media${endpoint}').delete(filters: {
-          '${endpoint}id': id,
+        await SupabaseManager('media${resource}').delete(filters: {
+          '${resource}id': id,
         });
       }
 

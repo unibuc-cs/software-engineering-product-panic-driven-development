@@ -9,7 +9,7 @@ final populateInCreate = {
 };
 
 RouterPlus mediaUsersRouter() => RouterDefault(
-  endpoint          : 'mediauser',
+  resource          : 'mediauser',
   requiresUser      : true,
   idField           : 'mediaid',
   validateForTable  : 'media',

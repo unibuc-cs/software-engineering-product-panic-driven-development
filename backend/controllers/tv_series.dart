@@ -11,11 +11,11 @@ final discardInCreate = [
 ];
 
 RouterPlus TVSeriesRouter() => RouterDefault(
-  endpoint          : 'tv_series',
-  isMediaType       : true,
-  nameField         : 'mediaid',
-  discardInCreate   : discardInCreate,
-  validateInCreate  : [],
-  discardInUpdate   : ['id', 'mediaid'],
-  noDelete          : true,
+  resource        : 'tv_series',
+  isMediaType     : true,
+  nameField       : 'mediaid',
+  discardInCreate : discardInCreate,
+  validateInCreate: [],
+  discardInUpdate : ['id', 'mediaid'],
+  noDelete        : true,
 ).router;

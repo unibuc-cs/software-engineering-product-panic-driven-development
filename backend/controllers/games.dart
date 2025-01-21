@@ -12,11 +12,11 @@ final discardInCreate = [
 ];
 
 RouterPlus gamesRouter() => RouterDefault(
-  endpoint          : 'game',
-  isMediaType       : true,
-  nameField         : 'mediaid',
-  discardInCreate   : discardInCreate,
-  validateInCreate  : [],
-  discardInUpdate   : ['id', 'mediaid'],
-  noDelete          : true,
+  resource        : 'game',
+  isMediaType     : true,
+  nameField       : 'mediaid',
+  discardInCreate : discardInCreate,
+  validateInCreate: [],
+  discardInUpdate : ['id', 'mediaid'],
+  noDelete        : true,
 ).router;

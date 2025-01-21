@@ -16,7 +16,7 @@ import 'media_publisher_service.dart';
 
 class MovieService extends Service<Movie> {
   MovieService._() : super(Movie.endpoint, Movie.from);
-  
+
   static final MovieService _instance = MovieService._();
 
   static MovieService get instance => _instance;
@@ -24,7 +24,7 @@ class MovieService extends Service<Movie> {
   @override
   Future<Movie> create(dynamic model) async {
     final body = await makePostRequest(model);
-    
+
     MediaService.instance.addToItems(body['media']);
     CreatorService.instance.addToItems(body['creators']);
     MediaCreatorService.instance.addToItems(body['mediacreators']);
@@ -38,8 +38,8 @@ class MovieService extends Service<Movie> {
     MediaRetailerService.instance.addToItems(body['mediaretailers']);
     SeriesService.instance.addToItems(body['series']);
     MediaSeriesService.instance.addToItems(body['mediaseries']);
-    MediaService.instance.addToItems(body['new_related_medias']);
-    MovieService.instance.addToItems(body['new_related_movie']);
+    MediaService.instance.addToItems(body['related_medias']);
+    MovieService.instance.addToItems(body['related_movie']);
     MovieService.instance.addToItems(body);
 
     return Movie.from(body);
