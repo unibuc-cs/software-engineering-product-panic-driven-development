@@ -1294,11 +1294,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   Widget renderStickyNote(Note? note, int mediaId) {
-    Widget textToDisplay = const Text(
-      '+',
-      style: TextStyle(
-        fontSize: 70,
-        color: Colors.black26,
+    Widget textToDisplay = const Center(
+      child: Text(
+        '+',
+        style: TextStyle(
+          fontSize: 70,
+          color: Colors.black26,
+        ),
       ),
     );
     var onClick = () {
@@ -1331,7 +1333,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             margin: const EdgeInsets.all(20),
             padding: const EdgeInsets.all(20),
             child: SingleChildScrollView(
-              child: textToDisplay,
+              child: Container(
+                width: double.infinity,
+                child: textToDisplay,
+              ),
             ),
           ),
           if (note != null)

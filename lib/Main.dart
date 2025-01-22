@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
     return AdaptiveTheme(
       light: ThemeData.light().copyWith(
         colorScheme: ColorScheme.light(
-          primary:   Color.fromARGB(255, 0, 0, 190),
+          primary: Color.fromARGB(255, 0, 0, 190),
         ),
       ),
       dark: ThemeData.dark().copyWith(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:mediamaster/Library.dart';
+import 'package:mediamaster/Widgets/themes.dart';
 import 'package:mutex/mutex.dart';
 import '../Services/provider_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -219,7 +220,7 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                         onPressed: () async {
                           String steamId = controller.text;
                           if (steamId.isNotEmpty) {
-                            searchResults = await _getGamesForID(steamId, debugging: false); // TODO: remove debugging here
+                            searchResults = await _getGamesForID(steamId, debugging: true); // TODO: remove debugging here
                             if (context.mounted) {
                               setState(() {});
                             }
@@ -238,16 +239,9 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                           await confirmImport(searchResults, gamesLibrary);
                         },
                         child: Text('Confirm import'),
-                        style: Theme.of(context).filledButtonTheme.style,
-                        // style: ButtonStyle(
-                        //   backgroundColor: WidgetStatePropertyAll(
-                            
-                        //     Color.fromARGB(172, 0, 174, 0),
-                        //   ),
-                        //   foregroundColor: WidgetStatePropertyAll(
-                        //     Color.fromARGB(255, 0, 0, 0),
-                        //   ),
-                        // ),
+                        style: greenFillButton(context)
+                          .filledButtonTheme
+                          .style,
                       ),
                     ),
                   SizedBox(
