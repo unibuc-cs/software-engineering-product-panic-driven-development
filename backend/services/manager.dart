@@ -6,6 +6,7 @@ import 'books/goodreads.dart';
 import 'streaming/anilist.dart';
 import 'games/pcgamingwiki.dart';
 import 'games/howlongtobeat.dart';
+import 'streaming/myanimelist.dart';
 
 class Manager {
   late Provider provider;
@@ -19,6 +20,8 @@ class Manager {
     'tmdbseries'   : Tmdb(mediaType: 'tv'),
     'anilistanime' : Anilist(mediaType: 'ANIME'),
     'anilistmanga' : Anilist(mediaType: 'MANGA'),
+    'myanimelist'  : Myanimelist(mediaType: 'anime'),
+    'mymangalist'  : Myanimelist(mediaType: 'manga'),
   };
 
   Manager(String name) {

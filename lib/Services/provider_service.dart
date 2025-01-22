@@ -55,10 +55,6 @@ Future<List<Map<String, dynamic>>> getOptionsHLTB(String query) async =>
 Future<Map<String, dynamic>> getInfoHLTB(Map<String, dynamic> game) async =>
   await _fetchInfo('howlongtobeat', game['id'].toString());
 
-// Steam
-Future<Map<String, dynamic>> getInfoSteam(String userId) async =>
-  await _fetchInfo('steam', userId);
-
 // Goodreads, key is link
 Future<List<Map<String, dynamic>>> getOptionsBook(String query) async =>
   await _fetchOptions('goodreads', query);
@@ -109,3 +105,14 @@ Future<Map<String, dynamic>> getInfoManga(Map<String, dynamic> manga) async =>
 Future<List<Map<String, dynamic>>> getRecsManga(Map<String, dynamic> manga) async =>
   await _fetchRecommendations('anilistmanga', manga['anilistid'].toString());
 
+// Steam
+Future<List<dynamic>> getSteamList(String userId) async =>
+  (await _fetchInfo('steam', userId))['games'];
+
+// MyAnimeList
+Future<List<dynamic>> getAnimeList(String username) async =>
+  (await _fetchInfo('myanimelist', username))['anime'];
+
+// MyMangaList
+Future<List<dynamic>> getMangaList(String username) async =>
+  (await _fetchInfo('mymangalist', username))['manga'];

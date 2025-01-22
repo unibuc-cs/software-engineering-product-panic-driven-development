@@ -39,7 +39,7 @@ Future<Map<String, dynamic>> _getGamesForID(String id) async {
   if (id.isEmpty) {
     return {};
   }
-  final gamesList = (await getInfoSteam(id))['games'];
+  final gamesList = await getSteamList(id);
   final futures = <Future<void>>[];
   Map<String, dynamic> games = {};
 

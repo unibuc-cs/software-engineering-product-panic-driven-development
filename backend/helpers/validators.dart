@@ -16,15 +16,17 @@ Future<void> validateExistence(dynamic id, String table) async {
 
 void validateService(String service) {
   final List<String> validServices = [
-    'pcgamingwiki',
-    'howlongtobeat',
+    'igdb'
     'steam',
     'goodreads',
     'tmdbmovie',
     'tmdbseries',
+    'myanimelist',
+    'mymangalist',
+    'pcgamingwiki',
     'anilistanime',
     'anilistmanga',
-    'igdb'
+    'howlongtobeat',
   ];
   if (!validServices.contains(service.toLowerCase())) {
     throw Exception('Service not found');
