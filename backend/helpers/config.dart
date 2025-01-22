@@ -38,6 +38,8 @@ class Config {
 
   String get steamKey => getEnv('API_KEY_STEAM');
 
+  String get traktId => getEnv('CLIENT_ID_TRAKT');
+
   String get secret => getEnv('SECRET');
 
   String get supabaseUrl => getEnv('URL_SUPABASE');

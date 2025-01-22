@@ -3,8 +3,10 @@ import 'games/igdb.dart';
 import 'games/steam.dart';
 import 'streaming/tmdb.dart';
 import 'books/goodreads.dart';
+import 'streaming/trakt.dart';
 import 'streaming/anilist.dart';
 import 'games/pcgamingwiki.dart';
+import 'books/goodreadslist.dart';
 import 'games/howlongtobeat.dart';
 import 'streaming/myanimelist.dart';
 
@@ -12,16 +14,19 @@ class Manager {
   late Provider provider;
 
   static final _providers = {
-    'pcgamingwiki' : PcGamingWiki.instance,
-    'howlongtobeat': HowLongToBeat.instance,
     'steam'        : Steam.instance,
     'goodreads'    : GoodReads.instance,
-    'tmdbmovie'    : Tmdb(mediaType: 'movie'),
+    'goodreadslist': GoodReadsList.instance,
+    'pcgamingwiki' : PcGamingWiki.instance,
+    'howlongtobeat': HowLongToBeat.instance,
     'tmdbseries'   : Tmdb(mediaType: 'tv'),
+    'tmdbmovie'    : Tmdb(mediaType: 'movie'),
+    'traktmovies'  : Trakt(mediaType: 'movies'),
+    'traktseries'   : Trakt(mediaType: 'shows'),
     'anilistanime' : Anilist(mediaType: 'ANIME'),
     'anilistmanga' : Anilist(mediaType: 'MANGA'),
-    'myanimelist'  : Myanimelist(mediaType: 'anime'),
-    'mymangalist'  : Myanimelist(mediaType: 'manga'),
+    'myanimelist'  : MyAnimeList(mediaType: 'anime'),
+    'mymangalist'  : MyAnimeList(mediaType: 'manga'),
   };
 
   Manager(String name) {

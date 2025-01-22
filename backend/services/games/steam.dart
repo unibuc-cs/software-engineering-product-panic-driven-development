@@ -30,14 +30,18 @@ class Steam extends Provider {
         .then((req) => req.close());
 
       if (response.statusCode != 200) {
-        return {'error': 'User not found'};
+        return {
+          'games': []
+        };
       }
 
       final body = await response.transform(utf8.decoder).join();
       final List<dynamic>? games = jsonDecode(body)['response']?['games'];
 
       if (games == null || games.isEmpty) {
-        return {'error': 'No games found'};
+        return {
+          'games': []
+        };
       }
 
       games.sort((game1, game2) => game1['name'].compareTo(game2['name']));
@@ -69,7 +73,9 @@ class Steam extends Provider {
       };
     }
     catch (e) {
-      return {'error': e.toString()};
+      return {
+        'games': []
+      };
     }
   }
 

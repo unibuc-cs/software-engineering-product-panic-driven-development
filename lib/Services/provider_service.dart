@@ -107,14 +107,26 @@ Future<Map<String, dynamic>> getInfoManga(Map<String, dynamic> manga) async =>
 Future<List<Map<String, dynamic>>> getRecsManga(Map<String, dynamic> manga) async =>
   await _fetchRecommendations('anilistmanga', manga['anilistid'].toString());
 
-// Steam
-Future<List<dynamic>> getSteamList(String userId) async =>
+// Steam Games List
+Future<List<dynamic>> getGamesList(String userId) async =>
   (await _fetchInfo('steam', userId))['games'];
 
-// MyAnimeList
+// Goodreads Books List
+Future<List<dynamic>> getBooksList(String userId) async =>
+  (await _fetchInfo('goodreadslist', userId))['books'];
+
+// Trakt Movie List
+Future<List<dynamic>> getMoviesList(String userSlug) async =>
+  (await _fetchInfo('traktmovies', userSlug))['movies'];
+
+// Trakt Series List
+Future<List<dynamic>> getSeriesList(String userSlug) async =>
+  (await _fetchInfo('traktseries', userSlug))['shows'];
+
+// MyAnimeList Anime List
 Future<List<dynamic>> getAnimeList(String username) async =>
   (await _fetchInfo('myanimelist', username))['anime'];
 
-// MyMangaList
+// MyAnimeList Manga List
 Future<List<dynamic>> getMangaList(String username) async =>
   (await _fetchInfo('mymangalist', username))['manga'];

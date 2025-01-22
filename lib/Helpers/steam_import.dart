@@ -114,11 +114,11 @@ Future<Map<String, Map<String, dynamic>>> _getGamesForID(String id, {bool debugg
     return tempAns;
   }
   // TODO: Ending test code
-  
+
   if (id.isEmpty) {
     return {};
   }
-  final gamesList = await getSteamList(id);
+  final gamesList = await getGamesList(id);
   final futures = <Future<void>>[];
   Map<String, Map<String, dynamic>> games = {};
   Mutex mutex = Mutex();

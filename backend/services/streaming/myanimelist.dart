@@ -3,12 +3,12 @@ import 'dart:convert';
 import '../provider.dart';
 import 'package:http/http.dart' as http;
 
-class Myanimelist extends Provider {
+class MyAnimeList extends Provider {
   // Members
   late final String _mediaType;
 
   // Public constructor
-  Myanimelist({required String mediaType}) : _mediaType = mediaType;
+  MyAnimeList({required String mediaType}) : _mediaType = mediaType;
 
   // Private methods
   Uri _url(String username) {
@@ -19,7 +19,9 @@ class Myanimelist extends Provider {
     try {
       final data = jsonDecode((await http.get(_url(username))).body);
       if (data.contains('errors')) {
-        return {};
+        return {
+          _mediaType: []
+        };
       }
       String englishKey = _mediaType == 'manga' ? 'manga_english' : 'anime_title_eng';
       return {
@@ -31,7 +33,9 @@ class Myanimelist extends Provider {
       };
     }
     catch (e) {
-      return {};
+      return {
+        _mediaType: []
+      };
     }
   }
 
