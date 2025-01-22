@@ -4,7 +4,9 @@ import 'package:http/http.dart' as http;
 
 Future<dynamic> _fetchEndpoint(String endpoint) async {
   http.Response response = await Config.instance.axios.get(endpoint);
-  return jsonDecode(response.body);
+  return response.body.isEmpty
+    ? {}
+    : jsonDecode(response.body);
 }
 
 Future<List<Map<String, dynamic>>> _fetchOptions(String serviceName, String query) async {

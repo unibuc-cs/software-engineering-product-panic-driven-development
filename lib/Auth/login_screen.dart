@@ -34,8 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
           IconButton(
             onPressed: () {
               AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
-                  ? AdaptiveTheme.of(context).setDark()
-                  : AdaptiveTheme.of(context).setLight();
+                ? AdaptiveTheme.of(context).setDark()
+                : AdaptiveTheme.of(context).setLight();
             },
             icon: const Icon(Icons.dark_mode),
             tooltip: 'Toggle dark mode',
@@ -45,12 +45,15 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is LoginFailure) {
-            ScaffoldMessenger.of(context)
+            ScaffoldMessenger
+              .of(context)
               ..hideCurrentSnackBar()
-              ..showSnackBar(SnackBar(
-                content: Text(state.error),
-                duration: const Duration(seconds: 3),
-              ));
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                  duration: const Duration(seconds: 3),
+                )
+              );
           }
         },
         child: Form(
@@ -64,61 +67,60 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: 500,
                       child: TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter an email.';
-                            }
-                            return null;
-                          }),
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter an email.';
+                          }
+                          return null;
+                        }
+                      ),
                     ),
                     const SizedBox(height: 10),
                     SizedBox(
                       width: 500,
                       child: TextFormField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a password.';
-                            }
-                            return null;
-                          }),
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a password.';
+                          }
+                          return null;
+                        }
+                      ),
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: state is! LoginLoading
-                          ? () {
-                              if (formKey.currentState!.validate()) {
-                                loginBloc.add(
-                                  LoginButtonPressed(
-                                    context: context,
-                                    email: _emailController.text,
-                                    password: _passwordController.text,
-                                  ),
-                                );
-                              }
+                        ? () {
+                            if (formKey.currentState!.validate()) {
+                              loginBloc.add(
+                                LoginButtonPressed(
+                                  context: context,
+                                  email: _emailController.text,
+                                  password: _passwordController.text,
+                                ),
+                              );
                             }
-                          : null,
+                          }
+                        : null,
                       style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(
-                            Color.fromARGB(219, 10, 94, 87)),
-                        foregroundColor:
-                            WidgetStateProperty.all<Color>(Colors.white),
+                        backgroundColor: WidgetStateProperty.all<Color>(Color.fromARGB(219, 10, 94, 87)),
+                        foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
                       ),
                       child: const Text('Log in'),
                     ),
                     if (state is LoginLoading)
                       const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(
-                            color: Color.fromARGB(219, 10, 94, 87)),
+                        child: CircularProgressIndicator(color: Color.fromARGB(219, 10, 94, 87)),
                       ),
                   ],
                 ),

@@ -161,12 +161,12 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
   final mediaType = initialBody['mediatype'];
   final mediaTypePlural = getPlural(mediaType);
   final endpoints = [
-    'creators',
-    'publishers',
-    'platforms',
     'links',
-    'retailers',
     'genres',
+    'creators',
+    'platforms',
+    'retailers',
+    'publishers',
   ];
   final result = <String, dynamic>{
     'series'                  : [],
@@ -243,8 +243,8 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
           final body = await postRequest(
             {
               'originalname': entry['name'],
-              'releasedate': DateTime.now().toIso8601String(),
-              'mediatype': mediaType,
+              'releasedate' : DateTime.now().toIso8601String(),
+              'mediatype'   : mediaType,
             },
             'medias',
           );

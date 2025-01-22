@@ -246,14 +246,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     String dbName = getMediaTypeDbName(MT);
 
     // Notat
-    List<int> media = MediaService
+    List<int> mediaIds = MediaService
       .instance
       .items
       .where((media) => media.originalName == name && media.mediaType == dbName)
       .map((media) => media.id)
       .toList();
     
-    if (media.isEmpty) {
+    if (mediaIds.isEmpty) {
       return null;
     }
 
@@ -267,7 +267,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     return serviceInstance
       .items
-      .where((entry) => entry.mediaId == media.first)
+      .where((entry) => entry.mediaId == mediaIds.first)
       .first as MT;
   }
 
@@ -438,7 +438,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                     if (!isWishlist && MT == Game) // Steam import button
                       IconButton(
                         onPressed: () async {
-                          await importSteam(context);
+                          await importSteam(context, this);
                         },
                         icon: Icon(
                           Icons.library_add_outlined,
@@ -632,7 +632,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                       // TODO: When you add something from wishlist we should move everything into library
                                       isChosen = true;
                                       setState(() {});
-                                      await _addMediaType(result);
+                                      await addMediaType(result);
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
                                       }
@@ -645,7 +645,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                     onTap: () async {
                                       isChosen = true;
                                       setState(() {});
-                                      await _addMediaType(result);
+                                      await addMediaType(result);
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
                                       }
@@ -1171,7 +1171,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   // This function creates the Media object and the speciffic MediaType object in the database. After that it connects the user to the MediaType object with either MediaUser or Wishlist
-  Future<void> _addMediaType(Map<String, dynamic> option) async {
+  Future<void> addMediaType(Map<String, dynamic> option) async {
     if (UserSystem.instance.currentUserData == null) {
       return;
     }
@@ -1201,7 +1201,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     await _addToLibraryOrWishlist(result.key, result.value);
-    // TODO: Add genres information
   }
 
   Widget _displayMedia(MT? mt) {  
@@ -1295,11 +1294,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   Widget renderStickyNote(Note? note, int mediaId) {
-    Widget textToDisplay = const Text(
-      '+',
-      style: TextStyle(
-        fontSize: 70,
-        color: Colors.black26,
+    Widget textToDisplay = const Center(
+      child: Text(
+        '+',
+        style: TextStyle(
+          fontSize: 70,
+          color: Colors.black26,
+        ),
       ),
     );
     var onClick = () {
@@ -1332,7 +1333,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             margin: const EdgeInsets.all(20),
             padding: const EdgeInsets.all(20),
             child: SingleChildScrollView(
-              child: textToDisplay,
+              child: Container(
+                width: double.infinity,
+                child: textToDisplay,
+              ),
             ),
           ),
           if (note != null)
