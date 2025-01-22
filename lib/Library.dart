@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:mediamaster/Widgets/themes.dart';
 import 'package:pair/pair.dart';
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
@@ -211,18 +212,18 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               });
             },
             trailing: IconButton(
-              icon: const Icon(Icons.delete),
+              icon: const Icon(
+                Icons.delete,
+              ),
               onPressed: () {
                 _showDeleteConfirmationDialog(
                   context,
                   mt.getMediaId(),
                 );
               },
-              style: ButtonStyle(
-                foregroundColor: WidgetStateProperty.all(
-                  Color(0xFFFF0000)
-                ),
-              ),
+              style: redNotFilledButton(context)
+                .filledButtonTheme
+                .style,
             ),
           ),
         );
@@ -372,10 +373,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         actions: [
           TextButton(
             onPressed: () {}, // TODO: profile page
-            style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
-              foregroundColor: WidgetStatePropertyAll(Colors.white),
-            ),
+            style: navigationButton(context)
+              .filledButtonTheme
+              .style,
             child: Text(UserSystem.instance.currentUserData!['name']),
           ),
           IconButton(
@@ -429,10 +429,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           )
                         );
                       },
-                      style: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Color.fromARGB(219, 10, 94, 87)),
-                        foregroundColor: WidgetStatePropertyAll(Colors.white),
-                      ),
+                      style: navigationButton(context)
+                        .filledButtonTheme
+                        .style,
                       child: Text('Go to $LibraryWishlistBig'),
                     ),
                     if (!isWishlist && MT == Game) // Steam import button
@@ -1033,14 +1032,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 });
               },
               child: const Text('Delete'),
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(
-                  Color(0xFFFF0000)
-                ),
-                foregroundColor: WidgetStateProperty.all(
-                  Color(0xFFFFFFFF)
-                ),
-              ),
+              style: redFillButton(context)
+                .filledButtonTheme
+                .style,
             ),
           ],
         );

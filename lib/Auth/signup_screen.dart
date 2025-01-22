@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import '../Widgets/themes.dart';
 
 import 'signup_bloc.dart';
 
@@ -159,10 +160,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             }
                           }
                         : null,
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(219, 10, 94, 87)),
-                        foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-                      ),
+                      style: navigationButton(context)
+                        .filledButtonTheme
+                        .style,
                       child: const Text('Sign up'),
                     ),
                     if (state is SignUpLoading)

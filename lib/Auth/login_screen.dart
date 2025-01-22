@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:mediamaster/Widgets/themes.dart';
 
 import 'login_bloc.dart';
 
@@ -111,10 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                           }
                         : null,
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(Color.fromARGB(219, 10, 94, 87)),
-                        foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-                      ),
+                      style: navigationButton(context)
+                        .filledButtonTheme
+                        .style,
                       child: const Text('Log in'),
                     ),
                     if (state is LoginLoading)
