@@ -146,8 +146,24 @@ Future<Map<String, Map<String, dynamic>>> _getGamesForID(String id, {bool debugg
 
 Future<void> confirmImport(Map<String, Map<String, dynamic>> gamesData, LibraryState gamesLibrary) async {
   // TODO: make it so it adds all games in paralel
-  for (var gameData in gamesData.entries) {
-    await gamesLibrary.addMediaType(gameData.value);
+  List<MapEntry<String, Map<String, dynamic>>> gameEntriesList = gamesData.entries.toList();
+  gameEntriesList.sort((a, b) => a.key.compareTo(b.key));
+  for (var gameData in gameEntriesList) {
+    print(gameData);
+    if (gamesLibrary.mediaAlreadyInLibrary(gameData.value['name'])) {
+      continue;
+    }
+    for (int trial = 0; trial < 3; ++trial) {
+      try {
+        await gamesLibrary.addMediaType(gameData.value);
+        break;
+      }
+      catch (e) {
+        print('Error importing game from Steam.');
+        print(gameData.value['name']);
+        print(e);
+      }
+    }
   }
 }
 
@@ -155,6 +171,7 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
   TextEditingController controller = TextEditingController();
 
   Map<String, Map<String, dynamic>> searchResults = {};
+  Color linkColor = Color.fromARGB(255, 0, 128, 198);
 
   return showDialog(
     context: context,
@@ -166,7 +183,14 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
               children: [
                 Text('Import games from Steam library'),
                 InkWell(
-                  child: Text('How to get Steam ID'),
+                  child: Text(
+                    'How to get Steam ID',
+                    style: TextStyle(
+                      color: linkColor,
+                      decoration: TextDecoration.underline,
+                      decorationColor: linkColor,
+                    ),
+                  ),
                   onTap: () async {
                     bool linkOpened = false;
                     try {
@@ -204,6 +228,9 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                       ),
                     ),
                   ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   if (searchResults.isNotEmpty) // Confirm button
                     Center(
                       child: TextButton(
@@ -211,8 +238,21 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                           await confirmImport(searchResults, gamesLibrary);
                         },
                         child: Text('Confirm import'),
+                        style: Theme.of(context).filledButtonTheme.style,
+                        // style: ButtonStyle(
+                        //   backgroundColor: WidgetStatePropertyAll(
+                            
+                        //     Color.fromARGB(172, 0, 174, 0),
+                        //   ),
+                        //   foregroundColor: WidgetStatePropertyAll(
+                        //     Color.fromARGB(255, 0, 0, 0),
+                        //   ),
+                        // ),
                       ),
                     ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(

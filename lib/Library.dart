@@ -246,14 +246,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     String dbName = getMediaTypeDbName(MT);
 
     // Notat
-    List<int> media = MediaService
+    List<int> mediaIds = MediaService
       .instance
       .items
       .where((media) => media.originalName == name && media.mediaType == dbName)
       .map((media) => media.id)
       .toList();
     
-    if (media.isEmpty) {
+    if (mediaIds.isEmpty) {
       return null;
     }
 
@@ -267,7 +267,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     return serviceInstance
       .items
-      .where((entry) => entry.mediaId == media.first)
+      .where((entry) => entry.mediaId == mediaIds.first)
       .first as MT;
   }
 
