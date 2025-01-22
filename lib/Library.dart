@@ -438,7 +438,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                     if (!isWishlist && MT == Game) // Steam import button
                       IconButton(
                         onPressed: () async {
-                          await importSteam(context);
+                          await importSteam(context, this);
                         },
                         icon: Icon(
                           Icons.library_add_outlined,
@@ -632,7 +632,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                       // TODO: When you add something from wishlist we should move everything into library
                                       isChosen = true;
                                       setState(() {});
-                                      await _addMediaType(result);
+                                      await addMediaType(result);
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
                                       }
@@ -645,7 +645,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                     onTap: () async {
                                       isChosen = true;
                                       setState(() {});
-                                      await _addMediaType(result);
+                                      await addMediaType(result);
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
                                       }
@@ -1171,7 +1171,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   // This function creates the Media object and the speciffic MediaType object in the database. After that it connects the user to the MediaType object with either MediaUser or Wishlist
-  Future<void> _addMediaType(Map<String, dynamic> option) async {
+  Future<void> addMediaType(Map<String, dynamic> option) async {
     if (UserSystem.instance.currentUserData == null) {
       return;
     }
@@ -1201,7 +1201,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     await _addToLibraryOrWishlist(result.key, result.value);
-    // TODO: Add genres information
   }
 
   Widget _displayMedia(MT? mt) {  

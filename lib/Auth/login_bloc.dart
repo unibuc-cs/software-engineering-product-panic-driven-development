@@ -14,12 +14,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginButtonPressed>(_onLoginButtonPressed);
   }
 
-  Future<void> checkUser(
-    Map<String, dynamic> body,
-  ) async {
+  Future<void> checkUser(Map<String, dynamic> body) async {
     try {
       await AuthService.instance.login(
-        email: body['email']!,
+        email   : body['email']!,
         password: body['password']!,
       );
       await UserSystem.instance.login();
@@ -36,15 +34,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       await Future.delayed(const Duration(seconds: 1));
       List<Object> list = event.props;
       await checkUser({
-        'email'    : list[1].toString(),
-        'password' : list[2].toString(),
+        'email'   : list[1].toString(),
+        'password': list[2].toString(),
       });
       emit(LoginSuccess());
       Navigator.pop(list[0] as BuildContext);
       Navigator.pop(list[0] as BuildContext);
-      Navigator.of(list[0] as BuildContext)
-          .push(MaterialPageRoute(builder: (context) => const Menu()));
-    } catch (error) {
+      Navigator
+        .of(list[0] as BuildContext)
+        .push(
+          MaterialPageRoute(builder: (context) => const Menu())
+        );
+    }
+    catch (error) {
       emit(LoginFailure(error: error.toString()));
     }
   }

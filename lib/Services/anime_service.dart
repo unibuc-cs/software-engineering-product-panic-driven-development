@@ -1,3 +1,6 @@
+import 'package:mediamaster/Services/genre_service.dart';
+import 'package:mediamaster/Services/media_genre_service.dart';
+
 import 'link_service.dart';
 import 'media_service.dart';
 import 'series_service.dart';
@@ -36,6 +39,8 @@ class AnimeService extends Service<Anime> {
     MediaLinkService.instance.addToItems(body['medialinks']);
     RetailerService.instance.addToItems(body['retailers']);
     MediaRetailerService.instance.addToItems(body['mediaretailers']);
+    GenreService.instance.addToItems(body['genres']);
+    MediaGenreService.instance.addToItems(body['mediagenres']);
     SeriesService.instance.addToItems(body['series']);
     MediaSeriesService.instance.addToItems(body['mediaseries']);
     MediaService.instance.addToItems(body['related_medias']);

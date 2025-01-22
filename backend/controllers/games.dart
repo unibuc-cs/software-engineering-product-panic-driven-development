@@ -9,6 +9,7 @@ final discardInCreate = [
   'icon',
   'dlcs',
   'remasters',
+  'remakes',
 ];
 
 RouterPlus gamesRouter() => RouterDefault(
