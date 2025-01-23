@@ -9,7 +9,7 @@ class Tmdb extends Provider {
   late final String _mediaType;
 
   // Public constructor
-  Tmdb({required String mediaType}) : _mediaType = mediaType {
+  Tmdb({required String mediaType}): _mediaType = mediaType {
      _headers = {
       'accept': 'application/json',
       'Authorization': 'Bearer ${config.tmdbToken}'

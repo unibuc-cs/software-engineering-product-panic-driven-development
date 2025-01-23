@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import '../provider.dart';
 import 'package:html/dom.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:puppeteer/puppeteer.dart';
 import 'package:html/parser.dart' show parse;
 
 class GoodReadsList extends Provider {

@@ -9,7 +9,7 @@ class Trakt extends Provider {
   late final String _mediaType;
 
   // Public constructor
-  Trakt({required String mediaType}) : _mediaType = mediaType {
+  Trakt({required String mediaType}): _mediaType = mediaType {
      _headers = {
       'Content-Type': 'application/json',
       'trakt-api-key': config.traktId,

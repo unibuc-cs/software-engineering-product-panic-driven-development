@@ -8,7 +8,7 @@ class MyAnimeList extends Provider {
   late final String _mediaType;
 
   // Public constructor
-  MyAnimeList({required String mediaType}) : _mediaType = mediaType;
+  MyAnimeList({required String mediaType}): _mediaType = mediaType;
 
   // Private methods
   Uri _url(String username) {

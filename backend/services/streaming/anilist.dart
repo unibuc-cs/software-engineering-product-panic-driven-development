@@ -22,7 +22,7 @@ class Anilist extends Provider {
   late final String _mediaType;
 
   // Public constructor
-  Anilist({required String mediaType}) : _mediaType = mediaType;
+  Anilist({required String mediaType}): _mediaType = mediaType;
 
   // Private methods
   String _removeBadItems(String input) {
@@ -79,7 +79,7 @@ class Anilist extends Provider {
       }
 
       return (response['Page']['media'] as List).map((media) {
-        final releaseDate = media['startDate']['year'].toString() ?? '';
+        final releaseDate = media['startDate']['year'].toString();
         return {
           'id': media['id'],
           // Prefer the English title, fallback to the Japanese one
