@@ -52,13 +52,13 @@ ThemeData navigationButton(BuildContext context) => ThemeData(
     style: ButtonStyle(
       backgroundColor: WidgetStatePropertyAll(
         Theme.of(context).brightness == Brightness.light
-          ? Color.fromARGB(255, 100, 100, 100)
-          : Color.fromARGB(255, 100, 100, 100),
+          ? Color.fromARGB(255, 200, 200, 200)
+          : Color.fromARGB(255, 60, 60, 60),
       ),
       foregroundColor: WidgetStatePropertyAll(
         Theme.of(context).brightness == Brightness.light
-          ? Color.fromARGB(255, 255, 255, 255)
-          : Color.fromARGB(255, 255, 255, 255),
+          ? Color.fromARGB(255, 0, 0, 0)
+          : Color.fromARGB(255, 224, 224, 224),
       ),
     ),
   ),

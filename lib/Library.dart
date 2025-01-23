@@ -148,6 +148,50 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
   }
 
+  Widget? getCustomIcon(MT mt) {
+    var iconUrl = '';
+    if (isWishlist) {
+      List<Wishlist> wishes = WishlistService
+        .instance
+        .items
+        .where((wish) => wish.mediaId == mt.getMediaId())
+        .toList();
+      
+      if (wishes.length != 1) {
+        // TODO: This should not be reachable. If somehow we got here, there was an error in the database
+        throw Exception('More Wishlist elements of the same mediaId (${mt.getMediaId()}) found. Contact an admin.');
+      }
+
+      iconUrl = 'https:${wishes.first.icon}';
+    }
+    else {
+      List<MediaUser> mus = MediaUserService
+        .instance
+        .items
+        .where((mu) => mu.mediaId == mt.getMediaId())
+        .toList();
+      
+      if (mus.length != 1) {
+        // TODO: This should not be reachable. If somehow we got here, there was an error in the database
+        throw Exception('More MediaUser elements of the same mediaId (${mt.getMediaId()}) found. Contact an admin.');
+      }
+
+      iconUrl = 'https:${mus.first.icon}';
+    }
+
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(
+            iconUrl,
+          ),
+        ),
+      ),
+    );
+  }
+
   // Create and return a list view of the filtered media
   ListView mediaListBuilder(BuildContext context) {
     List<ListTile> listTiles = List.empty(growable: true);
@@ -196,15 +240,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
     });
 
-    Icon leadingIcon = getIconForType(MT);
+    Icon defaultIcon = getIconForType(MT);
 
     for (int i = 0; i < mediaIndices.length; ++i) {
       final mt = mediaIndices[i].key;
       final mediaName = getCustomName(mt);
       if (filterQuery == '' || mediaName.toLowerCase().contains(filterQuery)) {
+        final customIcon = getCustomIcon(mt);
         listTiles.add(
           ListTile(
-            leading: leadingIcon,
+            leading: customIcon ?? defaultIcon,
             title: Text(mediaName),
             onTap: () {
               setState(() {
