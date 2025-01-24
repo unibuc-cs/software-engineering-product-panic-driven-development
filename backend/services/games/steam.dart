@@ -46,7 +46,6 @@ class Steam extends Provider {
 
       games.sort((game1, game2) => game1['name'].compareTo(game2['name']));
       return {
-        // image url: https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/<id>/<icon>.jpg
         'games': games
           .where((game) =>
             !game['name'].toLowerCase().contains('public test') &&
@@ -64,7 +63,7 @@ class Steam extends Provider {
                 .replaceAll(RegExp(r'\(.*?\)'), '')
                 .replaceAll('’', '\'')
                 .trim(),
-              'icon': game['img_icon_url'],
+              'icon': 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/${game['appid']}/${game['img_icon_url']}.jpg',
               'time_played': game['playtime_forever'],
               'last_played': _getDate(game['rtime_last_played'] ?? 0)
             };

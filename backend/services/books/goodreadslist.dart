@@ -50,14 +50,14 @@ class GoodReadsList extends Provider {
         };
       }
 
-      final books = <String>[];
+      final books = <Map<String, dynamic>>[];
       final rows = document.querySelectorAll('tr.bookalike.review');
       for (final row in rows) {
         final titleElement = row.querySelector('td.field.title div.value a');
 
         if (titleElement != null) {
           final title = titleElement.text.split('\n')[1].trim();
-          books.add(title);
+          books.add({ 'name': title });
         }
       }
       return {

@@ -1,9 +1,7 @@
 # MediaMaster
 
-We describe our app in more detail on the Wiki: https://github.com/unibuc-cs/software-engineering-product-panic-driven-development/wiki
-
-## Backend server
-- https://mediamaster.fly.dev/
+## Wiki
+- https://github.com/unibuc-cs/software-engineering-product-panic-driven-development/wiki
 
 ## Usage
 - Activate Run Pubspec Script
@@ -13,77 +11,27 @@ dart pub global activate rps
 
 - Install the dependencies
 ```bash
-rps restore
-```
-or
-```bash
-flutter pub get
+rps dependencies
 ```
 
-- Run in debug mode
-```bash
-rps app:dev
-```
-or
-```bash
-flutter run -d windows
-```
-
-- Run in release mode
-```bash
-rps app
-```
-or
-```bash
-flutter run -d windows --release
-```
-
-## Backend
-- Start the server
+- Local Server
 ```bash
 rps server
 ```
-or
+
+- Running on local server
 ```bash
-dart backend/main.dart
+rps app:local
 ```
 
-- Start the server with hot reload
+- Running on depoyed server
 ```bash
-rps server:dev
-```
-or
-```bash
-dart run --enable-vm-service backend/main.dart
+rps app
 ```
 
-- Start the server with nodemon
-```bash
-rps server:nodemon
-```
-or
-```bash
-nodemon -x "dart run backend/main.dart" -e dart
-```
+- Deployed server https://mediamaster.fly.dev/
+- For more commands, see the scripts in the `pubspec.yaml` file.
 
-## Testing
-
-- Test the services with the CLI app
-```bash
-rps cli
-```
-
-- Test all providers
-```bash
-rps test:providers
-```
-
-- Test all resources
-```
-rps test:resources
-```
-
-- Test individual services with unit tests (replace {service} with igdb, hltb or pcgw)
-```bash
-rps test:{service}
-```
+## Credits
+- [Python](https://www.python.org/downloads/)
+- [Nodemon (for better hot reload)](https://nodemon.io/)

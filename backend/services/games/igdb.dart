@@ -435,12 +435,12 @@ class IGDB extends Provider {
 
       if (game['artworks'] != null) {
         await _getArtworks(_accessToken, game);
-        game['artworks'] = _artworks;
+        game['artworks'] = _artworks.map((artwork) => 'https://$artwork').toList();
       }
 
       if (game['cover'] != null) {
         await _getCover(_accessToken, game);
-        game['coverimage'] = _cover;
+        game['coverimage'] = 'https://$_cover';
         game.remove('cover');
       }
 

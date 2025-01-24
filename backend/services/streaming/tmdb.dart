@@ -88,7 +88,7 @@ class Tmdb extends Provider {
       'description': media['overview'],
       'language': media['original_language'],
       'artworks': media['backdrop_path'],
-      'coverimage': media['poster_path'],
+      'coverimage': 'https://image.tmdb.org/t/p/original/${media['poster_path']}',
       'creators': media['production_companies'].map((dynamic producer) {
         return producer['name'];
       }).toList(),

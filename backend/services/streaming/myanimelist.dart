@@ -26,9 +26,9 @@ class MyAnimeList extends Provider {
       String englishKey = _mediaType == 'manga' ? 'manga_english' : 'anime_title_eng';
       return {
         _mediaType: (data as List)
-          .map((media) => (media[englishKey] != null && media[englishKey]!.isNotEmpty)
+          .map((media) => { 'name': (media[englishKey] != null && media[englishKey]!.isNotEmpty)
             ? media[englishKey]
-            : media['${_mediaType}_title'])
+            : media['${_mediaType}_title'] })
           .toList()
       };
     }

@@ -56,6 +56,8 @@ flutter:
 
 scripts:
   restore             : flutter clean && flutter pub get
+  python              : pip install -r assets/requirements.txt
+  dependencies        : rps restore && rps python
   app                 : flutter run -d windows
   app:dev             : flutter run -d windows --release
   app:local           : flutter run --dart-define=LOCAL=true -d windows

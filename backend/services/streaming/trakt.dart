@@ -30,7 +30,7 @@ class Trakt extends Provider {
     }
     return {
       _mediaType: jsonDecode(response.body)
-        .map((media) => media[media['type']]['title'])
+        .map((media) => { 'name': media[media['type']]['title'] })
         .toList()
     };
   }
