@@ -122,14 +122,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   Set<Genre> selectedGenresIds = {};
   Set<Tag> selectedTagsIds = {};
 
-  Widget loadingWidget = Center(
-    child: const Padding(
-      padding: EdgeInsets.all(8.0),
-      child: CircularProgressIndicator(
-          color: Color.fromARGB(219, 10, 94, 87)),
-    )
-  );
-
   @override
   LibraryState({required this.isWishlist});
 
@@ -597,7 +589,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 content: SizedBox(
                   width: 100,
                   height: 100,
-                  child: loadingWidget
+                  child: Center(
+                    child: loadingWidget(
+                      context
+                    ),
+                  ),
                 ),
               );
             }

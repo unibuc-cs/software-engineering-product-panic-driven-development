@@ -64,18 +64,17 @@ ThemeData navigationButton(BuildContext context) => ThemeData(
   ),
 );
 
-// TODO: Make this widget look nice in both light and dark theme
 Widget loadingWidget(BuildContext context) => CircularProgressIndicator(
-  color: Color.fromARGB(219, 10, 94, 87),
+  color: Theme.of(context).brightness == Brightness.light
+    ? Color.fromARGB(255, 0, 0, 190)
+    : Color.fromARGB(255, 150, 150, 255),
 );
 
-// TODO: Make this widget look nice in both light and dark theme
 Widget checkMarkWidget(BuildContext context) => Icon(
   Icons.check,
   color: Color.fromARGB(255, 0, 200, 10),
 );
 
-// TODO: Make this widget look nice in both light and dark theme
 Widget failMarkWidget(BuildContext context) => Icon(
   Icons.cancel_outlined,
   color: Color.fromARGB(255, 230, 30, 10),

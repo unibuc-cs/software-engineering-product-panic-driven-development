@@ -279,9 +279,8 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                           .style,
                       ),
                     ),
-                  // TODO: Enable all / disable all
                   SizedBox(
-                    height: 10,
+                    height: 7,
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -289,27 +288,26 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                         children: [
                           for (var entry in searchResults.entries)
                             Container(
-                              constraints: BoxConstraints(
-                                minHeight: 60,
-                              ),
                               child: Row(
                                 children: [
                                   Checkbox(
                                     value: wanted.contains(entry.key),
-                                    onChanged: (onOff) {
-                                      if (onOff == null) {
-                                        return;
-                                      }
+                                    onChanged: workingOn.isEmpty
+                                      ? (onOff) {
+                                          if (onOff == null) {
+                                            return;
+                                          }
 
-                                      if (onOff) {
-                                        wanted.add(entry.key);
-                                      }
-                                      else {
-                                        wanted.remove(entry.key);
-                                      }
+                                          if (onOff) {
+                                            wanted.add(entry.key);
+                                          }
+                                          else {
+                                            wanted.remove(entry.key);
+                                          }
 
-                                      setState(() {});
-                                    },
+                                          setState(() {});
+                                        }
+                                      : null, // This makes the box gray and non changeable when there is an import going on
                                   ),
                                   Expanded(
                                     child: Text(entry.key),
@@ -337,6 +335,38 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                       ),
                     ),
                   ),
+                  if (searchResults.isNotEmpty) // Space for buttons
+                    SizedBox(
+                      height: 7,
+                    ),
+                  if (searchResults.isNotEmpty) // Select / Deselect all
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              wanted = searchResults.keys.toSet();
+                              setState(() {});
+                            },
+                            child: Text('Select all'),
+                            style: greenFillButton(context)
+                              .filledButtonTheme
+                              .style,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              wanted = {};
+                              setState(() {});
+                            },
+                            child: Text('Deselect all'),
+                            style: redFillButton(context)
+                              .filledButtonTheme
+                              .style,
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),

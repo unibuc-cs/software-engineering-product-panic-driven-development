@@ -118,9 +118,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text('Log in'),
                     ),
                     if (state is LoginLoading)
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(color: Color.fromARGB(219, 10, 94, 87)),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: loadingWidget(
+                          context,
+                        ),
                       ),
                   ],
                 ),
