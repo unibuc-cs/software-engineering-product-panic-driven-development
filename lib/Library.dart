@@ -311,10 +311,17 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Media type already in db is not implemented, because of $err');
     }
 
-    return serviceInstance
+    // TODO: Sometimes there is an error with the database and things get created only as Media but not MediaType (or at least that is what the local version has)
+    List<MT> mts = serviceInstance
       .items
       .where((entry) => entry.mediaId == mediaIds.first)
-      .first as MT;
+      .map((entry) => entry as MT);
+    if (mts.isEmpty) {
+      // The error occured. The reasons why this happened can be many. I will for now just leave it at nothing
+      return null;
+    }
+
+    return mts.first;
   }
 
   bool mediaAlreadyInWishlist(String name) {

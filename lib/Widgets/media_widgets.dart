@@ -220,22 +220,20 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                flex: 3,
-                                child: Container(
-                                  // Cover
-                                  margin: const EdgeInsets.all(
-                                    20,
+                              Container(
+                                // Cover
+                                margin: const EdgeInsets.all(
+                                  20,
+                                ),
+                                child: Image(
+                                  image: NetworkImage(
+                                    coverUrl,
                                   ),
-                                  child: Image(
-                                    image: NetworkImage(
-                                      coverUrl,
-                                    ),
-                                  ),
+                                  width: 210,
+                                  height: 246,
                                 ),
                               ),
                               Expanded(
-                                flex: 4,
                                 child: Container(
                                   // Description
                                   margin: const EdgeInsets.fromLTRB(20, 30, 20, 0),

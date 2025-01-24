@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mediamaster/Library.dart';
 import 'package:mediamaster/Widgets/themes.dart';
 import 'package:mutex/mutex.dart';
+import 'package:url_launcher/link.dart';
 import '../Services/provider_service.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 Map<String, dynamic> _getBestMatch(String gameName, List<Map<String, dynamic>> gameOptions) {
   Map<String, dynamic> bestMatch = {};
@@ -107,7 +108,7 @@ Future<Map<String, Map<String, dynamic>>> _getGamesForID(String id, {bool debugg
       'Unrailed!': {'id': 115201, 'name': 'Unrailed! (2019)'},
       'Viscera Cleanup Detail Shadow Warrior': {'id': 16718, 'name': 'Viscera Cleanup Detail: Shadow Warrior (2013)'},
       'Titanfall 2': {'id': 17447, 'name': 'Titanfall 2 (2016)'},
-      'Viscera Cleanup Detail Santa"s Rampage': {'id': 5564, 'name': 'Viscera Cleanup Detail: Santa"s Rampage (2013)'},
+      'Viscera Cleanup Detail Santa\'s Rampage': {'id': 5564, 'name': 'Viscera Cleanup Detail: Santa\'s Rampage (2013)'},
       'We Were Here Expeditions The FriendShip': {'id': 266676, 'name': 'We Were Here Expeditions: The FriendShip (2023)'},
       'tModLoader': {'id': 134157, 'name': 'tModLoader (2020)'},
     };
@@ -145,18 +146,22 @@ Future<Map<String, Map<String, dynamic>>> _getGamesForID(String id, {bool debugg
   return games;
 }
 
-Future<void> confirmImport(Map<String, Map<String, dynamic>> gamesData, LibraryState gamesLibrary) async {
+Future<void> confirmImport(Map<String, Map<String, dynamic>> gamesData, LibraryState gamesLibrary, Set<String> wanted, void Function() setState, Set<String> workingOn, Set<String> done, Set<String> failed) async {
   // TODO: make it so it adds all games in paralel
+  // TODO: the TODO above probably cannot be fulfilled as even sequentially there are errors from PCGW that break the import process
   List<MapEntry<String, Map<String, dynamic>>> gameEntriesList = gamesData.entries.toList();
+  gameEntriesList = gameEntriesList.where((entry) => wanted.contains(entry.key) && !gamesLibrary.mediaAlreadyInLibrary(entry.value['name'])).toList();
   gameEntriesList.sort((a, b) => a.key.compareTo(b.key));
+
+  workingOn.addAll(gameEntriesList.map((entry) => entry.key));
+  setState();
+
   for (var gameData in gameEntriesList) {
-    print(gameData);
-    if (gamesLibrary.mediaAlreadyInLibrary(gameData.value['name'])) {
-      continue;
-    }
     for (int trial = 0; trial < 3; ++trial) {
       try {
         await gamesLibrary.addMediaType(gameData.value);
+        done.add(gameData.key);
+        workingOn.remove(gameData.key);
         break;
       }
       catch (e) {
@@ -165,6 +170,11 @@ Future<void> confirmImport(Map<String, Map<String, dynamic>> gamesData, LibraryS
         print(e);
       }
     }
+    if (workingOn.contains(gameData.key)) {
+      workingOn.remove(gameData.key);
+      failed.add(gameData.key);
+    }
+    setState();
   }
 }
 
@@ -174,34 +184,56 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
   Map<String, Map<String, dynamic>> searchResults = {};
   Color linkColor = Color.fromARGB(255, 0, 128, 198);
 
+  Set<String> wanted = {};
+  Set<String> workingOn = {};
+  Set<String> done = {};
+  Set<String> failed = {};
+
   return showDialog(
     context: context,
+    barrierDismissible: false,
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
             title: Column(
               children: [
-                Text('Import games from Steam library'),
-                InkWell(
-                  child: Text(
-                    'How to get Steam ID',
-                    style: TextStyle(
-                      color: linkColor,
-                      decoration: TextDecoration.underline,
-                      decorationColor: linkColor,
+                Row(
+                  children: [
+                    Text('Import games from Steam library'),
+                    IconButton(
+                      onPressed: () {
+                        if (workingOn.isEmpty) {
+                          Navigator
+                            .of(context)
+                            .pop();
+                        }
+                      },
+                      icon: Icon(
+                        Icons.close,
+                      ),
                     ),
-                  ),
-                  onTap: () async {
-                    bool linkOpened = false;
-                    try {
-                      linkOpened = await launchUrl(Uri.parse('https://www.howtogeek.com/819859/how-to-find-steam-id/#view-your-id-in-the-steam-app'));
-                    }
-                    catch (e) {
-                    }
-                    if (!linkOpened) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The link could not be opened')));
-                    }
+                  ],
+                ),
+                Link( // This is modified from https://androidride.com/flutter-hyperlink-text/ first example
+                  uri: Uri.parse('https://www.howtogeek.com/819859/how-to-find-steam-id/#view-your-id-in-the-steam-app'),
+                  builder: (context, followLink) {
+                    return RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'How to get Steam ID',
+                            style: TextStyle(
+                              color: linkColor,
+                              decoration: TextDecoration.underline,
+                              fontSize: 22,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = followLink,
+                          ),
+                        ],
+                      ),
+                    );
                   },
                 ),
               ],
@@ -216,11 +248,14 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                     decoration: InputDecoration(
                       labelText: 'Steam ID',
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.search),
+                        icon: const Icon(
+                          Icons.search,
+                        ),
                         onPressed: () async {
                           String steamId = controller.text;
                           if (steamId.isNotEmpty) {
-                            searchResults = await _getGamesForID(steamId, debugging: true); // TODO: remove debugging here
+                            searchResults = await _getGamesForID(steamId, debugging: false); // TODO: remove debugging here
+                            wanted = searchResults.keys.toSet();
                             if (context.mounted) {
                               setState(() {});
                             }
@@ -236,7 +271,7 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                     Center(
                       child: TextButton(
                         onPressed: () async {
-                          await confirmImport(searchResults, gamesLibrary);
+                          await confirmImport(searchResults, gamesLibrary, wanted, () => setState(() {}), workingOn, done, failed);
                         },
                         child: Text('Confirm import'),
                         style: greenFillButton(context)
@@ -244,6 +279,7 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                           .style,
                       ),
                     ),
+                  // TODO: Enable all / disable all
                   SizedBox(
                     height: 10,
                   ),
@@ -252,9 +288,49 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                       child: Column(
                         children: [
                           for (var entry in searchResults.entries)
-                            Card(
-                              child: ListTile(
-                                title: Text(entry.key),
+                            Container(
+                              constraints: BoxConstraints(
+                                minHeight: 60,
+                              ),
+                              child: Row(
+                                children: [
+                                  Checkbox(
+                                    value: wanted.contains(entry.key),
+                                    onChanged: (onOff) {
+                                      if (onOff == null) {
+                                        return;
+                                      }
+
+                                      if (onOff) {
+                                        wanted.add(entry.key);
+                                      }
+                                      else {
+                                        wanted.remove(entry.key);
+                                      }
+
+                                      setState(() {});
+                                    },
+                                  ),
+                                  Expanded(
+                                    child: Text(entry.key),
+                                  ),
+                                  SizedBox(
+                                    child: Center(
+                                      child: workingOn.contains(entry.key)
+                                      ? loadingWidget(context)
+                                      : done.contains(entry.key)
+                                        ? checkMarkWidget(context)
+                                        : failed.contains(entry.key)
+                                          ? failMarkWidget(context)
+                                          : null,
+                                    ),
+                                    height: 20,
+                                    width: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                ]
                               ),
                             ),
                         ],

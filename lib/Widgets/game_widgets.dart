@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:mediamaster/Widgets/themes.dart';
 import '../Models/game.dart';
 import 'media_widgets.dart';
-
 
 int getMinTimeToBeat(Game game) {
   List<int> times = List.from([
@@ -213,16 +213,9 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         // Play button
         margin: const EdgeInsets.all(10),
         child: TextButton(
-          style: ButtonStyle(
-            backgroundColor:
-                const WidgetStatePropertyAll(Colors.lightGreen),
-            shape:
-              const WidgetStatePropertyAll(RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.all(Radius.circular(10)),
-                ),
-              ),
-          ),
+          style: greenFillButton(context)
+            .filledButtonTheme
+            .style,
           onPressed: () {
             playGame(game);
           },

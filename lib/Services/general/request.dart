@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 String getErrMsg(String? body, String fallbackMsg) {
-  return (body != null && body.isNotEmpty && body.contains('error'))
+  return (body != null && body.isNotEmpty && body.contains('"error":"'))
     ? body.split('{"error":"')[1].split('"}')[0]
     : fallbackMsg;
 }
