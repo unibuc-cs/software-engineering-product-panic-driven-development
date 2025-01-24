@@ -45,85 +45,78 @@ class Library<MT extends MediaType> extends StatefulWidget {
 
 class LibraryState<MT extends MediaType> extends State<Library> {
   late final isWishlist;
+  
   int selectedMediaId = -1;
-  String filterQuery = '';
-  final String placeholderImage = '//static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
+  
+  final String placeholderImage = 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
+  
   TextEditingController searchController = TextEditingController();
+  String filterQuery = '';
+  
   bool increasingSorting = true;
-  int selectedSortingMethod = 0;
-  var mediaOrderComparators = [
-    Pair<String, dynamic>(
-      'By original name',
-      (MT a, MT b, int increasing) {
-        return increasing * a.media.originalName.compareTo(b.media.originalName);
-      },
-    ),
-    Pair<String, dynamic>(
-      'By critic score',
-      (MT a, MT b, int increasing) {
-        return increasing * a.media.criticScore.compareTo(b.media.criticScore);
-      },
-    ),
-    Pair<String, dynamic>(
-      'By comunity score',
-      (MT a, MT b, int increasing) {
-        return increasing * a.media.communityScore.compareTo(b.media.communityScore);
-      },
-    ),
-    Pair<String, dynamic>(
-      'By release date',
-      (MT a, MT b, int increasing) {
-        if (a.media.releaseDate == null && b.media.releaseDate == null) {
-          return false;
-        }
-        if (a.media.releaseDate == null) {
-          return increasing;
-        }
-        if (b.media.releaseDate == null) {
-          return -increasing;
-        }
-        return increasing * a.media.releaseDate!.compareTo(b.media.releaseDate!);
-      },
-    ),
+  String selectedSortingMethod = 'By original name';
+  Map<String, dynamic> mediaOrderComparators = {
+    'By original name': (MT a, MT b, int increasing) {
+      return increasing * a.media.originalName.compareTo(b.media.originalName);
+    },
+    'By given name': null, // TODO: This cannot be set before the constructor is called as member functions are needed. A workaround is to just add it in the constructor
+    'By critic score': (MT a, MT b, int increasing) {
+      return increasing * a.media.criticScore.compareTo(b.media.criticScore);
+    },
+    'By comunity score': (MT a, MT b, int increasing) {
+      return increasing * a.media.communityScore.compareTo(b.media.communityScore);
+    },
+    'By release date': (MT a, MT b, int increasing) {
+      if (a.media.releaseDate == null && b.media.releaseDate == null) {
+        return false;
+      }
+      if (a.media.releaseDate == null) {
+        return increasing;
+      }
+      if (b.media.releaseDate == null) {
+        return -increasing;
+      }
+      return increasing * a.media.releaseDate!.compareTo(b.media.releaseDate!);
+    },
     if (MT == Game)
-      Pair<String, dynamic>(
-        'By time to beat',
-        (MT a, MT b, int increasing) {
-          int ta = getMinTimeToBeat(a as Game);
-          int tb = getMinTimeToBeat(b as Game);
+      'By time to beat': (MT a, MT b, int increasing) {
+        int ta = getMinTimeToBeat(a as Game);
+        int tb = getMinTimeToBeat(b as Game);
 
-          if (tb == -1) {
-            return -1;
-          }
-          if (ta == -1) {
-            return 1;
-          }
-          return increasing * ta.compareTo(tb);
-        },
-      ),
+        if (tb == -1) {
+          return -1;
+        }
+        if (ta == -1) {
+          return 1;
+        }
+        return increasing * ta.compareTo(tb);
+      },
     if (MT == Game)
-      Pair<String, dynamic>(
-        'By time to 100%',
-        (MT a, MT b, int increasing) {
-          if ((b as Game).HLTBCompletionistInSeconds == -1) {
-            return -1;
-          }
-          if ((a as Game).HLTBCompletionistInSeconds == -1) {
-            return 1;
-          }
-          return increasing *
-              a.HLTBCompletionistInSeconds.compareTo(
-                  b.HLTBCompletionistInSeconds);
-        },
-      ),
+      'By time to 100%': (MT a, MT b, int increasing) {
+        if ((b as Game).HLTBCompletionistInSeconds == -1) {
+          return -1;
+        }
+        if ((a as Game).HLTBCompletionistInSeconds == -1) {
+          return 1;
+        }
+        return increasing *
+            a.HLTBCompletionistInSeconds.compareTo(
+                b.HLTBCompletionistInSeconds);
+      },
      // TODO: ADD OTHER SORTING METHODS
-  ];
+  };
+  
   bool filterAll = true;
   Set<Genre> selectedGenresIds = {};
   Set<Tag> selectedTagsIds = {};
 
   @override
-  LibraryState({required this.isWishlist});
+  LibraryState({required this.isWishlist}) {
+    // TODO: This cannot be set before the constructor as member functions are required
+    mediaOrderComparators['By given name'] = (MT a, MT b, int increasing) {
+      return increasing * getCustomName(a).compareTo(getCustomName(b));
+    };
+  }
 
   @override
   void initState() {
@@ -135,9 +128,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     if (aux.value == null) {
       return aux.key!.name;
     }
-    else {
-      return aux.value!.name;
-    }
+    return aux.value!.name;
   }
 
   Widget? getCustomIcon(MT mt) {
@@ -225,7 +216,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     mediaIndices.sort((p0, p1) {
-      return mediaOrderComparators[selectedSortingMethod].value(
+      return mediaOrderComparators[selectedSortingMethod](
         p0.key,
         p1.key,
         increasingSorting ? 1 : -1,
@@ -280,14 +271,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     filterQuery = '';
   }
 
-  MT? mediaAlreadyInDB(String name) {
+  MT? mediaAlreadyInDB(String originalName) {
     String dbName = getMediaTypeDbName(MT);
 
     // Notat
     List<int> mediaIds = MediaService
       .instance
       .items
-      .where((media) => media.originalName == name && media.mediaType == dbName)
+      .where((media) => media.originalName == originalName && media.mediaType == dbName)
       .map((media) => media.id)
       .toList();
     
@@ -304,25 +295,26 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     // TODO: Sometimes there is an error with the database and things get created only as Media but not MediaType (or at least that is what the local version has)
-    List<MT> mts = serviceInstance
+    List<dynamic> mts = serviceInstance
       .items
       .where((entry) => entry.mediaId == mediaIds.first)
-      .map((entry) => entry as MT);
+      .map((entry) => entry as MT)
+      .toList();
     if (mts.isEmpty) {
       // The error occured. The reasons why this happened can be many. I will for now just leave it at nothing
       return null;
     }
 
-    return mts.first;
+    return mts.first as MT;
   }
 
-  bool mediaAlreadyInWishlist(String name) {
+  bool mediaAlreadyInWishlist(String originalName) {
     String dbName = getMediaTypeDbName(MT);
 
     Set<int> mediaIds = MediaService
       .instance
       .items
-      .where((media) => media.originalName == name && dbName == media.mediaType)
+      .where((media) => media.originalName == originalName && dbName == media.mediaType)
       .map((media) => media.id)
       .toSet();
     
@@ -335,13 +327,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       .isNotEmpty;
   }
 
-  bool mediaAlreadyInLibrary(String name) {
+  bool mediaAlreadyInLibrary(String originalName) {
     String dbName = getMediaTypeDbName(MT);
     List<Media> media = MediaService
       .instance
       .items
       .where((media) =>
-        media.originalName == name &&
+        media.originalName == originalName &&
         media.mediaType == dbName
       ).toList();
 
@@ -357,6 +349,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       .where((mu) => mu.mediaId == id)
       .isNotEmpty;
   }
+
+  String get nameLW    => isWishlist ? 'wishlist' : 'library';
+  String get nameLWCap => isWishlist ? 'Wishlist' : 'Library';
 
   @override
   Widget build(BuildContext context) {
@@ -385,16 +380,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
     }
 
-    String mediaType = '';
-    try {
-      mediaType = getMediaTypeDbName(MT);
-    }
-    catch (err) {
-      throw UnimplementedError('Build not implemented for this media type, because of $err');
-    }
-
-    String LibraryWishlistSmall = isWishlist == false ? 'library' : 'wishlist';
-    String LibraryWishlistBig = isWishlist == false ? 'Wishlist' : 'Library';
+    String oppositeLibraryWishlistBig = isWishlist ? 'Library' : 'Wishlist';
 
     TextField textField = TextField(
       controller: searchController,
@@ -403,7 +389,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       },
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
-        hintText: 'Search $mediaType in $LibraryWishlistSmall',
+        hintText: 'Search ${getForType(MT, 'dbName')} in $nameLW',
         suffixIcon: butonSearchReset,
       ),
     );
@@ -413,8 +399,45 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MediaMaster'),
+        title: Container(
+          child: Row(
+            children: [
+              Text('${getMediaTypeDbNameCapitalize(MT)} $nameLWCap'),
+              SizedBox(
+                width: 30,
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Library<MT>(
+                        isWishlist: !isWishlist,
+                      ),
+                    ),
+                  );
+                },
+                style: navigationButton(context)
+                  .filledButtonTheme
+                  .style,
+                child: Text('Switch to $oppositeLibraryWishlistBig'),
+              ),
+            ],
+          ),
+        ),
+        
+        
         actions: [
+          IconButton(
+            onPressed: () {
+              AdaptiveTheme.of(context).mode ==
+                      AdaptiveThemeMode.light
+                  ? AdaptiveTheme.of(context).setDark()
+                  : AdaptiveTheme.of(context).setLight();
+            },
+            icon: const Icon(Icons.dark_mode),
+            tooltip: 'Toggle dark mode',
+          ),
           TextButton(
             onPressed: () {}, // TODO: profile page
             style: navigationButton(context)
@@ -446,37 +469,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         _showSortMediaDialog(context);
                       },
                       icon: const Icon(Icons.sort),
-                      tooltip: 'Sort ${mediaType}s',
+                      tooltip: 'Sort ${getForType(MT, "dbNamePlural")}',
                     ),
                     IconButton(
                       onPressed: () {
                         _showFilterMediaDialog(context);
                       },
                       icon: const Icon(Icons.filter_alt),
-                      tooltip: 'Filter ${mediaType}s',
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        AdaptiveTheme.of(context).mode ==
-                                AdaptiveThemeMode.light
-                            ? AdaptiveTheme.of(context).setDark()
-                            : AdaptiveTheme.of(context).setLight();
-                      },
-                      icon: const Icon(Icons.dark_mode),
-                      tooltip: 'Toggle dark mode',
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => Library<MT>(isWishlist: !isWishlist)
-                          )
-                        );
-                      },
-                      style: navigationButton(context)
-                        .filledButtonTheme
-                        .style,
-                      child: Text('Go to $LibraryWishlistBig'),
+                      tooltip: 'Filter ${getForType(MT, "dbNamePlural")}',
                     ),
                     if (!isWishlist && MT == Game) // Steam import button
                       IconButton(
@@ -498,7 +498,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           _showSearchMediaDialog(context);
                         },
                         icon: const Icon(Icons.add_circle),
-                        tooltip: 'Add $mediaType to $LibraryWishlistSmall',
+                        tooltip: 'Add ${getForType(MT, "dbName")} to $nameLW',
                       ),
                     ),
                     Expanded(
@@ -508,6 +508,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                       width: 5,
                     )
                   ],
+                ),
+                SizedBox(
+                  height: 10,
                 ),
                 Expanded(
                   child: mediaListWidget,
@@ -657,7 +660,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                     subtitle: Text(
                                       '$mediaType is already in library.',
                                       style: const TextStyle(
-                                        color: Color.fromARGB(255, 255, 0, 0),
+                                        color: Color.fromARGB(255, 220, 20, 20),
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     onTap: () {
@@ -676,10 +680,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                       ),
                                     ),
                                     onTap: () async {
-                                      // TODO: When you add something from wishlist we should move everything into library
                                       isChosen = true;
                                       setState(() {});
-                                      await addMediaType(result);
+                                      try {
+                                        await addMediaType(result);
+                                      }
+                                      catch(e) {
+                                        // TODO: Error here. What should we do?
+                                      }
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
                                       }
@@ -692,7 +700,12 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                     onTap: () async {
                                       isChosen = true;
                                       setState(() {});
-                                      await addMediaType(result);
+                                      try {
+                                        await addMediaType(result);
+                                      }
+                                      catch(e) {
+                                        // TODO: Error here. What should we do?
+                                      }
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
                                       }
@@ -716,14 +729,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   Future<void> _showSortMediaDialog(BuildContext context) {
-    // Helper function, should be called when a variable gets changed
-    void resetState() {
+    // Helper function, should be called when rendering is to be remade
+    void resetStateGlobal() {
       setState(() {});
     }
 
-    String mediaType = '';
+    String mediaTypePlural = '';
     try {
-      mediaType = getMediaTypeDbNamePlural(MT);
+      mediaTypePlural = getMediaTypeDbNamePlural(MT);
     }
     catch (err) {
       throw UnimplementedError('Sorting is not implemented for this media type, because of $err');
@@ -734,8 +747,13 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            // When something changes call this function to redraw everything
+            var resetState = () {
+              setState(() {});
+              resetStateGlobal();
+            };
             return AlertDialog(
-              title: Text('Sort $mediaType'),
+              title: Text('Sort $mediaTypePlural'),
               content: SizedBox(
                 height: 300,
                 child: SingleChildScrollView(
@@ -750,15 +768,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                       ),
                       Row(
                         children: [
-                          Checkbox(
-                            value: increasingSorting,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  increasingSorting = true;
-                                  resetState();
-                                }
-                              });
+                          Radio(
+                            value: 'increasing',
+                            groupValue: increasingSorting
+                              ? 'increasing'
+                              : 'decreasing',
+                            onChanged: (_) {
+                              increasingSorting = true;
+                              resetState();
                             },
                           ),
                           const Text(
@@ -772,15 +789,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                       ),
                       Row(
                         children: [
-                          Checkbox(
-                            value: !increasingSorting,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  increasingSorting = false;
-                                  resetState();
-                                }
-                              });
+                          Radio(
+                            value: 'decreasing',
+                            groupValue: increasingSorting
+                              ? 'increasing'
+                              : 'decreasing',
+                            onChanged: (_) {
+                              increasingSorting = false;
+                              resetState();
                             },
                           ),
                           const Text(
@@ -799,22 +815,19 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      for (int i = 0; i < mediaOrderComparators.length; ++i)
+                      for (String sortingMethod in mediaOrderComparators.keys)
                         Row(
                           children: [
-                            Checkbox(
-                              value: i == selectedSortingMethod,
-                              onChanged: (value) {
-                                setState(() {
-                                  if (value == true) {
-                                    selectedSortingMethod = i;
-                                    resetState();
-                                  }
-                                });
+                            Radio(
+                              value: sortingMethod,
+                              groupValue: selectedSortingMethod,
+                              onChanged: (_) {
+                                selectedSortingMethod = sortingMethod;
+                                resetState();
                               },
                             ),
                             Text(
-                              mediaOrderComparators[i].key,
+                              sortingMethod,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -829,7 +842,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             );
           },
         );
-      });
+      }
+    );
   }
 
   Future<void> _showFilterMediaDialog(BuildContext context) {
@@ -1161,7 +1175,27 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     return Pair(gameData, nullableGame as MT);
   }
 
+  // Despite its name, this function only connects the User and the MT. Speciffic data is being sent throught the data parameter
   Future<void> _addToLibraryOrWishlist(Map<String, dynamic> data, MT mt) async {
+    String coverImage = placeholderImage, icon = placeholderImage, backgroundImage = placeholderImage;
+
+    if (data.containsKey('icon')) {
+      icon = data['icon'];
+    }
+
+    if (data.containsKey('coverimage')) {
+      coverImage = backgroundImage = data['coverimage'];
+    }
+
+    if (data.containsKey('artworks') && data['artworks'].isNotEmpty) {
+      if (data['artworks'] is List) {
+        backgroundImage = data['artworks'][0];
+      }
+      else {
+        backgroundImage = data['artworks'];
+      }
+    }
+
     if (isWishlist) {
       if (mediaAlreadyInLibrary(data['originalname']) || mediaAlreadyInWishlist(data['originalname'])) {
         return;
@@ -1173,11 +1207,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         name: data['name'],
         userScore: -1,
         addedDate: DateTime.now(),
-        coverImage: data['coverimage'] ?? placeholderImage,
+        coverImage: coverImage,
         status: 'Plan To Consume',
         series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0],
-        icon: data['coverimage'] ?? placeholderImage,
-        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : (data['artworks'] is List ? data['artworks'][0] : data['artworks']),
+        icon: icon,
+        backgroundImage: backgroundImage,
         lastInteracted: DateTime.now(),
       );
 
@@ -1195,14 +1229,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       MediaUser mu = MediaUser(
         mediaId: mt.getMediaId(),
         userId: UserSystem.instance.getCurrentUserId(),
-        name: data['originalname'],
+        name: data['name'],
         userScore: -1,
         addedDate: DateTime.now(),
-        coverImage: data['coverimage'] ?? placeholderImage,
+        coverImage: coverImage,
         status: 'Plan To Consume',
         series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0] ?? data['name'],
-        icon: data['coverimage'] ?? placeholderImage,
-        backgroundImage: (data['artworks'] == null || data['artworks'].isEmpty) ? placeholderImage : (data['artworks'] is List ? data['artworks'][0] : data['artworks']),
+        icon: icon,
+        backgroundImage: backgroundImage,
         lastInteracted: DateTime.now(),
       );
 

@@ -173,14 +173,9 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
     customizations = aux.value;
   }
 
-  // not every link has https:, so first I remove it (when it is the case) and add it manually for all of them
-  String imageUrl = 'https:${customizations.backgroundImage.replaceAll('https:', '')}';
-  String coverUrl = 'https:${customizations.coverImage.replaceAll('https:', '')}';
-
-  if (media.mediaType == 'movie' || media.mediaType == 'tv_series') {
-      imageUrl = 'https://image.tmdb.org/t/p/original${customizations.backgroundImage}';
-      coverUrl = 'https://image.tmdb.org/t/p/original${customizations.coverImage}';
-  }
+  // TODO: Have all image links in basic format
+  String imageUrl = customizations.backgroundImage;
+  String coverUrl = customizations.coverImage;
 
   return SizedBox.expand(
     child: Container(

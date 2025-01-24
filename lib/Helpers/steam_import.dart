@@ -267,16 +267,32 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                   SizedBox(
                     height: 10,
                   ),
-                  if (searchResults.isNotEmpty) // Confirm button
-                    Center(
-                      child: TextButton(
-                        onPressed: () async {
-                          await confirmImport(searchResults, gamesLibrary, wanted, () => setState(() {}), workingOn, done, failed);
-                        },
-                        child: Text('Confirm import'),
-                        style: greenFillButton(context)
-                          .filledButtonTheme
-                          .style,
+                  if (searchResults.isNotEmpty) // Select / Deselect all
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              wanted = searchResults.keys.toSet();
+                              setState(() {});
+                            },
+                            child: Text('Select all'),
+                            style: greenFillButton(context)
+                              .filledButtonTheme
+                              .style,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              wanted = {};
+                              setState(() {});
+                            },
+                            child: Text('Deselect all'),
+                            style: redFillButton(context)
+                              .filledButtonTheme
+                              .style,
+                          ),
+                        ],
                       ),
                     ),
                   SizedBox(
@@ -339,32 +355,16 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
                     SizedBox(
                       height: 7,
                     ),
-                  if (searchResults.isNotEmpty) // Select / Deselect all
-                    Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              wanted = searchResults.keys.toSet();
-                              setState(() {});
-                            },
-                            child: Text('Select all'),
-                            style: greenFillButton(context)
-                              .filledButtonTheme
-                              .style,
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              wanted = {};
-                              setState(() {});
-                            },
-                            child: Text('Deselect all'),
-                            style: redFillButton(context)
-                              .filledButtonTheme
-                              .style,
-                          ),
-                        ],
+                  if (searchResults.isNotEmpty) // Confirm button
+                    Center(
+                      child: TextButton(
+                        onPressed: () async {
+                          await confirmImport(searchResults, gamesLibrary, wanted, () => setState(() {}), workingOn, done, failed);
+                        },
+                        child: Text('Confirm import'),
+                        style: greenFillButton(context)
+                          .filledButtonTheme
+                          .style,
                       ),
                     ),
                 ],
