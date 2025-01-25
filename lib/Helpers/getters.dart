@@ -26,6 +26,8 @@ dynamic getForType(Type type, String request) {
       'dbNameCapitalize' : 'Anime',
       'attribute'        : 'anilistid',
       'oldAttribute'     : 'id',
+      'defaultStatus'    : 'Plan to watch',
+      'statusOptions'    : ['Plan to watch', 'Watching', 'Completed'],
       'options'          : getOptionsAnime,
       'info'             : getInfoAnime,
       'recs'             : getRecsAnime,
@@ -38,6 +40,8 @@ dynamic getForType(Type type, String request) {
       'dbNameCapitalize' : 'Book',
       'attribute'        : 'goodreadslink',
       'oldAttribute'     : 'link',
+      'defaultStatus'    : 'Plan to read',
+      'statusOptions'    : ['Plan to read', 'Reading', 'Completed'],
       'options'          : getOptionsBook,
       'info'             : getInfoBook,
       'recs'             : getRecsBook,
@@ -50,6 +54,8 @@ dynamic getForType(Type type, String request) {
       'dbNameCapitalize' : 'Game',
       'attribute'        : 'igdbid',
       'oldAttribute'     : 'id',
+      'defaultStatus'    : 'Plan to play',
+      'statusOptions'    : ['Plan to play', 'Playing', 'Completed'],
       'options'          : getOptionsIGDB,
       'info'             : getInfoIGDB,
       'recs'             : getRecsIGDB,
@@ -62,6 +68,8 @@ dynamic getForType(Type type, String request) {
       'dbNameCapitalize' : 'Manga',
       'attribute'        : 'anilistid',
       'oldAttribute'     : 'id',
+      'defaultStatus'    : 'Plan to read',
+      'statusOptions'    : ['Plan to read', 'Reading', 'Completed'],
       'options'          : getOptionsManga,
       'info'             : getInfoManga,
       'recs'             : getRecsManga,
@@ -74,6 +82,8 @@ dynamic getForType(Type type, String request) {
       'dbNameCapitalize' : 'Movie',
       'attribute'        : 'tmdbid',
       'oldAttribute'     : 'id',
+      'defaultStatus'    : 'Plan to watch',
+      'statusOptions'    : ['Plan to watch', 'Watching', 'Completed'],
       'options'          : getOptionsMovie,
       'info'             : getInfoMovie,
       'recs'             : getRecsMovie,
@@ -86,6 +96,8 @@ dynamic getForType(Type type, String request) {
       'dbNameCapitalize' : 'TV Series',
       'attribute'        : 'tmdbid',
       'oldAttribute'     : 'id',
+      'defaultStatus'    : 'Plan to watch',
+      'statusOptions'    : ['Plan to watch', 'Watching', 'Completed'],
       'options'          : getOptionsSeries,
       'info'             : getInfoSeries,
       'recs'             : getRecsSeries,
@@ -124,6 +136,14 @@ String getAttributeNameForType(Type type) {
 
 String getOldAttributeNameForType(Type type) {
   return getForType(type, 'oldAttribute');
+}
+
+String getDefaultStatusForType(Type type) {
+  return getForType(type, 'defaultStatus');
+}
+
+List<String> getStatusOptionsForType(Type type) {
+  return getForType(type, 'statusOptions');
 }
 
 dynamic getOptionsForType(Type type, String query) async {

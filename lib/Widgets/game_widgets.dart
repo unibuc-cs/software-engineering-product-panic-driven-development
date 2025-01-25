@@ -206,7 +206,7 @@ Future<void> _showSysCheck(Game game, BuildContext context) {
   );
 }
 
-Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() resetState) {
+Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() resetState, bool isWishlist) {
   return Row(
     children: [
       Container(
@@ -285,7 +285,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         margin: const EdgeInsets.all(10),
         child: IconButton(
           onPressed: () {
-            showSettingsDialog(game, context, resetState);
+            showSettingsDialog(game, context, resetState, isWishlist);
           },
           icon: const Icon(
             Icons.settings,

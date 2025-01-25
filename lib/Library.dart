@@ -1208,7 +1208,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         userScore: -1,
         addedDate: DateTime.now(),
         coverImage: coverImage,
-        status: 'Plan To Consume',
+        status: getDefaultStatusForType(MT),
         series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0],
         icon: icon,
         backgroundImage: backgroundImage,
@@ -1233,7 +1233,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         userScore: -1,
         addedDate: DateTime.now(),
         coverImage: coverImage,
-        status: 'Plan To Consume',
+        status: getDefaultStatusForType(MT),
         series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0] ?? data['name'],
         icon: icon,
         backgroundImage: backgroundImage,
@@ -1300,7 +1300,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
     }
 
-    Widget additionalButtons = getAdditionalButtons(mt, context, () {setState(() {});});
+    Widget additionalButtons = getAdditionalButtons(mt, context, () {setState(() {});}, isWishlist);
 
     // TODO: Notes button
     // return StatefulBuilder(

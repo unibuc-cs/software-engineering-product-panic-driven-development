@@ -26,6 +26,7 @@ import 'anime_widgets.dart';
 import 'manga_widgets.dart';
 import 'movie_widgets.dart';
 import 'tv_series_widgets.dart';
+import 'themes.dart';
 
 // Auxilliary function for general list widgets (publishers, creators, ...)
 Widget getListWidget(String title, List<String> items) {
@@ -148,7 +149,7 @@ Pair<MediaUser?, Wishlist?> getCustomizations(Media media, bool isWishlist) {
         .where((mu) => mu.mediaId == media.id)
         .first,
       null
-      );
+    );
   }
   else {
     return Pair(
@@ -158,20 +159,13 @@ Pair<MediaUser?, Wishlist?> getCustomizations(Media media, bool isWishlist) {
         .items
         .where((wish) => wish.mediaId == media.id)
         .first
-      );
+    );
   }
 }
 
 Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, bool isWishlist) {
   Pair<MediaUser?, Wishlist?> aux = getCustomizations(media, isWishlist);
-  dynamic customizations;
-
-  if (aux.value == null) {
-    customizations = aux.key;
-  }
-  else {
-    customizations = aux.value;
-  }
+  dynamic customizations = aux.value ?? aux.key;
 
   // TODO: Have all image links in basic format
   String imageUrl = customizations.backgroundImage;
@@ -274,15 +268,46 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
   );
 }
 
-Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) async {
-  Set<int> mutIds = MediaUserTagService.instance.items.where((mut) => mut.mediaId == mt.getMediaId()).map((mut) => mut.tagId).toSet();
-
+Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext context, Function() resetState, bool isWishlist) async {
+  Set<int> mutIds = MediaUserTagService
+    .instance
+    .items
+    .where((mut) => mut.mediaId == mt.getMediaId())
+    .map((mut) => mut.tagId)
+    .toSet();
   String mediaType = getMediaTypeDbNameCapitalize(MT);
+  List<String> statusOptions = getStatusOptionsForType(MT);
+  String statusValue = MediaUserService
+    .instance
+    .items
+    .where((mu) => mu.mediaId == mt.getMediaId())
+    .map((mu) => mu.status)
+    .first;
+  
+  TextStyle titleStyle = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  );
+  TextStyle subtitleStyle = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
+
+  Pair<MediaUser?, Wishlist?> aux = getCustomizations(mt.media, isWishlist);
+  dynamic customizations = aux.value ?? aux.key;
+  dynamic serviceInstance = isWishlist ? WishlistService.instance : MediaUserService.instance;
+
+  TextEditingController controller = TextEditingController(text: customizations.name);
+
   return showDialog(
     context: context,
     builder: (context) {
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
+          setFullState() {
+            resetState();
+            setState(() {});
+          }
           return AlertDialog(
             title: Text('$mediaType settings'),
             content: SizedBox(
@@ -290,11 +315,59 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                 child: Column(
                   children: [
                     Text(
-                      '$mediaType tags',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      'Custom name',
+                      style: titleStyle,
+                    ),
+                    TextField(
+                      controller: controller,
+                      maxLength: 64,
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton( //TODO: make this look like the search menu
+                          icon: Icon(Icons.save),
+                          style: greenFillButton(context)
+                            .filledButtonTheme
+                            .style,
+                          onPressed: () async {
+                            await serviceInstance
+                              .update(customizations.mediaId, {
+                                'name' : controller.text,
+                              }
+                            );
+                            setFullState();
+                          },
+                        ),
                       ),
+                    ),
+                    Text(
+                      '$mediaType status',
+                      style: titleStyle,
+                    ),
+                    for (String status in statusOptions)
+                      Row(
+                        children: [
+                          Radio(
+                            value: status,
+                            groupValue: statusValue,
+                            onChanged: (_) async {
+                              statusValue = status;
+                              await MediaUserService
+                                .instance
+                                .update(mt.getMediaId(), {
+                                  'status': status,
+                                }
+                              );
+                              setFullState();
+                            },
+                          ),
+                          Text(
+                            status,
+                            style: subtitleStyle,
+                          ),
+                        ],
+                      ),
+                    Text(
+                      '$mediaType tags',
+                      style: titleStyle,
                     ),
                     for (Tag tag in TagService.instance.items)
                       Row(
@@ -316,16 +389,12 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                                 await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
                                 mutIds.remove(mut.tagId);
                               }
-                              resetState();
-                              setState(() {});
+                              setFullState();
                             },
                           ),
                           Text(
                             tag.name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: subtitleStyle,
                           ),
                         ],
                       ),
@@ -440,24 +509,25 @@ Future<void> showRecommendationsDialog<MT extends MediaType>(MT mt, BuildContext
   }
 }
 
-Widget getAdditionalButtons<MT extends MediaType>(MT mt, BuildContext context, Function() resetState) {
+// TODO: refactoring
+Widget getAdditionalButtons<MT extends MediaType>(MT mt, BuildContext context, Function() resetState, bool isWishlist) {
   if (MT == Anime) {
-    return getAdditionalButtonsForAnime(mt as Anime, context, resetState);
+    return getAdditionalButtonsForAnime(mt as Anime, context, resetState, isWishlist);
   }
   if (MT == Book) {
-    return getAdditionalButtonsForBook(mt as Book, context, resetState);
+    return getAdditionalButtonsForBook(mt as Book, context, resetState, isWishlist);
   }
   if (MT == Game) {
-    return getAdditionalButtonsForGame(mt as Game, context, resetState);
+    return getAdditionalButtonsForGame(mt as Game, context, resetState, isWishlist);
   }
   if (MT == Manga) {
-    return getAdditionalButtonsForManga(mt as Manga, context, resetState);
+    return getAdditionalButtonsForManga(mt as Manga, context, resetState, isWishlist);
   }
   if (MT == Movie) {
-    return getAdditionalButtonsForMovie(mt as Movie, context, resetState);
+    return getAdditionalButtonsForMovie(mt as Movie, context, resetState, isWishlist);
   }
   if (MT == TVSeries) {
-    return getAdditionalButtonsForTVSeries(mt as TVSeries, context, resetState);
+    return getAdditionalButtonsForTVSeries(mt as TVSeries, context, resetState, isWishlist);
   }
   throw UnimplementedError('getAdditionalButtons was not defined for this type');
 }

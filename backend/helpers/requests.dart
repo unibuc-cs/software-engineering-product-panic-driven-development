@@ -243,7 +243,6 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
           final body = await postRequest(
             {
               'originalname': entry['name'],
-              'releasedate' : DateTime.now().toIso8601String(),
               'mediatype'   : mediaType,
             },
             'medias',

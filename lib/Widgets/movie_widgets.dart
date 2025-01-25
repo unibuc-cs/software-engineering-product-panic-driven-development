@@ -5,7 +5,7 @@ import 'media_widgets.dart';
 // TODO: add specific stuff later
 // for now this is exactly as the one for Anime, Book, Manga and TVSeries
 // I left them like this because specific stuff will be added
-Widget getAdditionalButtonsForMovie(Movie movie, BuildContext context, Function() resetState) {
+Widget getAdditionalButtonsForMovie(Movie movie, BuildContext context, Function() resetState, bool isWishlist) {
   return Row(
     children: [
       Container(
@@ -13,7 +13,7 @@ Widget getAdditionalButtonsForMovie(Movie movie, BuildContext context, Function(
         margin: const EdgeInsets.all(10),
         child: IconButton(
           onPressed: () {
-            showSettingsDialog(movie, context, resetState);
+            showSettingsDialog(movie, context, resetState, isWishlist);
           },
           icon: const Icon(
             Icons.settings,
