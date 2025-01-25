@@ -82,13 +82,12 @@ class Tmdb extends Provider {
   }
 
   Map<String, dynamic> _sharedInfo(Map<String, dynamic> media) {
-    // Image url: https://image.tmdb.org/t/p/original
     return {
       'originalname': media[_mediaType == 'movie' ? 'title' : 'name'],
       'description': media['overview'],
       'language': media['original_language'],
-      'artworks': media['backdrop_path'],
-      'coverimage': 'https://image.tmdb.org/t/p/original/${media['poster_path']}',
+      'artworks': 'https://image.tmdb.org/t/p/original${media['backdrop_path']}',
+      'coverimage': 'https://image.tmdb.org/t/p/original${media['poster_path']}',
       'creators': media['production_companies'].map((dynamic producer) {
         return producer['name'];
       }).toList(),
