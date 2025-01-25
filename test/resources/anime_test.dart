@@ -26,8 +26,8 @@ void main() async {
       'https://www.bilibili.tv/media/36801',
       'https://www.primevideo.com/-/es/detail/0TN5ICF7AIEHNKWRVEQY2C6VCD/ref=atv_dp_share_cu_r'
     ],
-    'episodes': 127,
-    'duration': 25,
+    'nrepisodes': 127,
+    'episodeduration': 25,
     'language': 'english',
   };
   Anime updated = Anime(

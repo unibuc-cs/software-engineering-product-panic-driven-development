@@ -28,7 +28,7 @@ void main() async {
       'https://twitter.com/inazuma_project'
     ],
     'nrchapters': 42,
-    'nrvolumes': 10
+    'nrvolumes': 10,
   };
   Manga updated = Manga(
     mediaId: 10,

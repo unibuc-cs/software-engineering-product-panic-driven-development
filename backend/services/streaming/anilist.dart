@@ -176,8 +176,8 @@ class Anilist extends Provider {
 
       return {
         ..._sharedInfo(anime),
-        'episodes': anime['episodes'],
-        'duration': anime['duration']
+        'nrepisodes': anime['episodes'],
+        'episodeduration': anime['duration']
       };
     }
     catch (e) {

@@ -8,8 +8,6 @@ final discardInCreate = [
   'coverimage',
   'icon',
   'status',
-  'episodes', // this is temporary, just for testing
-  'duration',
 ];
 
 RouterPlus animeRouter() => RouterDefault(

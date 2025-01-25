@@ -8,7 +8,6 @@ final discardInCreate = [
   'coverimage',
   'icon',
   'status',
-  'nrvolumes',
 ];
 
 RouterPlus mangaRouter() => RouterDefault(
