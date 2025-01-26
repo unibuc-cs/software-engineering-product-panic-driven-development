@@ -79,3 +79,13 @@ Widget failMarkWidget(BuildContext context) => Icon(
   Icons.cancel_outlined,
   color: Color.fromARGB(255, 230, 30, 10),
 );
+
+TextStyle get titleStyle => TextStyle(
+  fontSize: 18,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle get subtitleStyle => TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.bold,
+);

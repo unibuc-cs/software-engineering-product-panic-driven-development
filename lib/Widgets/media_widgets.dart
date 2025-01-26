@@ -272,15 +272,6 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     .map((mu) => mu.status)
     .first;
   
-  TextStyle titleStyle = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-  );
-  TextStyle subtitleStyle = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-  );
-
   dynamic customizations = getCustomizations(mt.media, isWishlist);
   dynamic serviceInstance = isWishlist ? WishlistService.instance : MediaUserService.instance;
 

@@ -331,7 +331,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     dynamic serviceInstance = getServiceInstanceForType(MT);
 
-    List<MT> mts = serviceInstance
+    List<dynamic> mts = serviceInstance
       .items
       .where((mt) => mt.mediaId == selectedMediaId)
       .map((mt) => mt as MT)
@@ -341,7 +341,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       selectedMediaId = -1;
       return null;
     }
-    return mts.first;
+    return mts.first as MT;
   }
 
   @override
@@ -725,6 +725,26 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               setState(() {});
               resetStateGlobal();
             };
+            
+            Widget option(String description, String value, String groupValue, void Function() onChanged) {
+              return Row(
+                children: [
+                  Radio(
+                    value: value,
+                    groupValue: groupValue,
+                    onChanged: (_) {
+                      onChanged();
+                      resetState();
+                    },
+                  ),
+                  Text(
+                    description,
+                    style: subtitleStyle,
+                  ),
+                ],
+              );
+            }
+            
             return AlertDialog(
               title: Text('Sort $mediaTypePlural'),
               content: SizedBox(
@@ -732,81 +752,36 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         'Sort direction',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: titleStyle,
                       ),
-                      Row(
-                        children: [
-                          Radio(
-                            value: 'increasing',
-                            groupValue: increasingSorting
-                              ? 'increasing'
-                              : 'decreasing',
-                            onChanged: (_) {
-                              increasingSorting = true;
-                              resetState();
-                            },
-                          ),
-                          const Text(
-                            'Increasing',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      option(
+                        'Increasing',
+                        'increasing',
+                        increasingSorting
+                          ? 'increasing'
+                          : 'decreasing',
+                        () => increasingSorting = true,
                       ),
-                      Row(
-                        children: [
-                          Radio(
-                            value: 'decreasing',
-                            groupValue: increasingSorting
-                              ? 'increasing'
-                              : 'decreasing',
-                            onChanged: (_) {
-                              increasingSorting = false;
-                              resetState();
-                            },
-                          ),
-                          const Text(
-                            'Decreasing',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      option(
+                        'Decreasing',
+                        'decreasing',
+                        increasingSorting
+                          ? 'increasing'
+                          : 'decreasing',
+                        () => increasingSorting = false,
                       ),
-                      const Text(
+                      Text(
                         'Sort parameter',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: titleStyle,
                       ),
                       for (String sortingMethod in mediaOrderComparators.keys)
-                        Row(
-                          children: [
-                            Radio(
-                              value: sortingMethod,
-                              groupValue: selectedSortingMethod,
-                              onChanged: (_) {
-                                selectedSortingMethod = sortingMethod;
-                                resetState();
-                              },
-                            ),
-                            Text(
-                              sortingMethod,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        option(
+                          sortingMethod,
+                          sortingMethod,
+                          selectedSortingMethod,
+                          () => selectedSortingMethod = sortingMethod,
                         ),
                     ],
                   ),
@@ -848,12 +823,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         'Filter type',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: titleStyle,
                       ),
                       Row(
                         children: [
