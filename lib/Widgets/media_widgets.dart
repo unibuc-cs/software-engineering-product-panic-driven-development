@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pair/pair.dart';
 import '../Helpers/getters.dart';
 import '../Models/tag.dart';
 import '../Models/book.dart';
@@ -9,9 +8,7 @@ import '../Models/anime.dart';
 import '../Models/manga.dart';
 import '../Models/media.dart';
 import '../Models/movie.dart';
-import '../Models/wishlist.dart';
 import '../Models/tv_series.dart';
-import '../Models/media_user.dart';
 import '../Models/media_user_tag.dart';
 import '../Models/general/model.dart';
 import '../Models/general/media_type.dart';
@@ -140,32 +137,24 @@ Widget getRatingsWidget(Media media) {
   return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
 }
 
-Pair<MediaUser?, Wishlist?> getCustomizations(Media media, bool isWishlist) {
+dynamic getCustomizations(Media media, bool isWishlist) {
+  // TODO: maybe a try catch is required here. Not sure
   if (isWishlist == false) {
-    return Pair(
-      MediaUserService
-        .instance
-        .items
-        .where((mu) => mu.mediaId == media.id)
-        .first,
-      null
-    );
+    return MediaUserService
+      .instance
+      .items
+      .where((mu) => mu.mediaId == media.id)
+      .first;
   }
-  else {
-    return Pair(
-      null,
-      WishlistService
-        .instance
-        .items
-        .where((wish) => wish.mediaId == media.id)
-        .first
-    );
-  }
+  return WishlistService
+    .instance
+    .items
+    .where((wish) => wish.mediaId == media.id)
+    .first;
 }
 
 Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, bool isWishlist) {
-  Pair<MediaUser?, Wishlist?> aux = getCustomizations(media, isWishlist);
-  dynamic customizations = aux.value ?? aux.key;
+  dynamic customizations = getCustomizations(media, isWishlist);
 
   String imageUrl = customizations.backgroundImage;
   String coverUrl = customizations.coverImage;
@@ -292,8 +281,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     fontWeight: FontWeight.bold,
   );
 
-  Pair<MediaUser?, Wishlist?> aux = getCustomizations(mt.media, isWishlist);
-  dynamic customizations = aux.value ?? aux.key;
+  dynamic customizations = getCustomizations(mt.media, isWishlist);
   dynamic serviceInstance = isWishlist ? WishlistService.instance : MediaUserService.instance;
 
   TextEditingController controller = TextEditingController(text: customizations.name);

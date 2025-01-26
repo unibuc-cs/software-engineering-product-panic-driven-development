@@ -49,7 +49,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   int selectedMediaId = -1;
   
   TextEditingController searchController = TextEditingController();
-  String filterQuery = '';
+  String searchFilterQuery = '';
   
   bool increasingSorting = true;
   String selectedSortingMethod = 'By original name';
@@ -108,58 +108,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   Set<Genre> selectedGenresIds = {};
   Set<Tag> selectedTagsIds = {};
 
-  @override
-  LibraryState({required this.isWishlist}) {
-    // TODO: This cannot be set before the constructor as member functions are required
-    mediaOrderComparators['By given name'] = (MT a, MT b, int increasing) {
-      return increasing * getCustomName(a).compareTo(getCustomName(b));
-    };
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  String get nameLW    => isWishlist ? 'wishlist' : 'library';
+  String get nameLWCap => isWishlist ? 'Wishlist' : 'Library';
 
   String getCustomName(MT mt) {
-    Pair<MediaUser?, Wishlist?> aux = getCustomizations(mt.media, isWishlist);
-    if (aux.value == null) {
-      return aux.key!.name;
-    }
-    return aux.value!.name;
+    return getCustomizations(mt.media, isWishlist).name;
   }
 
-  Widget? getCustomIcon(MT mt) {
-    var iconUrl = '';
-    if (isWishlist) {
-      List<Wishlist> wishes = WishlistService
-        .instance
-        .items
-        .where((wish) => wish.mediaId == mt.getMediaId())
-        .toList();
-      
-      if (wishes.length != 1) {
-        // TODO: This should not be reachable. If somehow we got here, there was an error in the database
-        throw Exception('More Wishlist elements of the same mediaId (${mt.getMediaId()}) found. Contact an admin.');
-      }
-
-      iconUrl = wishes.first.icon;
-    }
-    else {
-      List<MediaUser> mus = MediaUserService
-        .instance
-        .items
-        .where((mu) => mu.mediaId == mt.getMediaId())
-        .toList();
-      
-      if (mus.length != 1) {
-        // TODO: This should not be reachable. If somehow we got here, there was an error in the database
-        throw Exception('More MediaUser elements of the same mediaId (${mt.getMediaId()}) found. Contact an admin.');
-      }
-
-      iconUrl = mus.first.icon;
-    }
-
+  Widget getCustomIcon(MT mt) {
+    String iconUrl = getCustomizations(mt.media, isWishlist).icon;
+    
     return Container(
       width: 40,
       height: 40,
@@ -173,8 +131,29 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
+  void _setSearchText() {
+    searchFilterQuery = searchController.text.toLowerCase();
+  }
+
+  void _clearSearchFilter() {
+    searchFilterQuery = '';
+  }
+
+  @override
+  LibraryState({required this.isWishlist}) {
+    // TODO: This cannot be set before the constructor as member functions are required
+    mediaOrderComparators['By given name'] = (MT a, MT b, int increasing) {
+      return increasing * getCustomName(a).compareTo(getCustomName(b));
+    };
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+  
   // Create and return a list view of the filtered media
-  ListView mediaListBuilder(BuildContext context) {
+  ListView _mediaListBuilder(BuildContext context) {
     List<ListTile> listTiles = List.empty(growable: true);
     List<Pair<MT, int>> mediaIndices = List.empty(growable: true);
     List<MT> entries = getAllFromService(MT, isWishlist == false ? 'MediaUser': 'Wishlist')
@@ -221,16 +200,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       );
     });
 
-    Icon defaultIcon = getIconForType(MT);
-
     for (int i = 0; i < mediaIndices.length; ++i) {
       final mt = mediaIndices[i].key;
       final mediaName = getCustomName(mt);
-      if (filterQuery == '' || mediaName.toLowerCase().contains(filterQuery)) {
+      if (searchFilterQuery == '' || mediaName.toLowerCase().contains(searchFilterQuery)) {
         final customIcon = getCustomIcon(mt);
         listTiles.add(
           ListTile(
-            leading: customIcon ?? defaultIcon,
+            leading: customIcon,
             title: Text(mediaName),
             onTap: () {
               setState(() {
@@ -261,22 +238,17 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     );
   }
 
-  void _setSearchText() {
-    filterQuery = searchController.text.toLowerCase();
-  }
-
-  void _clearSearchFilter() {
-    filterQuery = '';
-  }
-
   MT? mediaAlreadyInDB(String originalName) {
-    String dbName = getMediaTypeDbName(MT);
+    String dbTypeName = getMediaTypeDbName(MT);
 
     // Notat
     List<int> mediaIds = MediaService
       .instance
       .items
-      .where((media) => media.originalName == originalName && media.mediaType == dbName)
+      .where((media) =>
+        media.originalName == originalName &&
+        media.mediaType == dbTypeName
+      )
       .map((media) => media.id)
       .toList();
     
@@ -293,7 +265,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     // TODO: Sometimes there is an error with the database and things get created only as Media but not MediaType (or at least that is what the local version has)
-    List<dynamic> mts = serviceInstance
+    List<MT> mts = serviceInstance
       .items
       .where((entry) => entry.mediaId == mediaIds.first)
       .map((entry) => entry as MT)
@@ -303,19 +275,22 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       return null;
     }
 
-    return mts.first as MT;
+    return mts.first;
   }
 
   bool mediaAlreadyInWishlist(String originalName) {
-    String dbName = getMediaTypeDbName(MT);
+    String dbTypeName = getMediaTypeDbName(MT);
 
     Set<int> mediaIds = MediaService
       .instance
       .items
-      .where((media) => media.originalName == originalName && dbName == media.mediaType)
+      .where((media) =>
+        media.originalName == originalName &&
+        dbTypeName == media.mediaType
+      )
       .map((media) => media.id)
       .toSet();
-    
+
     return WishlistService
       .instance
       .items
@@ -326,20 +301,21 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   bool mediaAlreadyInLibrary(String originalName) {
-    String dbName = getMediaTypeDbName(MT);
-    List<Media> media = MediaService
+    String dbTypeName = getMediaTypeDbName(MT);
+    List<Media> medias = MediaService
       .instance
       .items
       .where((media) =>
         media.originalName == originalName &&
-        media.mediaType == dbName
-      ).toList();
+        media.mediaType == dbTypeName
+      )
+      .toList();
 
-    if (media.isEmpty) {
+    if (medias.isEmpty) {
       return false;
     }
 
-    int id = media.first.id;
+    int id = medias.first.id;
     
     return MediaUserService
       .instance
@@ -348,15 +324,32 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       .isNotEmpty;
   }
 
-  String get nameLW    => isWishlist ? 'wishlist' : 'library';
-  String get nameLWCap => isWishlist ? 'Wishlist' : 'Library';
+  MT? getSelectedMT() {
+    if (selectedMediaId == -1) {
+      return null;
+    }
+
+    dynamic serviceInstance = getServiceInstanceForType(MT);
+
+    List<MT> mts = serviceInstance
+      .items
+      .where((mt) => mt.mediaId == selectedMediaId)
+      .map((mt) => mt as MT)
+      .toList();
+    
+    if (mts.isEmpty) {
+      selectedMediaId = -1;
+      return null;
+    }
+    return mts.first;
+  }
 
   @override
   Widget build(BuildContext context) {
     _setSearchText();
 
     IconButton? butonSearchReset;
-    if (filterQuery == '') {
+    if (searchFilterQuery == '') {
       butonSearchReset = IconButton(
         onPressed: () {
           /*TODO: The search box gets activated only if you hold down at least 2 frames, 
@@ -392,7 +385,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       ),
     );
 
-    var mediaListWidget = mediaListBuilder(context);
+    var mediaListWidget = _mediaListBuilder(context);
     MT? selectedMT = getSelectedMT();
 
     return Scaffold(
@@ -525,24 +518,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         ],
       ),
     );
-  }
-
-  MT? getSelectedMT() {
-    if (selectedMediaId == -1) {
-      return null;
-    }
-
-    dynamic serviceInstance = getServiceInstanceForType(MT);
-
-    List<dynamic> mts = serviceInstance
-      .items
-      .where((mt) => mt.mediaId == selectedMediaId)
-      .toList();
-    
-    if (mts.isEmpty) {
-      return null;
-    }
-    return mts.first as MT;
   }
 
   Future<void> _showSearchMediaDialog(BuildContext context) {
@@ -745,7 +720,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            // When something changes call this function to redraw everything
+            // When something changes call this function to redraw everything (both the dialog and the library/wishlist)
             var resetState = () {
               setState(() {});
               resetStateGlobal();
