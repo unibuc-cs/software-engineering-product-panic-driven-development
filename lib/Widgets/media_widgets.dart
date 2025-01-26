@@ -137,24 +137,24 @@ Widget getRatingsWidget(Media media) {
   return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
 }
 
-dynamic getCustomizations(Media media, bool isWishlist) {
+dynamic getCustomizations(int mediaId, bool isWishlist) {
   // TODO: maybe a try catch is required here. Not sure
   if (isWishlist == false) {
     return MediaUserService
       .instance
       .items
-      .where((mu) => mu.mediaId == media.id)
+      .where((mu) => mu.mediaId == mediaId)
       .first;
   }
   return WishlistService
     .instance
     .items
-    .where((wish) => wish.mediaId == media.id)
+    .where((wish) => wish.mediaId == mediaId)
     .first;
 }
 
 Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, bool isWishlist) {
-  dynamic customizations = getCustomizations(media, isWishlist);
+  dynamic customizations = getCustomizations(media.id, isWishlist);
 
   String imageUrl = customizations.backgroundImage;
   String coverUrl = customizations.coverImage;
@@ -272,7 +272,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     .map((mu) => mu.status)
     .first;
   
-  dynamic customizations = getCustomizations(mt.media, isWishlist);
+  dynamic customizations = getCustomizations(mt.media.id, isWishlist);
   dynamic serviceInstance = isWishlist ? WishlistService.instance : MediaUserService.instance;
 
   TextEditingController controller = TextEditingController(text: customizations.name);

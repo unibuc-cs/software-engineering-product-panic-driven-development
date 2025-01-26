@@ -105,18 +105,18 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   };
   
   bool filterAll = true;
-  Set<Genre> selectedGenresIds = {};
-  Set<Tag> selectedTagsIds = {};
+  Set<int> selectedGenresIds = {};
+  Set<int> selectedTagsIds   = {};
 
   String get nameLW    => isWishlist ? 'wishlist' : 'library';
   String get nameLWCap => isWishlist ? 'Wishlist' : 'Library';
 
-  String getCustomName(MT mt) {
-    return getCustomizations(mt.media, isWishlist).name;
+  String getCustomName(int mediaId) {
+    return getCustomizations(mediaId, isWishlist).name;
   }
 
   Widget getCustomIcon(MT mt) {
-    String iconUrl = getCustomizations(mt.media, isWishlist).icon;
+    String iconUrl = getCustomizations(mt.media.id, isWishlist).icon;
     
     return Container(
       width: 40,
@@ -143,7 +143,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   LibraryState({required this.isWishlist}) {
     // TODO: This cannot be set before the constructor as member functions are required
     mediaOrderComparators['By given name'] = (MT a, MT b, int increasing) {
-      return increasing * getCustomName(a).compareTo(getCustomName(b));
+      return increasing * getCustomName(a.media.id).compareTo(getCustomName(b.media.id));
     };
   }
 
@@ -202,7 +202,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     for (int i = 0; i < mediaIndices.length; ++i) {
       final mt = mediaIndices[i].key;
-      final mediaName = getCustomName(mt);
+      final mediaName = getCustomName(mt.media.id);
       if (searchFilterQuery == '' || mediaName.toLowerCase().contains(searchFilterQuery)) {
         final customIcon = getCustomIcon(mt);
         listTiles.add(
@@ -703,7 +703,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
   Future<void> _showSortMediaDialog(BuildContext context) {
     // Helper function, should be called when rendering is to be remade
-    void resetStateGlobal() {
+    void resetGlobalState() {
       setState(() {});
     }
 
@@ -723,7 +723,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             // When something changes call this function to redraw everything (both the dialog and the library/wishlist)
             var resetState = () {
               setState(() {});
-              resetStateGlobal();
+              resetGlobalState();
             };
             
             Widget option(String description, String value, String groupValue, void Function() onChanged) {
@@ -796,7 +796,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
   Future<void> _showFilterMediaDialog(BuildContext context) {
     // Helper function, should be called when a variable gets changed
-    void resetState() {
+    void resetGlobalState() {
       setState(() {});
     }
 
@@ -808,14 +808,59 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Filtering is not implemented for this media type, because of $err');
     }
 
-    List<Tag> tags = TagService.instance.items;
-    List<Genre> genres = GenreService.instance.items;
+    List<Tag>   tags   = List.from(  TagService.instance.items, growable: false);
+    List<Genre> genres = List.from(GenreService.instance.items, growable: false);
+
+    tags  .sort((t0, t1) => t0.name.compareTo(t1.name));
+    genres.sort((g0, g1) => g0.name.compareTo(g1.name));
 
     return showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            void resetState() {
+              resetGlobalState();
+              setState(() {});
+            };
+
+            Widget radioOption(String description, String value, String groupValue, void Function() onChanged) {
+              return Row(
+                children: [
+                  Radio(
+                    value: value,
+                    groupValue: groupValue,
+                    onChanged: (_) {
+                      onChanged();
+                      resetState();
+                    },
+                  ),
+                  Text(
+                    description,
+                    style: subtitleStyle,
+                  ),
+                ],
+              );
+            }
+            
+            Widget checkboxOption(String description, bool value, void Function(bool?) onChanged) {
+              return Row(
+                children: [
+                  Checkbox(
+                    value: value,
+                    onChanged: (value) {
+                      onChanged(value);
+                      resetState();
+                    },
+                  ),
+                  Text(
+                    description,
+                    style: subtitleStyle,
+                  ),
+                ],
+              );
+            }
+            
             return AlertDialog(
               title: Text('Filter $mediaType'),
               content: SizedBox(
@@ -827,49 +872,21 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         'Filter type',
                         style: titleStyle,
                       ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: filterAll,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  filterAll = true;
-                                  resetState();
-                                }
-                              });
-                            },
-                          ),
-                          const Text(
-                            'All',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      radioOption(
+                        'All',
+                        'All',
+                        filterAll
+                          ? 'All'
+                          : 'Any',
+                        () => filterAll = true,
                       ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: !filterAll,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  filterAll = false;
-                                  resetState();
-                                }
-                              });
-                            },
-                          ),
-                          const Text(
-                            'Any',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      radioOption(
+                        'Any',
+                        'Any',
+                        filterAll
+                          ? 'All'
+                          : 'Any',
+                        () => filterAll = false,
                       ),
                       Row(
                         children: [
@@ -892,38 +909,22 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         ],
                       ),
                       for (Tag tag in tags)
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: selectedTagsIds.contains(tag),
-                              onChanged: (value) {
-                                setState(() {
-                                  if (value == true) {
-                                    selectedTagsIds.add(tag);
-                                  } else {
-                                    selectedTagsIds.remove(tag);
-                                  }
-                                  resetState();
-                                });
-                              },
-                            ),
-                            Text(
-                              tag.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        checkboxOption(
+                          tag.name,
+                          selectedTagsIds.contains(tag.id),
+                          (value) {
+                            value == null
+                              ? throw Exception('How did this tag filter checkbox get blocked?')
+                              : value
+                                ? selectedTagsIds.add(tag.id)
+                                : selectedTagsIds.remove(tag.id);
+                          },
                         ),
                       Row(
                         children: [
-                          const Text(
+                          Text(
                             'Genres',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: titleStyle,
                           ),
                           IconButton(
                             onPressed: () => setState(() {
@@ -937,29 +938,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         ],
                       ),
                       for (Genre genre in genres)
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: selectedGenresIds.contains(genre),
-                              onChanged: (value) {
-                                setState(() {
-                                  if (value == true) {
-                                    selectedGenresIds.add(genre);
-                                  } else {
-                                    selectedGenresIds.remove(genre);
-                                  }
-                                  resetState();
-                                });
-                              },
-                            ),
-                            Text(
-                              genre.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        checkboxOption(
+                          genre.name,
+                          selectedGenresIds.contains(genre.id),
+                          (value) {
+                            value == null
+                              ? throw Exception('How did this genre filter checkbox get blocked?')
+                              : value
+                                ? selectedGenresIds.add(genre.id)
+                                : selectedGenresIds.remove(genre.id);
+                          },
                         ),
                     ],
                   ),
@@ -968,7 +956,51 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             );
           },
         );
-      }
+      },
+    );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context, int mediaId) {
+    String mediaType = '';
+    try {
+      mediaType = getMediaTypeDbName(MT);
+    }
+    catch (err) {
+      throw UnimplementedError('Delete is not implemented for this media type, because of $err');
+    }
+
+    String customName = getCustomName(mediaId);
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Remove $customName'),
+          content: Text('Are you sure you want to delete this $mediaType?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _removeMediaCascade(mediaId);
+                Navigator.of(context).pop();
+                if (selectedMediaId == mediaId) {
+                  selectedMediaId = -1;
+                }
+                setState(() {});
+              },
+              child: const Text('Delete'),
+              style: redFillButton(context)
+                .filledButtonTheme
+                .style,
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1004,49 +1036,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
     await Future.wait(toDo);
     setState(() {});
-  }
-
-  Future<void> _showDeleteConfirmationDialog(BuildContext context, int mediaId) {
-    String mediaType = '';
-    try {
-      mediaType = getMediaTypeDbName(MT);
-    }
-    catch (err) {
-      throw UnimplementedError('Delete is not implemented for this media type, because of $err');
-    }
-
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Remove $mediaType'),
-          content: Text('Are you sure you want to delete this $mediaType?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await _removeMediaCascade(mediaId);
-                Navigator.of(context).pop();
-                setState(() {
-                  if (selectedMediaId == mediaId) {
-                    selectedMediaId = -1;
-                  }
-                });
-              },
-              child: const Text('Delete'),
-              style: redFillButton(context)
-                .filledButtonTheme
-                .style,
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Future<Pair<Map<String, dynamic>, MT>> _addGame(Map<String, dynamic> option) async {

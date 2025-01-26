@@ -2,12 +2,17 @@ import '../media.dart';
 import '../../Services/media_service.dart';
 
 abstract class MediaType {
+  Media? _media = null;
+
   Media get media {
-    return MediaService
-      .instance
-      .items
-      .where((media) => media.id == getMediaId())
-      .first;
+    if (_media == null) {
+      _media = MediaService
+        .instance
+        .items
+        .where((media) => media.id == getMediaId())
+        .first;
+    }
+    return _media!;
   }
 
   int getMediaId() {
