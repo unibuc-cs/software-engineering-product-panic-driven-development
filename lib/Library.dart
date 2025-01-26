@@ -265,17 +265,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     // TODO: Sometimes there is an error with the database and things get created only as Media but not MediaType (or at least that is what the local version has)
-    List<MT> mts = serviceInstance
+    List<dynamic> mts = serviceInstance
       .items
       .where((entry) => entry.mediaId == mediaIds.first)
-      .map((entry) => entry as MT)
       .toList();
     if (mts.isEmpty) {
       // The error occured. The reasons why this happened can be many. I will for now just leave it at nothing
       return null;
     }
 
-    return mts.first;
+    return mts.first as MT;
   }
 
   bool mediaAlreadyInWishlist(String originalName) {
@@ -659,7 +658,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                         await addMediaType(result);
                                       }
                                       catch(e) {
-                                        // TODO: Error here. What should we do?
+                                        print(e);
                                       }
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
@@ -677,7 +676,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                         await addMediaType(result);
                                       }
                                       catch(e) {
-                                        // TODO: Error here. What should we do?
+                                        print(e);
                                       }
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
@@ -1043,7 +1042,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     gameData[getAttributeNameForType(MT)] = gameData[getOldAttributeNameForType(MT)];
     String name = gameData['originalname'];
     Game? nullableGame = mediaAlreadyInDB(name) as Game?;
-
+    
     if (name[name.length - 1] == ')' && name.length >= 7) {
       name = name.substring(0, name.length - 7);
     }
@@ -1105,6 +1104,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
       nullableGame = await GameService.instance.create(gameData);
     }
+
     gameData['name'] = name;
     return Pair(gameData, nullableGame as MT);
   }
