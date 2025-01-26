@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Helpers/getters.dart';
+import '../Models/media_user.dart';
 import '../Models/tag.dart';
 import '../Models/book.dart';
 import '../Models/game.dart';
@@ -235,6 +236,7 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
                       margin: const EdgeInsets.all(10),
                       child: Column(
                         children: [
+                          // TODO: display user score and progress
                           getReleaseDateWidget(media),
                           getPublishersWidget(media),
                           getCreatorsWidget(media),
@@ -264,18 +266,50 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     .map((mut) => mut.tagId)
     .toSet();
   String mediaType = getMediaTypeDbNameCapitalize(MT);
+  String measureUnit = getMeasureUnitForType(MT);
+  String measureAttributeName = getMeasureAttributeNameForType(MT);
   List<String> statusOptions = getStatusOptionsForType(MT);
-  String statusValue = MediaUserService
-    .instance
+  
+  dynamic customizations = getCustomizations(mt.media.id, isWishlist);
+  dynamic serviceInstance = isWishlist ? WishlistService.instance : MediaUserService.instance;
+  String statusValue = serviceInstance
     .items
     .where((mu) => mu.mediaId == mt.getMediaId())
     .map((mu) => mu.status)
     .first;
-  
-  dynamic customizations = getCustomizations(mt.media.id, isWishlist);
-  dynamic serviceInstance = isWishlist ? WishlistService.instance : MediaUserService.instance;
 
-  TextEditingController controller = TextEditingController(text: customizations.name);
+  TextEditingController controllerName = TextEditingController(text: customizations.name);
+  TextEditingController controllerRating = TextEditingController(
+    text: customizations.userScore == -1 
+      ? '' 
+      : customizations.userScore.toString()
+  );
+  TextEditingController controllerProgress = TextEditingController(text: '');
+
+  if (isWishlist == false) {
+    // TODO: refactoring
+    if (mt is Anime) {
+      controllerProgress = TextEditingController(text: (customizations as MediaUser).nrEpisodesSeen.toString());
+    }
+    else if (mt is Book) {
+      controllerProgress = TextEditingController(text: (customizations as MediaUser).bookReadPages.toString());
+    }
+    else if (mt is Game) {
+      controllerProgress = TextEditingController(text: (customizations as MediaUser).gameTime.toString());
+    }
+    else if (mt is Manga) {
+      controllerProgress = TextEditingController(text: (customizations as MediaUser).mangaReadChapters.toString());
+    }
+    else if (mt is Movie) {
+      controllerProgress = TextEditingController(text: (customizations as MediaUser).movieSecondsWatched.toString());
+    }
+    else if (mt is TVSeries) {
+      controllerProgress = TextEditingController(text: (customizations as MediaUser).nrEpisodesSeen.toString());
+    }
+    else {
+      throw UnimplementedError('Progress for type $MT is not implemented!');
+    }
+  }
 
   return showDialog(
     context: context,
@@ -297,10 +331,10 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                       style: titleStyle,
                     ),
                     TextField(
-                      controller: controller,
+                      controller: controllerName,
                       maxLength: 64,
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton( //TODO: make this look like the search menu
+                      decoration: InputDecoration( //TODO: make this look like the search menu
+                        suffixIcon: IconButton(
                           icon: Icon(Icons.save),
                           style: greenFillButton(context)
                             .filledButtonTheme
@@ -308,7 +342,64 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                           onPressed: () async {
                             await serviceInstance
                               .update(customizations.mediaId, {
-                                'name' : controller.text,
+                                'name' : controllerName.text,
+                              }
+                            );
+                            setFullState();
+                          },
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Personal rating',
+                      style: titleStyle,
+                    ),
+                    TextField(
+                      controller: controllerRating,
+                      maxLength: 3,
+                      inputFormatters: <TextInputFormatter>[ 
+                        FilteringTextInputFormatter.digitsOnly 
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'Enter your rating',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.save),
+                          style: greenFillButton(context)
+                            .filledButtonTheme
+                            .style,
+                          onPressed: () async {
+                            await serviceInstance
+                              .update(customizations.mediaId, {
+                                'userscore' : int.parse(controllerRating.text),
+                              }
+                            );
+                            setFullState();
+                          },
+                        ),
+                      ),
+                    ),
+                    if (isWishlist == false)
+                      Text(
+                        'Update progress',
+                        style: titleStyle,
+                      ),
+                    if (isWishlist == false)
+                      TextField(
+                      controller: controllerProgress,
+                      inputFormatters: <TextInputFormatter>[ 
+                        FilteringTextInputFormatter.digitsOnly 
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'Update your progress ($measureUnit)',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.save),
+                          style: greenFillButton(context)
+                            .filledButtonTheme
+                            .style,
+                          onPressed: () async {
+                            await serviceInstance
+                              .update(customizations.mediaId, {
+                                measureAttributeName : int.parse(controllerProgress.text), // TODO: add check that this is not bigger than the maximum number possible
                               }
                             );
                             setFullState();
