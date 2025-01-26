@@ -111,7 +111,7 @@ class Tmdb extends Provider {
         ..._sharedInfo(movie),
         'seriesname'       : [(movie['belongs_to_collection'] as Map<String, dynamic>?)?['name']],
         'releasedate'      : movie['release_date'],
-        'durationinseconds': movie['runtime']*60,
+        'durationinseconds': movie['runtime'] * 60,
       };
     }
     catch (e) {
@@ -133,6 +133,7 @@ class Tmdb extends Provider {
       return {
         ..._sharedInfo(series),
         'releasedate': series['first_air_date'],
+        'nrepisodes' : series['number_of_episodes'],
       };
     }
     catch (e) {
