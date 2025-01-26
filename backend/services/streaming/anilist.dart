@@ -10,7 +10,7 @@ class Anilist extends Provider {
   };
   final _replaceItems = {
     '<br><br>': ' ',
-    '<br>': ' '
+    '<br>'    : ' '
   };
   final _removeItems = [
     '<i>',
@@ -142,20 +142,20 @@ class Anilist extends Provider {
     }
 
     return {
-      'id': media['id'],
-      'originalname': _removeBadItems(media['title']['english'] ?? media['title']['romaji']),
-      'description': _removeBadItems(media['description'] ?? ''),
-      'releasedate': DateTime.parse(
-        '${media["startDate"]["year"]}-'
-        '${formatTwoDigits(media["startDate"]["month"] ?? 1)}-'
-        '${formatTwoDigits(media["startDate"]["day"] ?? 1)}'
-      ),
-      'genres': media['genres'],
-      'coverimage': media['coverImage']['large'],
+      'id'            : media['id'],
+      'originalname'  : _removeBadItems(media['title']['english'] ?? media['title']['romaji']),
+      'description'   : _removeBadItems(media['description'] ?? ''),
+      'releasedate'   : DateTime.parse(
+                          '${media["startDate"]["year"]}-'
+                          '${formatTwoDigits(media["startDate"]["month"] ?? 1)}-'
+                          '${formatTwoDigits(media["startDate"]["day"] ?? 1)}'
+                        ),
+      'genres'        : media['genres'],
+      'coverimage'    : media['coverImage']['large'],
       'communityscore': media['meanScore'],
-      'criticscore': media['averageScore'],
-      'status': media['status'],
-      'links': media['externalLinks'].map((link) => link['url']).toSet().toList()
+      'criticscore'   : media['averageScore'],
+      'status'        : media['status'],
+      'links'         : media['externalLinks'].map((link) => link['url']).toSet().toList()
     };
   }
 
@@ -176,7 +176,7 @@ class Anilist extends Provider {
 
       return {
         ..._sharedInfo(anime),
-        'nrepisodes': anime['episodes'],
+        'nrepisodes'     : anime['episodes'],
         'episodeduration': anime['duration']
       };
     }
@@ -203,7 +203,7 @@ class Anilist extends Provider {
       return {
         ..._sharedInfo(manga),
         'nrchapters': manga['chapters'],
-        'nrvolumes': manga['volumes']
+        'nrvolumes' : manga['volumes']
       };
     }
     catch (e) {

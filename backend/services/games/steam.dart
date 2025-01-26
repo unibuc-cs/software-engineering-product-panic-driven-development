@@ -53,7 +53,7 @@ class Steam extends Provider {
             !game['name'].toLowerCase().contains('open beta'))
           .map((game) {
             return {
-              'id': game['appid'],
+              'id'  : game['appid'],
               'name': game['name']
                 .replaceAll('™', '')
                 .replaceAll('®', '')
@@ -63,7 +63,7 @@ class Steam extends Provider {
                 .replaceAll(RegExp(r'\(.*?\)'), '')
                 .replaceAll('’', '\'')
                 .trim(),
-              'icon': 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/${game['appid']}/${game['img_icon_url']}.jpg',
+              'icon'       : 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/${game['appid']}/${game['img_icon_url']}.jpg',
               'time_played': game['playtime_forever'],
               'last_played': _getDate(game['rtime_last_played'] ?? 0)
             };

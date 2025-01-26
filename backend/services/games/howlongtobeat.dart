@@ -84,7 +84,7 @@ class HowLongToBeat extends Provider {
         gameData.forEach((name, id) {
           options.add({
             'name': name,
-            'id': id,
+            'id'  : id,
           });
         });
         return options;

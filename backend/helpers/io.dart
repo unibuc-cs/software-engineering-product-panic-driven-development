@@ -20,10 +20,10 @@ String colored(dynamic message, String color) {
   return pen(message.toString());
 }
 
-String redColored(message) => colored(message, 'red');
+String redColored(message)   => colored(message, 'red');
 String greenColored(message) => colored(message, 'green');
-String blueColored(message) => colored(message, 'blue');
-String greyColored(message) => colored(message, 'grey');
+String blueColored(message)  => colored(message, 'blue');
+String greyColored(message)  => colored(message, 'grey');
 
 void startupLog(address, port) =>
   print('${blueColored('[STARTED]')} Listening at http://$address:$port');

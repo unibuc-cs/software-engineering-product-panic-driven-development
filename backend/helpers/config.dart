@@ -28,23 +28,23 @@ class Config {
 
   Axios get axios => Axios(baseUrl: _baseUrl);
 
-  String get igdbId => getEnv('CLIENT_ID_IGDB');
+  String get igdbId             => getEnv('CLIENT_ID_IGDB');
 
-  String get igdbSecret => getEnv('CLIENT_SECRET_IGDB');
+  String get igdbSecret         => getEnv('CLIENT_SECRET_IGDB');
 
-  String get goodreadsAgents => getEnv('USER_AGENTS_GOODREADS');
+  String get goodreadsAgents    => getEnv('USER_AGENTS_GOODREADS');
 
-  String get tmdbToken => getEnv('ACCESS_TOKEN_TMDB');
+  String get tmdbToken          => getEnv('ACCESS_TOKEN_TMDB');
 
-  String get steamKey => getEnv('API_KEY_STEAM');
+  String get steamKey           => getEnv('API_KEY_STEAM');
 
-  String get traktId => getEnv('CLIENT_ID_TRAKT');
+  String get traktId            => getEnv('CLIENT_ID_TRAKT');
 
-  String get secret => getEnv('SECRET');
+  String get secret             => getEnv('SECRET');
 
-  String get supabaseUrl => getEnv('URL_SUPABASE');
+  String get supabaseUrl        => getEnv('URL_SUPABASE');
 
-  String get supabaseKey => getEnv('ANON_KEY_SUPABASE');
+  String get supabaseKey        => getEnv('ANON_KEY_SUPABASE');
 
   String get supabaseServiceKey => getEnv('SERVICE_KEY_SUPABASE');
 

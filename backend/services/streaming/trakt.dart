@@ -11,8 +11,8 @@ class Trakt extends Provider {
   // Public constructor
   Trakt({required String mediaType}): _mediaType = mediaType {
      _headers = {
-      'Content-Type': 'application/json',
-      'trakt-api-key': config.traktId,
+      'Content-Type'     : 'application/json',
+      'trakt-api-key'    : config.traktId,
       'trakt-api-version': '2'
     };
   }

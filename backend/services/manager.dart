@@ -22,7 +22,7 @@ class Manager {
     'tmdbseries'   : Tmdb(mediaType: 'tv'),
     'tmdbmovie'    : Tmdb(mediaType: 'movie'),
     'traktmovies'  : Trakt(mediaType: 'movies'),
-    'traktseries'   : Trakt(mediaType: 'shows'),
+    'traktseries'  : Trakt(mediaType: 'shows'),
     'anilistanime' : Anilist(mediaType: 'ANIME'),
     'anilistmanga' : Anilist(mediaType: 'MANGA'),
     'myanimelist'  : MyAnimeList(mediaType: 'anime'),

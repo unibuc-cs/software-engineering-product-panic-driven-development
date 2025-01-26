@@ -94,7 +94,7 @@ class GoodReads extends Provider {
           .querySelectorAll('div.listWithDividers__item')
           .map((element) async {
               return {
-                'name': element.querySelector('span[itemprop="name"]')?.text.trim() ?? 'Unknown Title',
+                'name' : element.querySelector('span[itemprop="name"]')?.text.trim() ?? 'Unknown Title',
                 'index': element.querySelector('h3[class="gr-h3 gr-h3--noBottomMargin"]')?.text.split('Book')[1].trim()
               };
             })
@@ -130,19 +130,19 @@ class GoodReads extends Provider {
         .toList();
 
       return {
-        'originalname': document.querySelector('h1.Text__title1')?.text.trim(),
-        'creators': [document.querySelector('span.ContributorLink__name')?.text.trim()],
-        'links': [bookUrl],
+        'originalname'  : document.querySelector('h1.Text__title1')?.text.trim(),
+        'creators'      : [document.querySelector('span.ContributorLink__name')?.text.trim()],
+        'links'         : [bookUrl],
         'communityscore': (double.parse(document.querySelector('div.RatingStatistics__rating')!.text.trim()) * 20).round().toString(),
-        'releasedate': DateFormat('yyyy-MM-dd').format(parsedDate),
-        'description': document.querySelector('span.Formatted')?.text.trim(),
-        'totalpages': jsonData['numberOfPages'],
-        'coverimage': jsonData['image'],
-        'genres': genres,
-        'format': jsonData['bookFormat'],
-        'language': jsonData['inLanguage'],
-        'seriesname': seriesElement?.querySelectorAll('a').map((a) => a.text.split('#')[0].trim()).toList() ?? [],
-        'series': await instance._getBooksFromSeries(seriesElement?.querySelector('a')?.attributes['href'] ?? '')
+        'releasedate'   : DateFormat('yyyy-MM-dd').format(parsedDate),
+        'description'   : document.querySelector('span.Formatted')?.text.trim(),
+        'totalpages'    : jsonData['numberOfPages'],
+        'coverimage'    : jsonData['image'],
+        'genres'        : genres,
+        'format'        : jsonData['bookFormat'],
+        'language'      : jsonData['inLanguage'],
+        'seriesname'    : seriesElement?.querySelectorAll('a').map((a) => a.text.split('#')[0].trim()).toList() ?? [],
+        'series'        : await instance._getBooksFromSeries(seriesElement?.querySelector('a')?.attributes['href'] ?? '')
       };
     }
     catch (e) {

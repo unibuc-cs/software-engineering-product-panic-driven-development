@@ -9,28 +9,28 @@ class IGDB extends Provider {
   late final Map<String, String> _params;
   String _accessToken = '';
   String _cover = '';
-  final List<String> _artworks = [];
-  final List<String> _collections = [];
-  final List<dynamic> _developers = [];
-  final List<String> _franchises = [];
-  final List<String> _genres = [];
-  final List<dynamic> _platforms = [];
-  final List<dynamic> _publishers = [];
-  final List<String> _websites = [];
+  final List<String>  _artworks    = [];
+  final List<String>  _collections = [];
+  final List<dynamic> _developers  = [];
+  final List<String>  _franchises  = [];
+  final List<String>  _genres      = [];
+  final List<dynamic> _platforms   = [];
+  final List<dynamic> _publishers  = [];
+  final List<String>  _websites    = [];
 
   // Public constructor
   IGDB() {
     _params = {
-      'client_id': config.igdbId,
+      'client_id'    : config.igdbId,
       'client_secret': config.igdbSecret,
-      'grant_type': 'client_credentials'
+      'grant_type'   : 'client_credentials'
     };
   }
 
   // Private methods
   Map<String, String> _authHeaders(String accessToken) {
     return {
-      'Client-ID': config.igdbId,
+      'Client-ID'    : config.igdbId,
       'Authorization': 'Bearer $accessToken',
     };
   }
@@ -467,7 +467,7 @@ class IGDB extends Provider {
 
       if (game['involved_companies'] != null) {
         await _getCompanies(_accessToken, game);
-        game['creators'] = _developers;
+        game['creators']   = _developers;
         game['publishers'] = _publishers;
         game.remove('involved_companies');
       }
