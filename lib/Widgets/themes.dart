@@ -89,3 +89,9 @@ TextStyle get subtitleStyle => TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.bold,
 );
+
+Widget saveIcon(BuildContext context) => Icon(
+  Theme.of(context).brightness == Brightness.light
+    ? Icons.save_outlined
+    : Icons.save,
+);

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mediamaster/Services/anime_service.dart';
+import 'package:mediamaster/Services/book_service.dart';
+import 'package:mediamaster/Services/manga_service.dart';
 import '../Helpers/getters.dart';
-import '../Models/media_user.dart';
 import '../Models/tag.dart';
 import '../Models/book.dart';
 import '../Models/game.dart';
@@ -10,6 +12,7 @@ import '../Models/manga.dart';
 import '../Models/media.dart';
 import '../Models/movie.dart';
 import '../Models/tv_series.dart';
+import '../Models/media_user.dart';
 import '../Models/media_user_tag.dart';
 import '../Models/general/model.dart';
 import '../Models/general/media_type.dart';
@@ -265,49 +268,95 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     .where((mut) => mut.mediaId == mt.getMediaId())
     .map((mut) => mut.tagId)
     .toSet();
-  String mediaType = getMediaTypeDbNameCapitalize(MT);
-  String measureUnit = getMeasureUnitForType(MT);
+  String mediaType            = getMediaTypeDbNameCapitalize(MT);
+  String measureUnit          = getMeasureUnitForType(MT);
   String measureAttributeName = getMeasureAttributeNameForType(MT);
-  List<String> statusOptions = getStatusOptionsForType(MT);
+  List<String> statusOptions  = getStatusOptionsForType(MT);
   
-  dynamic customizations = getCustomizations(mt.media.id, isWishlist);
   dynamic serviceInstance = isWishlist ? WishlistService.instance : MediaUserService.instance;
-  String statusValue = serviceInstance
-    .items
-    .where((mu) => mu.mediaId == mt.getMediaId())
-    .map((mu) => mu.status)
-    .first;
 
-  TextEditingController controllerName = TextEditingController(text: customizations.name);
-  TextEditingController controllerRating = TextEditingController(
+  dynamic customizations = getCustomizations(mt.media.id, isWishlist);
+  String statusValue = '';
+  if (!isWishlist) {
+    statusValue = (customizations as MediaUser).status;
+  }
+
+  TextEditingController nameController = TextEditingController(
+    text: customizations.name,
+  );
+  TextEditingController ratingController = TextEditingController(
     text: customizations.userScore == -1 
-      ? '' 
+      ? ''
       : customizations.userScore.toString()
   );
-  TextEditingController controllerProgress = TextEditingController(text: '');
+  TextEditingController progressController = TextEditingController(
+    text: '',
+  );
 
-  if (isWishlist == false) {
-    // TODO: refactoring
-    if (mt is Anime) {
-      controllerProgress = TextEditingController(text: (customizations as MediaUser).nrEpisodesSeen.toString());
+  int maxProgressValue = 0;
+
+  if (!isWishlist) {
+    customizations as MediaUser;
+    try {
+      String progressString = {
+        Anime   : customizations.nrEpisodesSeen,
+        Book    : customizations.bookReadPages,
+        Game    : customizations.gameTime,
+        Manga   : customizations.mangaReadChapters,
+        Movie   : customizations.movieSecondsWatched,
+        TVSeries: customizations.nrEpisodesSeen,
+      }[MT].toString();
+      progressController = TextEditingController(
+        text: progressString
+      );
     }
-    else if (mt is Book) {
-      controllerProgress = TextEditingController(text: (customizations as MediaUser).bookReadPages.toString());
+    catch(e) {
+      throw UnimplementedError('Progress for type $MT is not implemented!');
     }
-    else if (mt is Game) {
-      controllerProgress = TextEditingController(text: (customizations as MediaUser).gameTime.toString());
+
+    if (MT == Anime) {
+      maxProgressValue = AnimeService
+        .instance
+        .items
+        .where((anime) => anime.mediaId == mt.getMediaId())
+        .first
+        .nrEpisodes;
     }
-    else if (mt is Manga) {
-      controllerProgress = TextEditingController(text: (customizations as MediaUser).mangaReadChapters.toString());
+    else if (MT == Book) {
+      maxProgressValue = BookService
+        .instance
+        .items
+        .where((book) => book.mediaId == mt.getMediaId())
+        .first
+        .totalPages;
     }
-    else if (mt is Movie) {
-      controllerProgress = TextEditingController(text: (customizations as MediaUser).movieSecondsWatched.toString());
+    else if (MT == Game) {
+      // Games never end
+      maxProgressValue = -1;
     }
-    else if (mt is TVSeries) {
-      controllerProgress = TextEditingController(text: (customizations as MediaUser).nrEpisodesSeen.toString());
+    else if (MT == Manga) {
+      maxProgressValue = MangaService
+        .instance
+        .items
+        .where((manga) => manga.mediaId == mt.getMediaId())
+        .first
+        .totalPages;
+    }
+    else if (MT == Movie) {
+      maxProgressValue = -1;
+      // Who tf updates the movie watch time during the movie?
+    }
+    else if (MT == TVSeries) {
+      throw UnimplementedError('Number of episodes for TV Series is not implemented yet');
+      // maxProgressValue = TVSeriesService
+      //   .instance
+      //   .items
+      //   .where((series) => series.mediaId == mt.getMediaId())
+      //   .first
+      //   .
     }
     else {
-      throw UnimplementedError('Progress for type $MT is not implemented!');
+      throw UnimplementedError('Tracking not implemented for this media type');
     }
   }
 
@@ -316,159 +365,178 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     builder: (context) {
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-          setFullState() {
+          void setFullState() {
             resetState();
             setState(() {});
-          }
+          };
+
           return AlertDialog(
             title: Text('$mediaType settings'),
-            content: SizedBox(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Text(
-                      'Custom name',
-                      style: titleStyle,
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text(
+                    'Custom name',
+                    style: titleStyle,
+                  ),
+                  TextField( //TODO: make this look like the search menu
+                    controller: nameController,
+                    maxLength: 64,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: saveIcon(context),
+                        onPressed: () async {
+                          await serviceInstance
+                            .update(
+                              customizations.mediaId,
+                              {'name' : nameController
+                                .text
+                                .trim(),
+                              },
+                            );
+                          setFullState();
+                        },
+                      ),
                     ),
-                    TextField(
-                      controller: controllerName,
-                      maxLength: 64,
-                      decoration: InputDecoration( //TODO: make this look like the search menu
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.save),
-                          style: greenFillButton(context)
-                            .filledButtonTheme
-                            .style,
-                          onPressed: () async {
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Personal rating',
+                    style: titleStyle,
+                  ),
+                  TextField( //TODO: make this look like the search menu
+                    controller: ratingController,
+                    maxLength: 3,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly 
+                    ],
+                    decoration: InputDecoration(
+                      labelText: 'Enter your rating (out of 100)',
+                      suffixIcon: IconButton(
+                        icon: saveIcon(context),
+                        onPressed: () async {
+                          int score = int.parse(ratingController.text);
+                          if (score >= 0 && score <= 100) {
                             await serviceInstance
                               .update(customizations.mediaId, {
-                                'name' : controllerName.text,
+                                'userscore' : score,
                               }
                             );
                             setFullState();
-                          },
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  if (!isWishlist)
+                    Column(
+                      children: [
+                        Text(
+                          'Update progress',
+                          style: titleStyle,
                         ),
-                      ),
-                    ),
-                    Text(
-                      'Personal rating',
-                      style: titleStyle,
-                    ),
-                    TextField(
-                      controller: controllerRating,
-                      maxLength: 3,
-                      inputFormatters: <TextInputFormatter>[ 
-                        FilteringTextInputFormatter.digitsOnly 
-                      ],
-                      decoration: InputDecoration(
-                        labelText: 'Enter your rating',
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.save),
-                          style: greenFillButton(context)
-                            .filledButtonTheme
-                            .style,
-                          onPressed: () async {
-                            await serviceInstance
-                              .update(customizations.mediaId, {
-                                'userscore' : int.parse(controllerRating.text),
-                              }
-                            );
-                            setFullState();
-                          },
-                        ),
-                      ),
-                    ),
-                    if (isWishlist == false)
-                      Text(
-                        'Update progress',
-                        style: titleStyle,
-                      ),
-                    if (isWishlist == false)
-                      TextField(
-                      controller: controllerProgress,
-                      inputFormatters: <TextInputFormatter>[ 
-                        FilteringTextInputFormatter.digitsOnly 
-                      ],
-                      decoration: InputDecoration(
-                        labelText: 'Update your progress ($measureUnit)',
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.save),
-                          style: greenFillButton(context)
-                            .filledButtonTheme
-                            .style,
-                          onPressed: () async {
-                            await serviceInstance
-                              .update(customizations.mediaId, {
-                                measureAttributeName : int.parse(controllerProgress.text), // TODO: add check that this is not bigger than the maximum number possible
-                              }
-                            );
-                            setFullState();
-                          },
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '$mediaType status',
-                      style: titleStyle,
-                    ),
-                    for (String status in statusOptions)
-                      Row(
-                        children: [
-                          Radio(
-                            value: status,
-                            groupValue: statusValue,
-                            onChanged: (_) async {
-                              statusValue = status;
-                              await MediaUserService
-                                .instance
-                                .update(mt.getMediaId(), {
-                                  'status': status,
+                        TextField( //TODO: make this look like the search menu
+                          controller: progressController,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly 
+                          ],
+                          decoration: InputDecoration(
+                            labelText: 'Update your progress ($measureUnit)',
+                            suffixIcon: IconButton(
+                              icon: saveIcon(context),
+                              onPressed: () async {
+                                int    progressValue = int.parse(progressController.text);
+                                if (progressValue < 0) {
+                                  return;
                                 }
-                              );
-                              setFullState();
-                            },
-                          ),
-                          Text(
-                            status,
-                            style: subtitleStyle,
-                          ),
-                        ],
-                      ),
-                    Text(
-                      '$mediaType tags',
-                      style: titleStyle,
-                    ),
-                    for (Tag tag in TagService.instance.items)
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: mutIds.contains(tag.id),
-                            onChanged: (value) async {
-                              MediaUserTag mut = MediaUserTag(
-                                mediaId: mt.getMediaId(),
-                                userId: UserSystem.instance.getCurrentUserId(),
-                                tagId: tag.id,
-                              );
+                                if (maxProgressValue > -1 && progressValue > maxProgressValue) {
+                                  return;
+                                }
 
-                              if (value == true) {
-                                await MediaUserTagService.instance.create(mut);
-                                mutIds.add(mut.tagId);
-                              }
-                              else {
-                                await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
-                                mutIds.remove(mut.tagId);
-                              }
-                              setFullState();
-                            },
+                                await serviceInstance
+                                  .update(
+                                    customizations.mediaId,
+                                    {measureAttributeName: progressValue},
+                                  );
+                                setFullState();
+                              },
+                            ),
                           ),
-                          Text(
-                            tag.name,
-                            style: subtitleStyle,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          '$mediaType status',
+                          style: titleStyle,
+                        ),
+                        for (String status in statusOptions)
+                          Row(
+                            children: [
+                              Radio(
+                                value: status,
+                                groupValue: statusValue,
+                                onChanged: (_) async {
+                                  statusValue = status;
+                                  await MediaUserService
+                                    .instance
+                                    .update(mt.getMediaId(), {
+                                      'status': status,
+                                    }
+                                  );
+                                  setFullState();
+                                },
+                              ),
+                              Text(
+                                status,
+                                style: subtitleStyle,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                  ],
-                ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  Text(
+                    '$mediaType tags',
+                    style: titleStyle,
+                  ),
+                  for (Tag tag in TagService.instance.items)
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: mutIds.contains(tag.id),
+                          onChanged: (value) async {
+                            MediaUserTag mut = MediaUserTag(
+                              mediaId: mt.getMediaId(),
+                              userId: UserSystem.instance.getCurrentUserId(),
+                              tagId: tag.id,
+                            );
+
+                            if (value == true) {
+                              await MediaUserTagService.instance.create(mut);
+                              mutIds.add(mut.tagId);
+                            }
+                            else {
+                              await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
+                              mutIds.remove(mut.tagId);
+                            }
+                            setFullState();
+                          },
+                        ),
+                        Text(
+                          tag.name,
+                          style: subtitleStyle,
+                        ),
+                      ],
+                    ),
+                ],
               ),
             ),
           );
