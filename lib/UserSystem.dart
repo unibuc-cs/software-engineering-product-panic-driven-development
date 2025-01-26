@@ -1,5 +1,6 @@
 import 'Helpers/database.dart';
 import 'Services/auth_service.dart';
+import 'Services/general/config.dart';
 
 class UserSystem {
   // The following 3 definitions are used to make this class a singleton
@@ -18,20 +19,18 @@ class UserSystem {
   }
 
   Future<void> login() async {
-    Map<String, dynamic> userData = await AuthService.instance.details();
+    currentUserData = await AuthService.instance.details();
 
-    while (userData.isEmpty) {
-      userData = await AuthService.instance.details();
+    while (currentUserData!['id'] == null) {
+      currentUserData = await AuthService.instance.details();
     }
 
-    currentUserData = Map<String, dynamic>();
-    currentUserData!['id'] = userData['id'];
-    currentUserData!['name'] = userData['user_metadata']?['name'];
     await HydrateWithUser();
   }
 
   Future<void> logout() async {
     await AuthService.instance.logout();
+    Config.instance.token = '';
     currentUserData = null;
     UnhydrateWithUser();
   }

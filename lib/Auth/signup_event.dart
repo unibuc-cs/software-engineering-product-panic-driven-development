@@ -26,5 +26,5 @@ class SignUpButtonPressed extends SignUpEvent {
   List<Object> get props => [context, username, email, password, confirmedPassword];
 
   @override
-  String toString() => 'SignUpButtonPressed {username: $username, email: $email, password: $password, confirmedPassword: $confirmedPassword }';
+  String toString() => 'SignUpButtonPressed';
 }

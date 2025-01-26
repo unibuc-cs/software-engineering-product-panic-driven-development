@@ -9,9 +9,16 @@ RouterPlus authRouter() {
   final router = Router().plus;
   SupabaseClient supabase = SupabaseManager.client;
 
-  router.get('/details', (Request req) async =>
-    sendOk(supabase.auth.currentUser)
-  );
+  Future<User?> getUser(Request req) async => 
+    (await supabase.auth.admin.getUserById(req.context['userId']! as String)).user;
+
+  router.get('/details', (Request req) async {
+    final user = await getUser(req);
+    return {
+      'id'  : user!.id,
+      'name': user.userMetadata?['name'],
+    };
+  });
 
   router.post('/login', (Request req) async {
     final body = await req.body.asJson;
@@ -22,11 +29,13 @@ RouterPlus authRouter() {
       ]
     );
 
-    await supabase.auth.signInWithPassword(
-      email: body['email'],
-      password: body['password']
-    );
-    return sendOk({ 'token': getToken(supabase.auth.currentUser?.id) });
+    final user = (
+      await supabase.auth.signInWithPassword(
+        email: body['email'],
+        password: body['password']
+      )
+    ).user;
+    return sendOk({ 'token': getToken(user?.id) });  
   });
 
   router.post('/signup', (Request req) async {
@@ -36,6 +45,7 @@ RouterPlus authRouter() {
         'email',
         'password',
         'name',
+        'isGuest',
       ]
     );
 
@@ -44,7 +54,7 @@ RouterPlus authRouter() {
     final response = await supabase.auth.admin.createUser(AdminUserAttributes(
       email: body['email'],
       password: body['password'],
-      userMetadata: {'name': body['name']},
+      userMetadata: {'name': body['name'], 'isGuest': body['isGuest']},
       emailConfirm: true,
     ));
     final User? user = response.user;
@@ -56,9 +66,35 @@ RouterPlus authRouter() {
   });
 
   router.get('/logout', (Request req) async {
+    final user = await getUser(req);
     await supabase.auth.signOut();
     SupabaseManager.resetClient();
     supabase = SupabaseManager.client;
+
+    if (user == null || !user.userMetadata!.containsKey('isGuest') || !user.userMetadata?['isGuest']) {
+      return sendNoContent();
+    }
+
+    // Guest account, so we have to delete everything related to it
+    List<String> tableNames = [
+      'note',
+      'wishlist',
+      'mediauser',
+      'mediausertag',
+      'userachievement',
+      //TODO: add these
+      //'usertag',
+      //'mediausersource',
+    ];
+
+    await Future.wait(tableNames.map((tableName) => SupabaseManager
+      .client
+      .from(tableName)
+      .delete()
+      .eq('userid', user.id)
+    ));
+
+    await supabase.auth.admin.deleteUser(user.id);
     return sendNoContent();
   });
 

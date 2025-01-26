@@ -12,6 +12,7 @@ post {
 
 headers {
   Authorization: Bearer {{tokenValid}}
+  ~Authorization: Bearer {{tokenGuest}}
 }
 
 body:json {

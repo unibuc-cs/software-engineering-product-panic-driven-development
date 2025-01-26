@@ -167,7 +167,6 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
   Pair<MediaUser?, Wishlist?> aux = getCustomizations(media, isWishlist);
   dynamic customizations = aux.value ?? aux.key;
 
-  // TODO: Have all image links in basic format
   String imageUrl = customizations.backgroundImage;
   String coverUrl = customizations.coverImage;
 

@@ -48,8 +48,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   
   int selectedMediaId = -1;
   
-  final String placeholderImage = 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
-  
   TextEditingController searchController = TextEditingController();
   String filterQuery = '';
   
@@ -145,7 +143,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         throw Exception('More Wishlist elements of the same mediaId (${mt.getMediaId()}) found. Contact an admin.');
       }
 
-      iconUrl = 'https:${wishes.first.icon}';
+      iconUrl = wishes.first.icon;
     }
     else {
       List<MediaUser> mus = MediaUserService
@@ -159,7 +157,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         throw Exception('More MediaUser elements of the same mediaId (${mt.getMediaId()}) found. Contact an admin.');
       }
 
-      iconUrl = 'https:${mus.first.icon}';
+      iconUrl = mus.first.icon;
     }
 
     return Container(
@@ -1177,14 +1175,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
   // Despite its name, this function only connects the User and the MT. Speciffic data is being sent throught the data parameter
   Future<void> _addToLibraryOrWishlist(Map<String, dynamic> data, MT mt) async {
+    final String placeholderImage = 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
     String coverImage = placeholderImage, icon = placeholderImage, backgroundImage = placeholderImage;
 
-    if (data.containsKey('icon')) {
-      icon = data['icon'];
-    }
-
     if (data.containsKey('coverimage')) {
-      coverImage = backgroundImage = data['coverimage'];
+      icon = coverImage = backgroundImage = data['coverimage'];
     }
 
     if (data.containsKey('artworks') && data['artworks'].isNotEmpty) {
@@ -1194,6 +1189,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       else {
         backgroundImage = data['artworks'];
       }
+    }
+
+    if (data.containsKey('icon')) {
+      icon = data['icon'];
     }
 
     if (isWishlist) {

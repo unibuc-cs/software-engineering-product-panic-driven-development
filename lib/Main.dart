@@ -10,6 +10,8 @@ import 'Auth/signup_screen.dart';
 import 'Auth/signup_bloc.dart';
 import 'Auth/login_screen.dart';
 import 'Auth/login_bloc.dart';
+import 'Auth/guest_screen.dart';
+import 'Auth/guest_bloc.dart';
 
 void main() async {
   DotEnv(includePlatformEnvironment: true)..load();
@@ -113,6 +115,24 @@ class HomeState extends State<Home> {
                 .filledButtonTheme
                 .style,
               child: const Text('Log in'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator
+                  .of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                            create: (context) => GuestBloc(),
+                            child: const GuestScreen(),
+                      )
+                    )
+                  );
+              },
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
+              child: const Text('Try as guest'),
             ),
           ],
         ),
