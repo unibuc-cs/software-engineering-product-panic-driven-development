@@ -32,6 +32,7 @@ class AuthService {
   }
 
   Future<String> getGoogleLoginUrl() async {
+ 
     final response = await postRequest<Map<String, dynamic>>(
       endpoint: '$endpoint/login-google',
       body: {},
@@ -41,6 +42,7 @@ class AuthService {
   }
 
   Future<Map<String, dynamic>> handleGoogleCallback(String token) async {
+    
     final response = await postRequest<Map<String, dynamic>>(
       endpoint: '$endpoint/callback-google',
       body: {'token': token},
