@@ -7,7 +7,6 @@ RouterPlus wishlistsRouter() => RouterDefault(
   idField           : 'mediaid',
   validateForTable  : 'media',
   validateInCreate  : ['mediaid', 'name', 'addeddate', 'lastinteracted'],
-  populateInCreate  : {'status': 'Plan to Consume'},
   discardInUpdate   : ['mediaid', 'userid'],
   dependencyInDelete: false,
 ).router;

@@ -16,7 +16,6 @@ void main() async {
     mediaId: 1,
     userId: '',
     name: 'test1234',
-    status: 'test',
     addedDate: DateTime.now(),
     lastInteracted: DateTime.now(),
   );

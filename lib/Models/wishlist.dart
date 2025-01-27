@@ -8,7 +8,6 @@ class Wishlist implements Model {
   int userScore;
   DateTime addedDate;
   String coverImage;
-  String status;
   String series;
   String icon;
   String backgroundImage;
@@ -21,7 +20,6 @@ class Wishlist implements Model {
     this.userScore = 0,
     required this.addedDate,
     this.coverImage = '',
-    this.status = '',
     this.series = '',
     this.icon = '',
     this.backgroundImage = '',
@@ -53,7 +51,6 @@ class Wishlist implements Model {
       'userscore': userScore,
       'addeddate': addedDate.toIso8601String(),
       'coverimage': coverImage,
-      'status': status,
       'series': series,
       'icon': icon,
       'backgroundimage': backgroundImage,
@@ -70,7 +67,6 @@ class Wishlist implements Model {
       userScore: json['userscore'] ?? 0,
       addedDate: DateTime.parse(json['addeddate']),
       coverImage: json['coverimage'] ?? '',
-      status: json['status'] ?? '',
       series: json['series'] ?? '',
       icon: json['icon'] ?? '',
       backgroundImage: json['backgroundimage'] ?? '',

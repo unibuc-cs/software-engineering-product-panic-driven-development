@@ -333,6 +333,7 @@ Future<void> showIGDBImportDialog(BuildContext context, LibraryState<Game> libra
   bool confirmed    = false; // Flag to track if the choice was confirmed or not.
   bool dataGathered = false; // Flag to track if the data was received from IGDB.
   bool invalidId    = false; // Flag to track if the id was invalid.
+  String gameName   = '';
 
   List<Widget> invalidIdWidgets = [
     Text(
@@ -372,7 +373,7 @@ Future<void> showIGDBImportDialog(BuildContext context, LibraryState<Game> libra
                         ),
                       ),
                       Text(dataGathered
-                          ? 'Creating game in database'
+                          ? 'Adding $gameName to database'
                           : 'Waiting for IGDB to finnish',
                         style: titleStyle,
                       ),
@@ -443,6 +444,7 @@ Future<void> showIGDBImportDialog(BuildContext context, LibraryState<Game> libra
                                 invalidId = true;
                                 return;
                               }
+                              gameName = gameData['originalname'];
                               dataGathered = true;
                               setState(() {});
                               var result = await library.createGame(gameData);

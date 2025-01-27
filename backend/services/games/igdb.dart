@@ -205,7 +205,7 @@ class IGDB extends Provider {
       final response = await _makeRequest(
         'franchises',
         headers: _authHeaders(accessToken),
-        body: 'fields name; where id = ${_formatIds(game, 'franchise')};'
+        body: 'fields name; where id = ${_formatIds(game, 'franchises')};'
       );
 
       if (response != null) {
@@ -450,7 +450,8 @@ class IGDB extends Provider {
         game.remove('collections');
       }
 
-      if (game['franchises'] != null) {
+      if (game['franchises'] != null || game['franchise'] != null) {
+        game['franchises'] ??= [];
         await _getFranchises(_accessToken, game);
         if (game['seriesname'] != null) {
           game['seriesname'] += _franchises;
@@ -458,6 +459,7 @@ class IGDB extends Provider {
         else {
           game['seriesname'] = _franchises;
         }
+        game.remove('franchises');
       }
 
       if (game['genres'] != null) {

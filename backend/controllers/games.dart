@@ -6,6 +6,7 @@ final discardInCreate = [
   'url',
   'artworks',
   'coverimage',
+  'francise',
   'icon',
   'dlcs',
   'remasters',

@@ -1159,7 +1159,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         userScore: -1,
         addedDate: DateTime.now(),
         coverImage: coverImage,
-        status: getDefaultStatusForType(MT),
         series: (data['seriesname'] == null || data['seriesname'].isEmpty) ? data['name'] : data['seriesname'][0],
         icon: icon,
         backgroundImage: backgroundImage,
