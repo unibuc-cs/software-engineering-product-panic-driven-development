@@ -136,8 +136,11 @@ Future<Map<String, Map<String, dynamic>>> _getGamesForID(String id, {bool debugg
       final gameOptions = await getOptionsIGDB(name);
       final bestOptionMatch = _getBestMatch(name, gameOptions);
       if (bestOptionMatch.isNotEmpty) {
-        await mutex.protect(() async { // TODO: This might be useless because of the delay given initialy. If we get to that conclusion, then the mutex.protect can be removed
-          games[name] = bestOptionMatch;
+        await mutex.protect(() async {
+          games[name] = {
+            ...bestOptionMatch,
+            'icon': game['icon'], // TODO: Get the rest of the custom data
+          };
         });
       }
     }));
@@ -147,8 +150,6 @@ Future<Map<String, Map<String, dynamic>>> _getGamesForID(String id, {bool debugg
 }
 
 Future<void> confirmImport(Map<String, Map<String, dynamic>> gamesData, LibraryState gamesLibrary, Set<String> wanted, void Function() setState, Set<String> workingOn, Set<String> done, Set<String> failed) async {
-  // TODO: make it so it adds all games in paralel
-  // TODO: the TODO above probably cannot be fulfilled as even sequentially there are errors from PCGW that break the import process
   List<MapEntry<String, Map<String, dynamic>>> gameEntriesList = gamesData.entries.toList();
   gameEntriesList = gameEntriesList.where((entry) => wanted.contains(entry.key) && !gamesLibrary.mediaAlreadyInLibrary(entry.value['name'])).toList();
   gameEntriesList.sort((a, b) => a.key.compareTo(b.key));
@@ -156,10 +157,14 @@ Future<void> confirmImport(Map<String, Map<String, dynamic>> gamesData, LibraryS
   workingOn.addAll(gameEntriesList.map((entry) => entry.key));
   setState();
 
+  // This for loop cannot be made concurrent because of rate limits
   for (var gameData in gameEntriesList) {
+    int igdbId = gameData.value['id'];
+    gameData.value.remove('id');
+    gameData.value.remove('name');
     for (int trial = 0; trial < 3; ++trial) {
       try {
-        await gamesLibrary.addMediaType(gameData.value);
+        await gamesLibrary.importIGDB(igdbId, gameData.value);
         done.add(gameData.key);
         workingOn.remove(gameData.key);
         break;

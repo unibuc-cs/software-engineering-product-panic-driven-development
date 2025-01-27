@@ -1054,6 +1054,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     setState(() {});
   }
 
+  // This function receives the result of getInfoIGDB and creates (if needed) the game in the db. It returns extra data and the game (created or received from the db)
   Future<Pair<Map<String, dynamic>, Game>> createGame(Map<String, dynamic> gameData) async {
     String name = gameData['originalname'];
     Game? nullableGame = mediaAlreadyInDB(name) as Game?;
@@ -1207,6 +1208,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     setState(() {});
+  }
+
+  Future<void> importIGDB(int igdbId, Map<String, dynamic> userData) async {
+    Pair<Map<String, dynamic>, Game> result = await createGame(await getInfoIGDB({'id': igdbId}));
+    await addToLibraryOrWishlist({
+        ...result.key,
+        ...userData,
+      },
+      result.value as MT,
+    );
   }
 
   // This function creates the Media object and the speciffic MediaType object in the database. After that it connects the user to the MediaType object with either MediaUser or Wishlist
