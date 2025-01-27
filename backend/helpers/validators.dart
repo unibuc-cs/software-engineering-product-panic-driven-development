@@ -10,7 +10,7 @@ Future<void> validateExistence(dynamic id, String table) async {
       .single();
   }
   catch (e) {
-    throw Exception('${table.toLowerCase()}Id not found');
+    throw Exception('${table.toLowerCase()}id not found');
   }
 }
 

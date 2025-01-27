@@ -116,11 +116,11 @@ class RouterMedia extends RouterBase {
   RouterMedia({
     required String resource,
     bool requiresUser = false,
-  }): super('media${requiresUser ? "user" : ""}${resource}') {
+  }): super('media${requiresUser ? 'user' : ''}${resource}') {
     Future<void> _validate(Map<String, dynamic> body, String idField) async =>
       await Future.wait({
         'media': 'mediaid',
-        idField.split('id').first: idField,
+        '${requiresUser ? 'user' : ''}${idField.split('id').first}': idField,
       }.entries.map((entry) async => await validateExistence(body[entry.value], entry.key)));
 
     Map<String, dynamic> _filters(Request req, [String mediaId = '', Map<String, dynamic> filters = const {}]) => {

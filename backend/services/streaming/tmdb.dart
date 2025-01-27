@@ -91,6 +91,7 @@ class Tmdb extends Provider {
       'creators'      : media['production_companies'].map((dynamic producer) {
                           return producer['name'];
                         }).toList(),
+      'genres'        : media['genres'].map((genre) => genre['name']).toList(),
       'status'        : media['status'],
       'communityscore': (media['vote_average']*10).round(),
     };
@@ -133,7 +134,6 @@ class Tmdb extends Provider {
       return {
         ..._sharedInfo(series),
         'releasedate': series['first_air_date'],
-        'nrepisodes' : series['number_of_episodes'],
         'seasons'    : series['seasons'].map((season) => {
           'name'      : season['name'],
           'coverimage': 'https://image.tmdb.org/t/p/original${season['poster_path']}',

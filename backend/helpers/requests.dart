@@ -201,7 +201,7 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     }())
   );
 
-  if (body.containsKey('seasonsBody')) {
+  if (body.containsKey('seasonsBody') && body['seasonsBody']!.isNotEmpty) {
     try {
       Mutex seasonMutex = Mutex();
 
