@@ -6,7 +6,7 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 
 import 'Helpers/getters.dart';
 import 'Helpers/steam_import.dart';
-import 'Models/tag.dart';
+import 'Models/user_tag.dart';
 import 'Models/book.dart';
 import 'Models/game.dart';
 import 'Models/note.dart';
@@ -19,13 +19,13 @@ import 'Models/wishlist.dart';
 import 'Models/tv_series.dart';
 import 'Models/media_user.dart';
 import 'Models/general/media_type.dart';
-import 'Services/tag_service.dart';
 import 'Services/game_service.dart';
 import 'Services/note_service.dart';
 import 'Services/genre_service.dart';
 import 'Services/media_service.dart';
-import 'Services/wishlist_service.dart';
 import 'Services/provider_service.dart';
+import 'Services/user_tag_service.dart';
+import 'Services/wishlist_service.dart';
 import 'Services/media_user_service.dart';
 import 'Services/media_user_tag_service.dart';
 import 'Services/media_genre_service.dart';
@@ -816,11 +816,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('Filtering is not implemented for this media type, because of $err');
     }
 
-    List<Tag>   tags   = List.from(  TagService.instance.items, growable: false);
-    List<Genre> genres = List.from(GenreService.instance.items, growable: false);
+    List<UserTag> userTags = List.from(UserTagService.instance.items, growable: false);
+    List<Genre>   genres   = List.from(  GenreService.instance.items, growable: false);
 
-    tags  .sort((t0, t1) => t0.name.compareTo(t1.name));
-    genres.sort((g0, g1) => g0.name.compareTo(g1.name));
+    userTags.sort((t0, t1) => t0.name.compareTo(t1.name));
+      genres.sort((g0, g1) => g0.name.compareTo(g1.name));
 
     return showDialog(
       context: context,
@@ -916,16 +916,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                           ),
                         ],
                       ),
-                      for (Tag tag in tags)
+                      for (UserTag userTag in userTags)
                         checkboxOption(
-                          tag.name,
-                          selectedTagsIds.contains(tag.id),
+                          userTag.name,
+                          selectedTagsIds.contains(userTag.id),
                           (value) {
                             value == null
                               ? throw Exception('How did this tag filter checkbox get blocked?')
                               : value
-                                ? selectedTagsIds.add(tag.id)
-                                : selectedTagsIds.remove(tag.id);
+                                ? selectedTagsIds.add(userTag.id)
+                                : selectedTagsIds.remove(userTag.id);
                           },
                         ),
                       Row(

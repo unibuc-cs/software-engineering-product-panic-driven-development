@@ -1,5 +1,4 @@
 import 'auth.dart';
-import 'tags.dart';
 import 'notes.dart';
 import 'anime.dart';
 import 'books.dart';
@@ -12,10 +11,11 @@ import 'movies.dart';
 import 'series.dart';
 import 'seasons.dart';
 import 'creators.dart';
-import 'wishlists.dart';
 import 'platforms.dart';
 import 'retailers.dart';
 import 'tv_series.dart';
+import 'user_tags.dart';
+import 'wishlists.dart';
 import 'media_users.dart';
 import 'publishers.dart';
 import 'media_links.dart';
@@ -40,7 +40,6 @@ RouterPlus apiRouter() {
   final router = Router(notFoundHandler: unknownEndpoint).plus;
 
   router.mount('/auth', authRouter().call);
-  router.mount('/tags', tagsRouter().call);
   router.mount('/anime', animeRouter().call);
   router.mount('/books', booksRouter().call);
   router.mount('/games', gamesRouter().call);
@@ -63,6 +62,7 @@ RouterPlus apiRouter() {
   router.mount('/mediacreators', mediaCreatorsRouter().call);
   router.mount('/mediaplatforms', mediaPlatformsRouter().call);
   router.mount('/mediaretailers', mediaRetailersRouter().call);
+  router.mount('/usertags', requireAuth(userTagsRouter().call));
   router.mount('/mediapublishers', mediaPublishersRouter().call);
   router.mount('/appachievements', appAchievementsRouter().call);
   router.mount('/wishlists', requireAuth(wishlistsRouter().call));

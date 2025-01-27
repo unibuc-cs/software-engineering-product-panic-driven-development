@@ -1,11 +1,11 @@
 meta {
-  name: Create
+  name: Update
   type: http
-  seq: 1
+  seq: 4
 }
 
-post {
-  url: {{URL}}/tags
+put {
+  url: {{URL}}/usertags/2
   body: json
   auth: none
 }

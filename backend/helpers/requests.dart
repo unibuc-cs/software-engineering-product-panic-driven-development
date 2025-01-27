@@ -94,6 +94,7 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
       'retailersBody'  : ['retailers'],
       'seriesBody'     : ['seriesname'],
       'mediaseriesBody': ['series'],
+      'seasonsBody'    : ['seasons'],
       'mediaBody'      : [
         'originalname',
         'description',
@@ -173,6 +174,7 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     'related_medias'          : [],
     'related_$mediaTypePlural': [],
     'mediaseries'             : [],
+    'seasons'                 : [],
   };
   final body = splitBody(initialBody);
   final Mutex resultMutex = Mutex();
@@ -199,7 +201,43 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     }())
   );
 
+  if (body.containsKey('seasonsBody')) {
+    try {
+      Mutex seasonMutex = Mutex();
+
+      List<Future<dynamic>> tasks = [];
+
+      body['seasonsBody']!['seasons'].forEach((season) {
+        final seasonBody = {
+          '${mediaType.replaceAll('_', '')}id': result['id'],
+          ...season,
+        };
+
+        tasks.add(() async {
+          var seasonResponse = (await SupabaseManager
+            .client
+            .from('season')
+            .insert(seasonBody)
+            .select()
+            .single()
+          );
+
+          await addToList(result['seasons'], seasonResponse, seasonMutex);
+        }());
+      });
+
+      await Future.wait(tasks);
+    }
+    catch(e) {
+      print(e);
+    }
+  }
+  removeIfEmpty(result, 'seasons');
+
   if (body['seriesBody'] == null) {
+    removeIfEmpty(result, 'related_medias');
+    removeIfEmpty(result, 'related_$mediaTypePlural');
+    removeIfEmpty(result, 'mediaseries');
     return sendOk(result);
   }
 
@@ -228,6 +266,9 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
   removeIfEmpty(result, 'series');
 
   if (body['mediaseriesBody']?['series'].length == 0) {
+    removeIfEmpty(result, 'related_medias');
+    removeIfEmpty(result, 'related_$mediaTypePlural');
+    removeIfEmpty(result, 'mediaseries');
     return sendOk(result);
   }
 

@@ -134,6 +134,11 @@ class Tmdb extends Provider {
         ..._sharedInfo(series),
         'releasedate': series['first_air_date'],
         'nrepisodes' : series['number_of_episodes'],
+        'seasons'    : series['seasons'].map((season) => {
+          'name'      : season['name'],
+          'coverimage': 'https://image.tmdb.org/t/p/original${season['poster_path']}',
+          'nrepisodes': season['episode_count']
+        }).toList(),
       };
     }
     catch (e) {

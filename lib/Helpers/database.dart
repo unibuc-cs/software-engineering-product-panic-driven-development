@@ -1,4 +1,3 @@
-import '../Models/tag.dart';
 import '../Models/genre.dart';
 import '../Services/anime_service.dart';
 import '../Services/app_achievement_service.dart';
@@ -26,32 +25,33 @@ import '../Services/publisher_service.dart';
 import '../Services/retailer_service.dart';
 import '../Services/season_service.dart';
 import '../Services/series_service.dart';
-import '../Services/tag_service.dart';
+import '../Services/user_tag_service.dart';
 import '../Services/genre_service.dart';
 import '../Services/tv_series_service.dart';
 import '../Services/user_achievement_service.dart';
 import '../Services/wishlist_service.dart';
 
 Future<void> seedData() async {
-  TagService tagServ = TagService.instance;
+  // UserTagService userTagServ = UserTagService.instance;
   GenreService genreServ = GenreService.instance;
   List<Future<void>> allFutures = [];
 
-  if ((await tagServ.readAll()).isEmpty) {
-    var tagsToAdd = [
-      'Singleplayer',
-      'Multiplayer',
-      'Casual',
-      'Competitive',
-      'VR',
-      'Indie',
-      'Co-Op',
-      'Local Co-Op',
-      'MMO',
-    ];
+  // TODO: Move this to signup or something similar
+  // if ((await userTagServ.readAll()).isEmpty) {
+  //   var tagsToAdd = [
+  //     'Singleplayer',
+  //     'Multiplayer',
+  //     'Casual',
+  //     'Competitive',
+  //     'VR',
+  //     'Indie',
+  //     'Co-Op',
+  //     'Local Co-Op',
+  //     'MMO',
+  //   ];
 
-    allFutures.addAll(tagsToAdd.map((tagName) => tagServ.create(Tag(name: tagName))));
-  }
+  //   allFutures.addAll(tagsToAdd.map((tagName) => userTagServ.create(UserTag(name: tagName))));
+  // }
 
   if ((await genreServ.readAll()).isEmpty) {
     var genresToAdd = [
@@ -124,7 +124,6 @@ Future<void> HydrateWithoutUser() async {
     RetailerService.instance,
     SeasonService.instance,
     SeriesService.instance,
-    TagService.instance,
     TVSeriesService.instance,
   ];
 
@@ -137,6 +136,7 @@ Future<void> HydrateWithUser() async {
     MediaUserTagService.instance,
     NoteService.instance,
     UserAchievementService.instance,
+    UserTagService.instance,
     WishlistService.instance,
   ];
 

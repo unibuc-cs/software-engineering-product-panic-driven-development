@@ -1,5 +1,6 @@
 import 'package:mediamaster/Services/genre_service.dart';
 import 'package:mediamaster/Services/media_genre_service.dart';
+import 'package:mediamaster/Services/season_service.dart';
 
 import 'link_service.dart';
 import 'media_service.dart';
@@ -44,6 +45,7 @@ class TVSeriesService extends Service<TVSeries> {
     SeriesService.instance.addToItems(body['series']);
     MediaSeriesService.instance.addToItems(body['mediaseries']);
     MediaService.instance.addToItems(body['related_medias']);
+    SeasonService.instance.addToItems(body['seasons']);
     TVSeriesService.instance.addToItems(body['related_tv_series']);
     TVSeriesService.instance.addToItems(body);
 

@@ -4,20 +4,20 @@ import 'package:mediamaster/Services/anime_service.dart';
 import 'package:mediamaster/Services/book_service.dart';
 import 'package:mediamaster/Services/manga_service.dart';
 import '../Helpers/getters.dart';
-import '../Models/tag.dart';
 import '../Models/book.dart';
 import '../Models/game.dart';
 import '../Models/anime.dart';
 import '../Models/manga.dart';
 import '../Models/media.dart';
 import '../Models/movie.dart';
+import '../Models/user_tag.dart';
 import '../Models/tv_series.dart';
 import '../Models/media_user.dart';
 import '../Models/media_user_tag.dart';
 import '../Models/general/model.dart';
 import '../Models/general/media_type.dart';
+import '../Services/user_tag_service.dart';
 import '../Services/wishlist_service.dart';
-import '../Services/tag_service.dart';
 import '../Services/media_user_service.dart';
 import '../Services/media_user_tag_service.dart';
 import '../UserSystem.dart';
@@ -512,16 +512,16 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                       '$mediaType tags',
                       style: titleStyle,
                     ),
-                    for (Tag tag in TagService.instance.items)
+                    for (UserTag userTag in UserTagService.instance.items)
                       Row(
                         children: [
                           Checkbox(
-                            value: mutIds.contains(tag.id),
+                            value: mutIds.contains(userTag.id),
                             onChanged: (value) async {
                               MediaUserTag mut = MediaUserTag(
                                 mediaId: mt.getMediaId(),
                                 userId: UserSystem.instance.getCurrentUserId(),
-                                tagId: tag.id,
+                                tagId: userTag.id,
                               );
 
                               if (value == true) {
@@ -536,7 +536,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                             },
                           ),
                           Text(
-                            tag.name,
+                            userTag.name,
                             style: subtitleStyle,
                           ),
                         ],
