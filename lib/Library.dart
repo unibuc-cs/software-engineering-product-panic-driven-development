@@ -58,6 +58,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       return increasing * a.media.originalName.compareTo(b.media.originalName);
     },
     'By given name': null, // TODO: This cannot be set before the constructor is called as member functions are needed. A workaround is to just add it in the constructor
+    'By given rating': null, // TODO: This cannot be set before the constructor is called as member functions are needed. A workaround is to just add it in the constructor
     'By critic score': (MT a, MT b, int increasing) {
       return increasing * a.media.criticScore.compareTo(b.media.criticScore);
     },
@@ -115,6 +116,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     return getCustomizations(mediaId, isWishlist).name;
   }
 
+  int getCustomRating(int mediaId) {
+    return getCustomizations(mediaId, isWishlist).userScore;
+  }
+
   Widget getCustomIcon(MT mt) {
     String iconUrl = getCustomizations(mt.media.id, isWishlist).icon;
     
@@ -144,6 +149,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     // TODO: This cannot be set before the constructor as member functions are required
     mediaOrderComparators['By given name'] = (MT a, MT b, int increasing) {
       return increasing * getCustomName(a.media.id).compareTo(getCustomName(b.media.id));
+    };
+    // TODO: This cannot be set before the constructor as member functions are required
+    mediaOrderComparators['By given rating'] = (MT a, MT b, int increasing) {
+      return increasing * getCustomRating(a.media.id).compareTo(getCustomRating(b.media.id));
     };
   }
 
@@ -646,7 +655,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                                   return ListTile(
                                     title: Text(mediaName),
                                     subtitle: Text(
-                                      '$mediaType is already in wishlist.',
+                                      '$mediaType is already in wishlist (will get moved over here).',
                                       style: const TextStyle(
                                         color: Color.fromARGB(255, 255, 0, 0),
                                       ),
@@ -1038,10 +1047,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   Future<Pair<Map<String, dynamic>, MT>> _addGame(Map<String, dynamic> option) async {
+    String name = option['name'];
+    Game? nullableGame = mediaAlreadyInDB(name) as Game?;
+    
     var gameData = await getInfoIGDB(option);
     gameData[getAttributeNameForType(MT)] = gameData[getOldAttributeNameForType(MT)];
-    String name = gameData['originalname'];
-    Game? nullableGame = mediaAlreadyInDB(name) as Game?;
     
     if (name[name.length - 1] == ')' && name.length >= 7) {
       name = name.substring(0, name.length - 7);
@@ -1157,10 +1167,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         return;
       }
 
-      if (mediaAlreadyInWishlist(data['originalname'])) {
-        await WishlistService.instance.delete(mt.getMediaId());
-      }
-
       MediaUser mu = MediaUser(
         mediaId: mt.getMediaId(),
         userId: UserSystem.instance.getCurrentUserId(),
@@ -1174,6 +1180,23 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         backgroundImage: backgroundImage,
         lastInteracted: DateTime.now(),
       );
+
+      if (mediaAlreadyInWishlist(data['originalname'])) {
+        Wishlist wishlist = WishlistService
+          .instance
+          .items
+          .where((wish) => wish.mediaId == mt.getMediaId())
+          .first;
+        
+        // Move customizations over
+        mu.name            = wishlist.name;
+        mu.userScore       = wishlist.userScore;
+        mu.coverImage      = wishlist.coverImage;
+        mu.icon            = wishlist.icon;
+        mu.backgroundImage = wishlist.backgroundImage;
+
+        await WishlistService.instance.delete(mt.getMediaId());
+      }
 
       await MediaUserService.instance.create(mu);
     }
