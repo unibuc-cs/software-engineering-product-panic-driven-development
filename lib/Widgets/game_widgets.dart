@@ -1,7 +1,10 @@
 import 'dart:math';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mediamaster/Library.dart';
+import 'package:mediamaster/Services/provider_service.dart';
 import 'package:mediamaster/Widgets/themes.dart';
+import 'package:url_launcher/link.dart';
 import '../Models/game.dart';
 import 'media_widgets.dart';
 
@@ -324,15 +327,143 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
   );
 }
 
-Future<void> showIGDBImportDialog(BuildContext context, Library<Game> library) {
+Future<void> showIGDBImportDialog(BuildContext context, LibraryState<Game> library) {
+  TextEditingController controller = TextEditingController();
+
+  bool confirmed    = false; // Flag to track if the choice was confirmed or not.
+  bool dataGathered = false; // Flag to track if the data was received from IGDB.
+  bool invalidId    = false; // Flag to track if the id was invalid.
+
+  List<Widget> invalidIdWidgets = [
+    Text(
+      'The ID is invalid',
+      style: subtitleStyle,
+      textAlign: TextAlign.center,
+    ),
+    SizedBox(
+      height: 20,
+    ),
+    Icon(
+      Icons.sentiment_dissatisfied_rounded,
+      size: 50,
+    ),
+  ];
+
   return showDialog(
     context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
-        return AlertDialog(
-          
-        );
-      }
-    ),
+    barrierDismissible: false,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          if (confirmed) {
+            if (!invalidId) {
+              return AlertDialog(
+                content: Container(
+                  constraints: BoxConstraints(maxHeight: 140),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: Center(
+                          child: loadingWidget(
+                            context
+                          ),
+                        ),
+                      ),
+                      Text(dataGathered
+                          ? 'Creating game in database'
+                          : 'Waiting for IGDB to finnish',
+                        style: titleStyle,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return AlertDialog(
+              title: const Text('Invalid ID'),
+              content: Column(
+                children: invalidIdWidgets,
+              ),
+            );
+          }
+          else {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Import game using IGDB ID'),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 350,
+                height: 100,
+                child: Column(
+                  children: [
+                    Link(
+                      uri: Uri.parse('https://duckduckgo.com'), // TODO: Replace this with a link to some tutorial on getting the IGDB id.
+                      builder: (context, followLink) => RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'How to get IGDB ID',
+                              style: TextStyle(
+                                color: linkColor,
+                                decoration: TextDecoration.underline,
+                                fontSize: 22,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = followLink,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    TextField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        labelText: 'Insert IGDB ID',
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () async {
+                            String query = controller.text;
+                            if (query.isNotEmpty) {
+                              confirmed = true;
+                              setState(() {});
+                              Map<String, dynamic> gameData = {};
+                              try {
+                                gameData = await getInfoIGDB({'id': query});
+                              }
+                              catch(e) {
+                                invalidId = true;
+                                return;
+                              }
+                              dataGathered = true;
+                              setState(() {});
+                              var result = await library.createGame(gameData);
+                              await library.addToLibraryOrWishlist(
+                                result.key,
+                                result.value,
+                              );
+                              Navigator.of(context).pop();
+                              setState(() {});
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      );
+    },
   );
 }

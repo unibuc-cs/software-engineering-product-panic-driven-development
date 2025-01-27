@@ -95,3 +95,5 @@ Widget saveIcon(BuildContext context) => Icon(
     ? Icons.save_outlined
     : Icons.save,
 );
+
+Color get linkColor => Color.fromARGB(255, 0, 128, 198);

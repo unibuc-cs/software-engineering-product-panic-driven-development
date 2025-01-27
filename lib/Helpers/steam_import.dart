@@ -182,7 +182,6 @@ Future<void> importSteam(BuildContext context, LibraryState gamesLibrary) {
   TextEditingController controller = TextEditingController();
 
   Map<String, Map<String, dynamic>> searchResults = {};
-  Color linkColor = Color.fromARGB(255, 0, 128, 198);
 
   Set<String> wanted = {};
   Set<String> workingOn = {};

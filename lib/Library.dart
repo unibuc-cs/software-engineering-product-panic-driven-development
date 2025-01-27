@@ -487,10 +487,10 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         ),
                         tooltip: 'Import from Steam',
                       ),
-                    if (!isWishlist && MT == Game) // IGDB import button
+                    if (MT == Game) // IGDB import button
                       IconButton(
                         onPressed: () {
-                          showIGDBImportDialog(context, this as Library<Game>);
+                          showIGDBImportDialog(context, this as LibraryState<Game>);
                         },
                         icon: const Icon(Icons.add_link),
                         tooltip: 'Add game using IGDB id',
@@ -1054,11 +1054,9 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     setState(() {});
   }
 
-  Future<Pair<Map<String, dynamic>, MT>> _addGame(Map<String, dynamic> option) async {
-    String name = option['name'];
+  Future<Pair<Map<String, dynamic>, Game>> createGame(Map<String, dynamic> gameData) async {
+    String name = gameData['originalname'];
     Game? nullableGame = mediaAlreadyInDB(name) as Game?;
-    
-    var gameData = await getInfoIGDB(option);
     gameData[getAttributeNameForType(MT)] = gameData[getOldAttributeNameForType(MT)];
     
     if (name[name.length - 1] == ')' && name.length >= 7) {
@@ -1124,11 +1122,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     gameData['name'] = name;
-    return Pair(gameData, nullableGame as MT);
+    return Pair(gameData, nullableGame);
   }
 
   // Despite its name, this function only connects the User and the MT. Speciffic data is being sent throught the data parameter
-  Future<void> _addToLibraryOrWishlist(Map<String, dynamic> data, MT mt) async {
+  Future<void> addToLibraryOrWishlist(Map<String, dynamic> data, MT mt) async {
     final String placeholderImage = 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
     String coverImage = placeholderImage, icon = placeholderImage, backgroundImage = placeholderImage;
 
@@ -1223,7 +1221,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     Pair<Map<String, dynamic>, MT> result;
 
     if (MT == Game) {
-      result = await _addGame(option);
+      result = await createGame(await getInfoIGDB(option)) as Pair<Map<String, dynamic>, MT>;
     }
     else if (MT == Anime || MT == Book || MT == Manga || MT == Movie || MT == TVSeries) {
       var data = await getInfoForType(MT, option);
@@ -1242,7 +1240,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       throw UnimplementedError('AddMediaType with for type $MT is not implemented!');
     }
 
-    await _addToLibraryOrWishlist(result.key, result.value);
+    await addToLibraryOrWishlist(result.key, result.value);
   }
 
   Widget _displayMedia(MT? mt) {  
