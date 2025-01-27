@@ -101,7 +101,7 @@ class PcGamingWiki extends Provider {
 
           if (minimumReq.isNotEmpty || recommendedReq.isNotEmpty) {
             sysReqs[category] = {
-              'minimum': (minimumReq != '') ? minimumReq : null,
+              'minimum'    : (minimumReq != '') ? minimumReq : null,
               'recommended': (recommendedReq != '') ? recommendedReq : null
             };
           }

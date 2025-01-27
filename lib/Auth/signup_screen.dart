@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import '../Widgets/themes.dart';
 
 import 'signup_bloc.dart';
 
@@ -76,98 +77,100 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     SizedBox(
                       width: 500,
                       child: TextFormField(
-                          controller: _usernameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Username',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a username.';
-                            }
-                            return null;
-                          }),
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Username',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a username.';
+                          }
+                          return null;
+                        }
+                      ),
                     ),
                     const SizedBox(height: 10),
                     SizedBox(
                       width: 500,
                       child: TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter an email.';
-                            }
-                            return null;
-                          }),
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter an email.';
+                          }
+                          return null;
+                        }
+                      ),
                     ),
                     const SizedBox(height: 10),
                     SizedBox(
                       width: 500,
                       child: TextFormField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a password.';
-                            }
-                            if (value.length < 8) {
-                              return 'Please enter a password of at least 8 characters.';
-                            }
-                            return null;
-                          }),
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a password.';
+                          }
+                          if (value.length < 8) {
+                            return 'Please enter a password of at least 8 characters.';
+                          }
+                          return null;
+                        }
+                      ),
                     ),
                     const SizedBox(height: 10),
                     SizedBox(
                       width: 500,
                       child: TextFormField(
-                          controller: _confirmedPasswordController,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Confirm password',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter the same password as above.';
-                            }
-                            return null;
-                          }),
+                        controller: _confirmedPasswordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Confirm password',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter the same password as above.';
+                          }
+                          return null;
+                        }
+                      ),
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: state is! SignUpLoading
-                          ? () {
-                              if (formKey.currentState!.validate()) {
-                                signUpBloc.add(
-                                  SignUpButtonPressed(
-                                    context: context,
-                                    username: _usernameController.text,
-                                    email: _emailController.text,
-                                    password: _passwordController.text,
-                                    confirmedPassword:
-                                        _confirmedPasswordController.text,
-                                  ),
-                                );
-                              }
+                        ? () {
+                            if (formKey.currentState!.validate()) {
+                              signUpBloc.add(
+                                SignUpButtonPressed(
+                                  context: context,
+                                  username: _usernameController.text,
+                                  email: _emailController.text,
+                                  password: _passwordController.text,
+                                  confirmedPassword:
+                                      _confirmedPasswordController.text,
+                                ),
+                              );
                             }
-                          : null,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color.fromARGB(219, 10, 94, 87)),
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
-                      ),
+                          }
+                        : null,
+                      style: navigationButton(context)
+                        .filledButtonTheme
+                        .style,
                       child: const Text('Sign up'),
                     ),
                     if (state is SignUpLoading)
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(
-                            color: Color.fromARGB(219, 10, 94, 87)),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: loadingWidget(
+                          context,
+                        ),
                       ),
                   ],
                 ),

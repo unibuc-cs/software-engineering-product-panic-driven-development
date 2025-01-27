@@ -17,6 +17,7 @@ dependencies:
   pair             : ^0.1.2
   intl             : ^0.19.0
   path             : ^1.9.0
+  mutex            : ^3.1.0
   shelf            : ^1.4.1
   dotenv           : ^4.2.0
   numerus          : ^2.3.0
@@ -27,10 +28,11 @@ dependencies:
   shelf_plus       : ^1.10.0
   basic_utils      : ^5.7.0
   dart_console     : ^4.0.1
+  flutter_bloc     : ^8.1.6
   hive_flutter     : ^1.1.0
   shelf_router     : ^1.1.4
   shelf_static     : ^1.1.3
-  flutter_bloc     : ^8.1.6
+  url_launcher     : ^6.0.8
   axios_package    : ^0.0.3
   hive_generator   : ^2.0.1
   email_validator  : ^3.0.0
@@ -54,6 +56,8 @@ flutter:
 
 scripts:
   restore             : flutter clean && flutter pub get
+  python              : pip install -r assets/requirements.txt
+  dependencies        : rps restore && rps python
   app                 : flutter run -d windows
   app:dev             : flutter run -d windows --release
   app:local           : flutter run --dart-define=LOCAL=true -d windows
@@ -63,7 +67,7 @@ scripts:
   server:dev          : dart run --define=RELOAD=true --define=LOCAL=true --enable-vm-service backend/main.dart
   server:node         : nodemon -x "dart run --define=LOCAL=true backend/main.dart" -e dart
   deploy              : fly deploy
-  cli                 : dart backend/providers/cli.dart
+  cli                 : dart backend/services/cli.dart
   test:steam          : dart --define=LOCAL=true test/providers/steam_test.dart
   test:igdb           : dart --define=LOCAL=true test/providers/igdb_test.dart
   test:hltb           : dart --define=LOCAL=true test/providers/hltb_test.dart
@@ -83,13 +87,13 @@ scripts:
   test:manga          : dart --define=LOCAL=true test/resources/manga_test.dart
   test:media          : dart --define=LOCAL=true test/resources/media_test.dart
   test:mediacreator   : dart --define=LOCAL=true test/resources/media_creator_test.dart
+  test:mediagenre     : dart --define=LOCAL=true test/resources/media_genre_test.dart
   test:medialink      : dart --define=LOCAL=true test/resources/media_link_test.dart
   test:mediaplatform  : dart --define=LOCAL=true test/resources/media_platform_test.dart
   test:mediapublisher : dart --define=LOCAL=true test/resources/media_publisher_test.dart
   test:mediaretailer  : dart --define=LOCAL=true test/resources/media_retailer_test.dart
   test:mediaseries    : dart --define=LOCAL=true test/resources/media_series_test.dart
   test:mediauser      : dart --define=LOCAL=true test/resources/media_user_test.dart
-  test:mediausergenre : dart --define=LOCAL=true test/resources/media_user_genre_test.dart
   test:mediausertag   : dart --define=LOCAL=true test/resources/media_user_tag_test.dart
   test:movie          : dart --define=LOCAL=true test/resources/movie_test.dart
   test:note           : dart --define=LOCAL=true test/resources/note_test.dart
@@ -99,7 +103,7 @@ scripts:
   test:season         : dart --define=LOCAL=true test/resources/season_test.dart
   test:series         : dart --define=LOCAL=true test/resources/series_test.dart
   test:tag            : dart --define=LOCAL=true test/resources/tag_test.dart
-  test:tv_series      : dart --define=LOCAL=true test/resources/tv_series_test.dart
+  test:tvseries       : dart --define=LOCAL=true test/resources/tv_series_test.dart
   test:userachievement: dart --define=LOCAL=true test/resources/user_achievement_test.dart
   test:wishlist       : dart --define=LOCAL=true test/resources/wishlist_test.dart
   test:resources      : dart test/resources/run_tests.dart

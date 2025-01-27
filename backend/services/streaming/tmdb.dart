@@ -9,9 +9,9 @@ class Tmdb extends Provider {
   late final String _mediaType;
 
   // Public constructor
-  Tmdb({required String mediaType}) : _mediaType = mediaType {
+  Tmdb({required String mediaType}): _mediaType = mediaType {
      _headers = {
-      'accept': 'application/json',
+      'accept'       : 'application/json',
       'Authorization': 'Bearer ${config.tmdbToken}'
     };
   }
@@ -48,9 +48,12 @@ class Tmdb extends Provider {
       }
 
       return (response['results'] as List).map((media) {
+        final date = media[_mediaType == 'movie' ? 'release_date' : 'first_air_date'] ?? '';
+        final releaseDate = date.length >= 4 ? date.substring(0, 4) : '';
         return {
           'id': media['id'],
-          'name': media[_mediaType == 'movie' ? 'title' : 'name']
+          'name': media[_mediaType == 'movie' ? 'title' : 'name'] +
+                  (releaseDate.isNotEmpty ? ' ($releaseDate)' : ''),
         };
       }).toList();
     }
@@ -79,17 +82,17 @@ class Tmdb extends Provider {
   }
 
   Map<String, dynamic> _sharedInfo(Map<String, dynamic> media) {
-    // Image url: https://image.tmdb.org/t/p/original
     return {
-      'originalname': media[_mediaType == 'movie' ? 'title' : 'name'],
-      'description': media['overview'],
-      'language': media['original_language'],
-      'artworks': media['backdrop_path'],
-      'coverimage': media['poster_path'],
-      'creators': media['production_companies'].map((dynamic producer) {
-        return producer['name'];
-      }).toList(),
-      'status': media['status'],
+      'originalname'  : media[_mediaType == 'movie' ? 'title' : 'name'],
+      'description'   : media['overview'],
+      'language'      : media['original_language'],
+      'artworks'      : 'https://image.tmdb.org/t/p/original${media['backdrop_path']}',
+      'coverimage'    : 'https://image.tmdb.org/t/p/original${media['poster_path']}',
+      'creators'      : media['production_companies'].map((dynamic producer) {
+                          return producer['name'];
+                        }).toList(),
+      'genres'        : media['genres'].map((genre) => genre['name']).toList(),
+      'status'        : media['status'],
       'communityscore': (media['vote_average']*10).round(),
     };
   }
@@ -107,9 +110,9 @@ class Tmdb extends Provider {
 
       return {
         ..._sharedInfo(movie),
-        'seriesname': [(movie['belongs_to_collection'] as Map<String, dynamic>?)?['name']],
-        'releasedate': movie['release_date'],
-        'durationinseconds': movie['runtime']*60,
+        'seriesname'       : [(movie['belongs_to_collection'] as Map<String, dynamic>?)?['name']],
+        'releasedate'      : movie['release_date'],
+        'durationinseconds': movie['runtime'] * 60,
       };
     }
     catch (e) {
@@ -131,6 +134,11 @@ class Tmdb extends Provider {
       return {
         ..._sharedInfo(series),
         'releasedate': series['first_air_date'],
+        'seasons'    : series['seasons'].map((season) => {
+          'name'      : season['name'],
+          'coverimage': 'https://image.tmdb.org/t/p/original${season['poster_path']}',
+          'nrepisodes': season['episode_count']
+        }).toList(),
       };
     }
     catch (e) {
@@ -152,7 +160,7 @@ class Tmdb extends Provider {
 
       return (response['results'] as List).map((media) {
         return {
-          'id': media['id'],
+          'id'  : media['id'],
           'name': media[_mediaType == 'movie' ? 'title' : 'name']
         };
       }).toList();

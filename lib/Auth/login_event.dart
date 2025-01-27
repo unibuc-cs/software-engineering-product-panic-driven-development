@@ -12,13 +12,11 @@ class LoginButtonPressed extends LoginEvent {
   final String email;
   final String password;
 
-  const LoginButtonPressed(
-      {required this.context, required this.email, required this.password});
+  const LoginButtonPressed({required this.context, required this.email, required this.password});
 
   @override
   List<Object> get props => [context, email, password];
 
   @override
-  String toString() =>
-      'LoginButtonPressed {email: $email, password: $password }';
+  String toString() => 'LoginButtonPressed';
 }

@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 String getErrMsg(String? body, String fallbackMsg) {
-  return (body != null && body.isNotEmpty && body.contains('error'))
+  return (body != null && body.isNotEmpty && body.contains('"error":"'))
     ? body.split('{"error":"')[1].split('"}')[0]
     : fallbackMsg;
 }
@@ -15,7 +15,7 @@ Future<dynamic> request<T>({
   dynamic body,
   required T Function(dynamic) fromJson,
 }) async {
-  http.Response response;;
+  http.Response response;
   final Config config = Config.instance;
   String errMsg, methodUpper = method.toUpperCase();
   Map<String, String> headers = {

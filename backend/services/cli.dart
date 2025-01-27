@@ -5,16 +5,24 @@ import 'manager.dart';
 import 'package:dart_console/dart_console.dart';
 
 final console = Console();
+final options = {
+  '1': 'igdb',
+  '2': 'pcgamingwiki',
+  '3': 'howlongtobeat',
+  '4': 'goodreads',
+  '5': 'tmdbmovies',
+  '6': 'tmdbseries',
+  '7': 'anilistanime',
+  '8': 'anilistmanga',
+};
 
-String encodeWithDateTime(Map<String, dynamic> data) {
-  return const JsonEncoder.withIndent('  ').convert(data.map((key, value) {
-    if (value is DateTime) {
-      return MapEntry(key, value.toString().substring(0, 10));
-    } else {
-      return MapEntry(key, value);
-    }
-  }));
-}
+String encodeWithDateTime(Map<String, dynamic> data) => const JsonEncoder
+  .withIndent('  ')
+  .convert(data.map((key, value) =>
+    value is DateTime
+      ? MapEntry(key, value.toString().substring(0, 10))
+      : MapEntry(key, value)
+  ));
 
 int getUserInput(List<Map<String, dynamic>> options) {
   try {
@@ -63,30 +71,6 @@ Future<void> main() async {
     console.clearScreen();
     String providerName = 'igdb';
     switch (choice) {
-      case '1':
-        providerName = 'igdb';
-        break;
-      case '2':
-        providerName = 'pcgamingwiki';
-        break;
-      case '3':
-        providerName = 'howlongtobeat';
-        break;
-      case '4':
-        providerName = 'goodreads';
-        break;
-      case '5':
-        providerName = 'tmdbmovies';
-        break;
-      case '6':
-        providerName = 'tmdbseries';
-        break;
-      case '7':
-        providerName = 'anilistanime';
-        break;
-      case '8':
-        providerName = 'anilistmanga';
-        break;
       case '9':
         stdout.write('New query: ');
         query = stdin.readLineSync() ?? '';
@@ -95,8 +79,7 @@ Future<void> main() async {
         running = false;
         break;
       default:
-        print('Invalid choice.');
-        break;
+        providerName = options[choice] ?? 'igdb';
     }
 
     final providerManager = Manager(providerName);

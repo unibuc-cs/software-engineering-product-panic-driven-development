@@ -1,7 +1,7 @@
 import '../helpers/config.dart';
 
 abstract class Provider {
-  final config = Config();
+  final config = Config.instance;
 
   Future<List<Map<String, dynamic>>> getOptions(String query) async {
     throw UnimplementedError('getOptions method is not implemented');
@@ -15,7 +15,5 @@ abstract class Provider {
     throw UnimplementedError('getRecommendations method is not implemented');
   }
 
-  String getKey() {
-    return 'id';
-  }
+  String getKey() => 'id';
 }

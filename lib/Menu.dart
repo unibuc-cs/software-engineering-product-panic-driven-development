@@ -1,3 +1,5 @@
+import 'package:mediamaster/Widgets/themes.dart';
+
 import 'UserSystem.dart';
 
 import 'Main.dart';
@@ -52,8 +54,8 @@ class MenuState extends State<Menu> {
           IconButton(
             onPressed: () {
               AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
-                  ? AdaptiveTheme.of(context).setDark()
-                  : AdaptiveTheme.of(context).setLight();
+                ? AdaptiveTheme.of(context).setDark()
+                : AdaptiveTheme.of(context).setLight();
             },
             icon: const Icon(Icons.dark_mode),
             tooltip: 'Toggle dark mode',
@@ -63,7 +65,10 @@ class MenuState extends State<Menu> {
                 UserSystem.instance.logout();
                 Navigator.pop(context);
                 Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const Home()));
+                  MaterialPageRoute(
+                    builder: (context) => const Home()
+                  )
+                );
               },
               icon: const Icon(Icons.logout),
               tooltip: 'Log out'),
@@ -76,79 +81,67 @@ class MenuState extends State<Menu> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Game>(),
+                  builder: (context) => Library<Game>(isWishlist: false),
                 ));
               },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              ),
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
               child: const Text('Games'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Book>(),
+                  builder: (context) => Library<Book>(isWishlist: false),
                 ));
               },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              ),
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
               child: const Text('Books'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Anime>(),
+                  builder: (context) => Library<Anime>(isWishlist: false),
                 ));
               },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              ),
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
               child: const Text('Anime'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Manga>(),
+                  builder: (context) => Library<Manga>(isWishlist: false),
                 ));
               },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              ),
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
               child: const Text('Manga'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<Movie>(),
+                  builder: (context) => Library<Movie>(isWishlist: false),
                 ));
               },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              ),
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
               child: const Text('Movies'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Library<TVSeries>(),
+                  builder: (context) => Library<TVSeries>(isWishlist: false),
                 ));
               },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              ),
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
               child: const Text('TV Series'),
             ),
           ],

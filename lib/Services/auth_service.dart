@@ -19,7 +19,7 @@ class AuthService {
 
   Future<void> login({
     required String email,
-    required String password
+    required String password,
   }) async {
     Config.instance.token = (await postRequest<String>(
       endpoint: '$endpoint/login',
@@ -34,7 +34,8 @@ class AuthService {
   Future<Map<String, dynamic>> signup({
     required String name,
     required String email,
-    required String password
+    required String password,
+    bool isGuest = false,
   }) {
     return postRequest<Map<String, dynamic>>(
       endpoint: '$endpoint/signup',
@@ -42,6 +43,7 @@ class AuthService {
         'email': email,
         'password': password,
         'name': name,
+        'isGuest': isGuest,
       },
       fromJson: (json) => json,
     );

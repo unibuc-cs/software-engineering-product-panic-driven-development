@@ -2,6 +2,7 @@ import 'general/model.dart';
 
 class Note implements Model {
   // Data
+  int id;
   int mediaId;
   String userId;
   String content;
@@ -9,6 +10,7 @@ class Note implements Model {
   DateTime modifiedDate;
 
   Note({
+    this.id = -1,
     required this.mediaId,
     required this.userId,
     required this.content,
@@ -23,14 +25,11 @@ class Note implements Model {
     if (runtimeType != other.runtimeType) {
       return false;
     }
-    return mediaId == (other as Note).mediaId && userId == other.userId;
+    return id == (other as Note).id;
   }
 
   @override
-  int get hashCode => Object.hash(mediaId, userId);
-
-  @override
-  dynamic get id => mediaId;
+  int get hashCode => id;
 
   @override
   Map<String, dynamic> toJson() {
@@ -46,6 +45,7 @@ class Note implements Model {
   @override
   factory Note.from(Map<String, dynamic> json) {
     return Note(
+      id: json['id'],
       mediaId: json['mediaid'],
       userId: json['userid'],
       content: json['content'],
@@ -53,17 +53,4 @@ class Note implements Model {
       modifiedDate: DateTime.parse(json['modifieddate']),
     );
   }
-
-  // TODO: Endpoint this
-  // static Future<List<Note>> getNotes(int userId, int mediaId) async {
-  //   return (await Supabase
-  //     .instance
-  //     .client
-  //     .from('note')
-  //     .select()
-  //     .eq('userid', userId)
-  //     .eq('mediaid', mediaId)
-  //   ).map(Note.from)
-  //    .toList();
-  // }
 }

@@ -1,4 +1,4 @@
-import 'helpers/utils.dart';
+import 'helpers/io.dart';
 import 'helpers/config.dart';
 import 'controllers/api.dart';
 import 'helpers/responses.dart';
@@ -14,8 +14,8 @@ Handler init() {
 
 void main() => shelfRun(
   init,
-  defaultBindPort: Config().port,
-  defaultBindAddress: bool.fromEnvironment('LOCAL', defaultValue: false) ? 'localhost' : '0.0.0.0',
+  defaultBindPort       : Config.instance.port,
+  defaultBindAddress    : bool.fromEnvironment('LOCAL', defaultValue: false) ? 'localhost' : '0.0.0.0',
   defaultEnableHotReload: bool.fromEnvironment('RELOAD', defaultValue: false),
-  onStarted: startupLog
+  onStarted             : startupLog
 );

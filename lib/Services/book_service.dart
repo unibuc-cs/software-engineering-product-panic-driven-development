@@ -1,3 +1,6 @@
+import 'package:mediamaster/Services/genre_service.dart';
+import 'package:mediamaster/Services/media_genre_service.dart';
+
 import 'link_service.dart';
 import 'media_service.dart';
 import 'series_service.dart';
@@ -16,7 +19,7 @@ import 'media_publisher_service.dart';
 
 class BookService extends Service<Book> {
   BookService._() : super(Book.endpoint, Book.from);
-  
+
   static final BookService _instance = BookService._();
 
   static BookService get instance => _instance;
@@ -24,7 +27,7 @@ class BookService extends Service<Book> {
   @override
   Future<Book> create(dynamic model) async {
     final body = await makePostRequest(model);
-    
+
     MediaService.instance.addToItems(body['media']);
     CreatorService.instance.addToItems(body['creators']);
     MediaCreatorService.instance.addToItems(body['mediacreators']);
@@ -35,11 +38,13 @@ class BookService extends Service<Book> {
     LinkService.instance.addToItems(body['links']);
     MediaLinkService.instance.addToItems(body['medialinks']);
     RetailerService.instance.addToItems(body['retailers']);
+    GenreService.instance.addToItems(body['genres']);
+    MediaGenreService.instance.addToItems(body['mediagenres']);
     MediaRetailerService.instance.addToItems(body['mediaretailers']);
     SeriesService.instance.addToItems(body['series']);
     MediaSeriesService.instance.addToItems(body['mediaseries']);
-    MediaService.instance.addToItems(body['new_related_medias']);
-    BookService.instance.addToItems(body['new_related_book']);
+    MediaService.instance.addToItems(body['related_medias']);
+    BookService.instance.addToItems(body['related_books']);
     BookService.instance.addToItems(body);
 
     return Book.from(body);

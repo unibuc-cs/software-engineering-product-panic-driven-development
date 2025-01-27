@@ -10,7 +10,7 @@ class Anilist extends Provider {
   };
   final _replaceItems = {
     '<br><br>': ' ',
-    '<br>': ' '
+    '<br>'    : ' '
   };
   final _removeItems = [
     '<i>',
@@ -22,7 +22,7 @@ class Anilist extends Provider {
   late final String _mediaType;
 
   // Public constructor
-  Anilist({required String mediaType}) : _mediaType = mediaType;
+  Anilist({required String mediaType}): _mediaType = mediaType;
 
   // Private methods
   String _removeBadItems(String input) {
@@ -65,6 +65,9 @@ class Anilist extends Provider {
                 romaji
                 english
               }
+              startDate {
+                year
+              }
             }
           }
         }
@@ -76,10 +79,12 @@ class Anilist extends Provider {
       }
 
       return (response['Page']['media'] as List).map((media) {
+        final releaseDate = media['startDate']['year'].toString();
         return {
           'id': media['id'],
           // Prefer the English title, fallback to the Japanese one
-          'name': _removeBadItems(media['title']['english'] ?? media['title']['romaji'])
+          'name': _removeBadItems(media['title']['english'] ?? media['title']['romaji']) +
+                  (releaseDate.isNotEmpty ? ' ($releaseDate)' : ''),
         };
       }).toList();
     }
@@ -137,20 +142,20 @@ class Anilist extends Provider {
     }
 
     return {
-      'id': media['id'],
-      'originalname': _removeBadItems(media['title']['english'] ?? media['title']['romaji']),
-      'description': _removeBadItems(media['description'] ?? ''),
-      'releasedate': DateTime.parse(
-        '${media["startDate"]["year"]}-'
-        '${formatTwoDigits(media["startDate"]["month"] ?? 1)}-'
-        '${formatTwoDigits(media["startDate"]["day"] ?? 1)}'
-      ),
-      'genres': media['genres'],
-      'coverimage': media['coverImage']['large'],
+      'id'            : media['id'],
+      'originalname'  : _removeBadItems(media['title']['english'] ?? media['title']['romaji']),
+      'description'   : _removeBadItems(media['description'] ?? ''),
+      'releasedate'   : DateTime.parse(
+                          '${media["startDate"]["year"]}-'
+                          '${formatTwoDigits(media["startDate"]["month"] ?? 1)}-'
+                          '${formatTwoDigits(media["startDate"]["day"] ?? 1)}'
+                        ),
+      'genres'        : media['genres'],
+      'coverimage'    : media['coverImage']['large'],
       'communityscore': media['meanScore'],
-      'criticscore': media['averageScore'],
-      'status': media['status'],
-      'links': media['externalLinks'].map((link) => link['url']).toList()
+      'criticscore'   : media['averageScore'],
+      'status'        : media['status'],
+      'links'         : media['externalLinks'].map((link) => link['url']).toSet().toList()
     };
   }
 
@@ -171,8 +176,8 @@ class Anilist extends Provider {
 
       return {
         ..._sharedInfo(anime),
-        'episodes': anime['episodes'],
-        'duration': anime['duration']
+        'nrepisodes'     : anime['episodes'],
+        'episodeduration': anime['duration']
       };
     }
     catch (e) {
@@ -198,7 +203,7 @@ class Anilist extends Provider {
       return {
         ..._sharedInfo(manga),
         'nrchapters': manga['chapters'],
-        'nrvolumes': manga['volumes']
+        'nrvolumes' : manga['volumes']
       };
     }
     catch (e) {

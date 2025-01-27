@@ -1,10 +1,7 @@
 import 'dart:io';
 import 'package:path/path.dart';
+import '../../backend/helpers/io.dart';
 import '../../backend/helpers/utils.dart';
-
-String extractName(String path) {
-  return path.substring(path.lastIndexOf('\\') + 1, path.length - 11);
-}
 
 void runTests({
   List<String>? excluded
@@ -13,6 +10,7 @@ void runTests({
   excluded.add('run_tests');
   List<String> last = [
     'media_creator',
+    'media_genre',
     'media_link',
     'media_platform',
     'media_publisher',
@@ -31,7 +29,7 @@ void runTests({
     .parent
     .listSync()
     .where((entity) => entity is File && entity.path.endsWith('.dart'))
-    .where((file) => !last.contains(extractName(file.toString())))
+    .where((file) => !last.contains(extractFileName(file.toString())))
     .toList();
   files.addAll(last.map((file) => File(join(Directory(Platform.script.toFilePath()).parent.path, file + '_test.dart'))));
   final dashes = greenColored('-' * 35);

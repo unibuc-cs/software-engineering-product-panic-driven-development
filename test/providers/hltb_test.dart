@@ -8,6 +8,7 @@ double getHours(String time) {
 
 void main() {
   group('HowLongToBeat', () {
+
     test('getOptions for several valid games', () async {
       final games = [
         'Hollow Knight',
@@ -20,7 +21,7 @@ void main() {
         expect(options, isNotEmpty);
         for (var option in options) {
           expect(option['name'], isNotEmpty);
-          expect(option['link'], isNotEmpty);
+          expect(option['id'], isA<int>());
         }
       }
     });
@@ -33,7 +34,7 @@ void main() {
     test('getInfo for a singleplayer game', () async {
       // game: Hollow Knight
       final game_info = await getInfoHLTB({
-        'link': 'https://howlongtobeat.com/game/26286'
+        'id': '26286'
       });
       expect(game_info, isNotNull);
       expect(game_info['Main Story'], isNotNull);
@@ -48,7 +49,7 @@ void main() {
     test('getInfo for a multiplayer game', () async {
       // game: League of Legends
       final game_info = await getInfoHLTB({
-        'link': 'https://howlongtobeat.com/game/5203'
+        'id': '5203'
       });
       expect(game_info, isNotNull);
       expect(game_info['Main Story'], isNull);
@@ -63,7 +64,7 @@ void main() {
     test('getInfo for a game with no data', () async {
       // game: Khamrai
       final game_info = await getInfoHLTB({
-        'link': 'https://howlongtobeat.com/game/19200'
+        'id': '19200'
       });
       expect(game_info, isNotNull);
       expect(game_info, isEmpty);

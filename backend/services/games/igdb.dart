@@ -9,28 +9,28 @@ class IGDB extends Provider {
   late final Map<String, String> _params;
   String _accessToken = '';
   String _cover = '';
-  final List<String> _artworks = [];
-  final List<String> _collections = [];
-  final List<dynamic> _developers = [];
-  final List<String> _franchises = [];
-  final List<String> _genres = [];
-  final List<dynamic> _platforms = [];
-  final List<dynamic> _publishers = [];
-  final List<String> _websites = [];
+  final List<String>  _artworks    = [];
+  final List<String>  _collections = [];
+  final List<dynamic> _developers  = [];
+  final List<String>  _franchises  = [];
+  final List<String>  _genres      = [];
+  final List<dynamic> _platforms   = [];
+  final List<dynamic> _publishers  = [];
+  final List<String>  _websites    = [];
 
   // Public constructor
   IGDB() {
     _params = {
-      'client_id': config.igdbId,
+      'client_id'    : config.igdbId,
       'client_secret': config.igdbSecret,
-      'grant_type': 'client_credentials'
+      'grant_type'   : 'client_credentials'
     };
   }
 
   // Private methods
   Map<String, String> _authHeaders(String accessToken) {
     return {
-      'Client-ID': config.igdbId,
+      'Client-ID'    : config.igdbId,
       'Authorization': 'Bearer $accessToken',
     };
   }
@@ -205,7 +205,7 @@ class IGDB extends Provider {
       final response = await _makeRequest(
         'franchises',
         headers: _authHeaders(accessToken),
-        body: 'fields name; where id = ${_formatIds(game, 'franchise')};'
+        body: 'fields name; where id = ${_formatIds(game, 'franchises')};'
       );
 
       if (response != null) {
@@ -435,12 +435,12 @@ class IGDB extends Provider {
 
       if (game['artworks'] != null) {
         await _getArtworks(_accessToken, game);
-        game['artworks'] = _artworks;
+        game['artworks'] = _artworks.map((artwork) => 'https:$artwork').toList();
       }
 
       if (game['cover'] != null) {
         await _getCover(_accessToken, game);
-        game['coverimage'] = _cover;
+        game['coverimage'] = 'https:$_cover';
         game.remove('cover');
       }
 
@@ -450,7 +450,8 @@ class IGDB extends Provider {
         game.remove('collections');
       }
 
-      if (game['franchises'] != null) {
+      if (game['franchises'] != null || game['franchise'] != null) {
+        game['franchises'] ??= [];
         await _getFranchises(_accessToken, game);
         if (game['seriesname'] != null) {
           game['seriesname'] += _franchises;
@@ -458,6 +459,7 @@ class IGDB extends Provider {
         else {
           game['seriesname'] = _franchises;
         }
+        game.remove('franchises');
       }
 
       if (game['genres'] != null) {
@@ -467,7 +469,7 @@ class IGDB extends Provider {
 
       if (game['involved_companies'] != null) {
         await _getCompanies(_accessToken, game);
-        game['creators'] = _developers;
+        game['creators']   = _developers;
         game['publishers'] = _publishers;
         game.remove('involved_companies');
       }
@@ -488,7 +490,7 @@ class IGDB extends Provider {
 
       if (game['websites'] != null) {
         await _getWebsites(_accessToken, game);
-        game['links'] = _websites;
+        game['links'] = _websites.toSet().toList();
         game.remove('websites');
       }
       return game;

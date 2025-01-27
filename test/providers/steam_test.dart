@@ -54,7 +54,7 @@ final users = {
 
 Future<Map<String, dynamic>> getGames(String selectedUser) async {
   final userId = users[selectedUser] ?? '';
-  final gamesList = (await getInfoSteam(userId))['games'];
+  final gamesList = await getGamesList(userId);
   final futures = <Future<void>>[];
   Map<String, dynamic> games = {};
 

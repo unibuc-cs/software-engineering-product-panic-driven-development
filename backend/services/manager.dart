@@ -3,62 +3,46 @@ import 'games/igdb.dart';
 import 'games/steam.dart';
 import 'streaming/tmdb.dart';
 import 'books/goodreads.dart';
+import 'streaming/trakt.dart';
 import 'streaming/anilist.dart';
 import 'games/pcgamingwiki.dart';
+import 'books/goodreadslist.dart';
 import 'games/howlongtobeat.dart';
-
-class Dummy extends Provider {
-  @override
-  Future<List<Map<String, dynamic>>> getOptions(String query) async {
-    return [{'error': 'No provider found'}];
-  }
-
-  @override
-  Future<Map<String, dynamic>> getInfo(String item) async {
-    return {'error': 'No provider found'};
-  }
-
-  @override
-  Future<List<Map<String, dynamic>>> getRecommendations(String item) async {
-    return [{'error': 'No provider found'}];
-  }
-}
+import 'streaming/myanimelist.dart';
 
 class Manager {
   late Provider provider;
 
   static final _providers = {
-    'pcgamingwiki': PcGamingWiki.instance,
+    'steam'        : Steam.instance,
+    'goodreads'    : GoodReads.instance,
+    'goodreadslist': GoodReadsList.instance,
+    'pcgamingwiki' : PcGamingWiki.instance,
     'howlongtobeat': HowLongToBeat.instance,
-    'steam': Steam.instance,
-    'goodreads': GoodReads.instance,
-    'tmdbmovie': Tmdb(mediaType: 'movie'),
-    'tmdbseries': Tmdb(mediaType: 'tv'),
-    'anilistanime': Anilist(mediaType: 'ANIME'),
-    'anilistmanga': Anilist(mediaType: 'MANGA'),
+    'tmdbseries'   : Tmdb(mediaType: 'tv'),
+    'tmdbmovie'    : Tmdb(mediaType: 'movie'),
+    'traktmovies'  : Trakt(mediaType: 'movies'),
+    'traktseries'  : Trakt(mediaType: 'shows'),
+    'anilistanime' : Anilist(mediaType: 'ANIME'),
+    'anilistmanga' : Anilist(mediaType: 'MANGA'),
+    'myanimelist'  : MyAnimeList(mediaType: 'anime'),
+    'mymangalist'  : MyAnimeList(mediaType: 'manga'),
   };
 
   Manager(String name) {
-    if (name.toLowerCase() == 'igdb') {
-      // we need a new IGDB instance every time, because it handles internal state
-      provider = IGDB();
-    }
-    else {
-      provider = _providers[name.toLowerCase()] ?? Dummy();
-    }
+    provider = name.toLowerCase() == 'igdb'
+      ? IGDB()
+      : _providers[name.toLowerCase()]!;
   }
 
   Provider? getProvider() => provider;
 
-  Future<List<Map<String, dynamic>>> getOptions(String query) async {
-    return await provider.getOptions(query);
-  }
+  Future<List<Map<String, dynamic>>> getOptions(String query) async =>
+    await provider.getOptions(query);
 
-  Future<Map<String, dynamic>> getInfo(String item) async {
-    return await provider.getInfo(item);
-  }
+  Future<Map<String, dynamic>> getInfo(String item) async =>
+    await provider.getInfo(item);
 
-  Future<List<Map<String, dynamic>>> getRecommendations(String item) async {
-    return await provider.getRecommendations(item);
-  }
+  Future<List<Map<String, dynamic>>> getRecommendations(String item) async =>
+    await provider.getRecommendations(item);
 }

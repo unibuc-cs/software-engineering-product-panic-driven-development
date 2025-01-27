@@ -1,3 +1,6 @@
+import 'package:mediamaster/Services/genre_service.dart';
+import 'package:mediamaster/Services/media_genre_service.dart';
+
 import 'link_service.dart';
 import 'media_service.dart';
 import 'series_service.dart';
@@ -16,7 +19,7 @@ import 'media_publisher_service.dart';
 
 class AnimeService extends Service<Anime> {
   AnimeService._() : super(Anime.endpoint, Anime.from);
-  
+
   static final AnimeService _instance = AnimeService._();
 
   static AnimeService get instance => _instance;
@@ -24,7 +27,7 @@ class AnimeService extends Service<Anime> {
   @override
   Future<Anime> create(dynamic model) async {
     final body = await makePostRequest(model);
-    
+
     MediaService.instance.addToItems(body['media']);
     CreatorService.instance.addToItems(body['creators']);
     MediaCreatorService.instance.addToItems(body['mediacreators']);
@@ -36,10 +39,12 @@ class AnimeService extends Service<Anime> {
     MediaLinkService.instance.addToItems(body['medialinks']);
     RetailerService.instance.addToItems(body['retailers']);
     MediaRetailerService.instance.addToItems(body['mediaretailers']);
+    GenreService.instance.addToItems(body['genres']);
+    MediaGenreService.instance.addToItems(body['mediagenres']);
     SeriesService.instance.addToItems(body['series']);
     MediaSeriesService.instance.addToItems(body['mediaseries']);
-    MediaService.instance.addToItems(body['new_related_medias']);
-    AnimeService.instance.addToItems(body['new_related_anime']);
+    MediaService.instance.addToItems(body['related_medias']);
+    AnimeService.instance.addToItems(body['related_anime']);
     AnimeService.instance.addToItems(body);
 
     return Anime.from(body);

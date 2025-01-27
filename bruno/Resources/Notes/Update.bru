@@ -5,9 +5,13 @@ meta {
 }
 
 put {
-  url: {{URL}}/notes/1
+  url: {{URL}}/notes/2
   body: json
   auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenValid}}
 }
 
 body:json {

@@ -1,15 +1,12 @@
 import 'dart:math';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:mediamaster/Models/tag.dart';
-import 'package:mediamaster/UserSystem.dart';
-import 'package:mediamaster/Models/game.dart';
-import 'package:mediamaster/Models/genre.dart';
-import 'package:mediamaster/Services/tag_service.dart';
-import 'package:mediamaster/Models/media_user_tag.dart';
-import 'package:mediamaster/Services/genre_service.dart';
-import 'package:mediamaster/Models/media_user_genre.dart';
+import 'package:mediamaster/Library.dart';
 import 'package:mediamaster/Services/provider_service.dart';
+import 'package:mediamaster/Widgets/themes.dart';
+import 'package:url_launcher/link.dart';
+import '../Models/game.dart';
+import 'media_widgets.dart';
 
 int getMinTimeToBeat(Game game) {
   List<int> times = List.from([
@@ -124,7 +121,7 @@ Widget renderPCGW(Game game) {
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
-                details,
+                details == '' ? 'N/A' : details,
                 textAlign: TextAlign.left,
               ),
             ),
@@ -134,50 +131,53 @@ Widget renderPCGW(Game game) {
     );
   }
 
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      formatPCGWRow(
-        'OS minimum',
-        game.OSMinimum,
-      ),
-      formatPCGWRow(
-        'OS recommended',
-        game.OSRecommended,
-      ),
-      formatPCGWRow(
-        'CPU minimum',
-        game.CPUMinimum,
-      ),
-      formatPCGWRow(
-        'CPU recommended',
-        game.CPURecommended,
-      ),
-      formatPCGWRow(
-        'RAM minimum',
-        game.RAMMinimum,
-      ),
-      formatPCGWRow(
-        'RAM recommended',
-        game.RAMRecommended,
-      ),
-      formatPCGWRow(
-        'HDD minimum',
-        game.HDDMinimum,
-      ),
-      formatPCGWRow(
-        'HDD recommended',
-        game.HDDRecommended,
-      ),
-      formatPCGWRow(
-        'GPU minimum',
-        game.GPUMinimum,
-      ),
-      formatPCGWRow(
-        'GPU recommended',
-        game.GPURecommended,
-      ),
-    ],
+  return SizedBox(
+    width: 400,
+    child:   Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        formatPCGWRow(
+          'OS minimum',
+          game.OSMinimum,
+        ),
+        formatPCGWRow(
+          'OS recommended',
+          game.OSRecommended,
+        ),
+        formatPCGWRow(
+          'CPU minimum',
+          game.CPUMinimum,
+        ),
+        formatPCGWRow(
+          'CPU recommended',
+          game.CPURecommended,
+        ),
+        formatPCGWRow(
+          'RAM minimum',
+          game.RAMMinimum,
+        ),
+        formatPCGWRow(
+          'RAM recommended',
+          game.RAMRecommended,
+        ),
+        formatPCGWRow(
+          'HDD minimum',
+          game.HDDMinimum,
+        ),
+        formatPCGWRow(
+          'HDD recommended',
+          game.HDDRecommended,
+        ),
+        formatPCGWRow(
+          'GPU minimum',
+          game.GPUMinimum,
+        ),
+        formatPCGWRow(
+          'GPU recommended',
+          game.GPURecommended,
+        ),
+      ],
+    )
   );
 }
 
@@ -210,241 +210,16 @@ Future<void> _showSysCheck(Game game, BuildContext context) {
   );
 }
 
-Future<void> _showGameSettingsDialog(Game game, BuildContext context, Function() resetState) async {
-  // TODO: Endpoint this
-  Set<int> mutIds = await MediaUserTag.getAllFor(game.mediaId, UserSystem().getCurrentUserId()); // TODO: Implement this so it returns the set of tag ids for which there exist a MediaUserTag with that tagId
-  Set<int> mugIds = await MediaUserGenre.getAllFor(game.mediaId, UserSystem().getCurrentUserId()); // TODO: Similar to the one above but with Genre
-
-  // https://dart.dev/tools/diagnostic-messages?utm_source=dartdev&utm_medium=redir&utm_id=diagcode&utm_content=use_build_context_synchronously#use_build_context_synchronously
-  // If we remove the following if there is a chance that there will be weird crashes and bugs and what not.
-  if (context.mounted) {
-    return showDialog( // TODO: There is a big chance that none of what I did here works (Builder within Builder)
-      context: context,
-      builder: (context) {
-        return FutureBuilder(
-          future: Future.wait([TagService.instance.readAll(), GenreService.instance.readAll()]),
-          builder: (context, snapshot) {
-            return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return AlertDialog(
-                  title: const Text('Game settings'),
-                  content: SizedBox(
-                    height: 400,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Game tags',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          for (Tag tag in snapshot.data!.first.map((obj) => obj as Tag))
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: mutIds.contains(tag.id),
-                                  onChanged: (value) {
-                                    setState(() async {
-                                      MediaUserTag mut = MediaUserTag(
-                                        mediaId: game.mediaId,
-                                        userId: UserSystem().currentUser!.id,
-                                        tagId: tag.id,
-                                      );
-
-                                      if (value == true) {
-                                        // TODO: Endpoint this
-                                        await Supabase.instance.client.from('mediausertag').insert(mut.toSupa());
-                                        mutIds.add(mut.tagId);
-                                      } else {
-                                        // TODO: Endpoint this
-                                        await Supabase.instance.client.from('mediausertag').delete().eq('userid', mut.userId).eq('mediaid', mut.mediaId).eq('tagid', mut.tagId);
-                                        mutIds.remove(mut.tagId);
-                                      }
-                                      resetState();
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  tag.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          const Text(
-                            'Game genres',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          for (Genre genre in snapshot.data!.last.map((obj) => obj as Genre))
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: mugIds.contains(genre.id),
-                                  onChanged: (value) {
-                                    setState(() async {
-                                      MediaUserGenre mug = MediaUserGenre(
-                                        mediaId: game.mediaId,
-                                        userId: UserSystem().currentUser!.id,
-                                        genreId: genre.id,
-                                      );
-
-                                      if (value == true) {
-                                        // TODO: Endpoint this
-                                        await Supabase.instance.client.from('mediausergenre').insert(mug.toSupa());
-                                        mugIds.add(mug.genreId);
-                                      } else {
-                                        // TODO: Endpoint this
-                                        await Supabase.instance.client.from('mediausergenre').delete().eq('userid', mug.userId).eq('mediaid', mug.mediaId).eq('genreid', mug.genreId);
-                                        mugIds.remove(mug.genreId);
-                                      }
-                                      resetState();
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  genre.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-        );
-      }
-    );
-  }
-}
-
-Future<void> _showGameRecommendationsDialog(Game game, BuildContext context) async {
-  var similarGames = await getRecsIGDB(game.toJson());
-  List<Widget> recommendations = [];
-
-  if (context.mounted) {
-    if (similarGames.isEmpty) {
-      return showDialog(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return const AlertDialog(
-                title: Text(
-                  'Similar games',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                content: SizedBox(
-                  height: 400,
-                  width: 300,
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.sentiment_dissatisfied,
-                            color: Colors.grey,
-                            size: 50,
-                          ),
-                          SizedBox(height: 20),
-                          Text(
-                            'There are no similar games for this game, sorry!',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      );
-    }
-
-    for (var similarGame in similarGames) {
-      String name = similarGame['name'];
-      if (name[name.length - 1] == ')' && name.length >= 7) {
-        name = name.substring(0, name.length - 7);
-      }
-      recommendations.add(
-        ListTile(
-          leading: const Icon(Icons.videogame_asset),
-          title: Text(
-            similarGame['name'],
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          trailing: GestureDetector(
-            onTap: () {
-              Clipboard.setData(ClipboardData(text: name));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('$name copied to clipboard')),
-              );
-            },
-            child: const Icon(Icons.copy), // Icon to indicate copying
-          ),
-        ),
-      );
-    }
-
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: const Text('Similar games'),
-              content: SizedBox(
-                height: 400,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: recommendations,
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      }
-    );
-  }
-}
-
-Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() resetState) {
+Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() resetState, bool isWishlist) {
   return Row(
     children: [
       Container(
         // Play button
         margin: const EdgeInsets.all(10),
         child: TextButton(
-          style: ButtonStyle(
-            backgroundColor:
-                const WidgetStatePropertyAll(Colors.lightGreen), // TODO: MaterialStateProperty was here before. If something does not look alright then this could be the cause
-            shape:
-              const WidgetStatePropertyAll(RoundedRectangleBorder( // TODO: MaterialStateProperty was here before. If something does not look alright then this could be the cause
-                  borderRadius:
-                      BorderRadius.all(Radius.circular(10)),
-                ),
-              ),
-          ),
+          style: greenFillButton(context)
+            .filledButtonTheme
+            .style,
           onPressed: () {
             playGame(game);
           },
@@ -459,7 +234,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
                 textAlign: TextAlign.center,
               ),
               Text(
-                '(currently unnavailable)',
+                '(currently unavailable)',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 12.0,
@@ -514,7 +289,7 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         margin: const EdgeInsets.all(10),
         child: IconButton(
           onPressed: () {
-            _showGameSettingsDialog(game, context, resetState);
+            showSettingsDialog(game, context, resetState, isWishlist);
           },
           icon: const Icon(
             Icons.settings,
@@ -528,11 +303,11 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         ),
       ),
       Container(
-        // Settings button
+        // Recommendations button
         margin: const EdgeInsets.all(10),
         child: TextButton(
           onPressed: () {
-            _showGameRecommendationsDialog(game, context);
+            showRecommendationsDialog(game, context);
           },
           style: const ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(
@@ -549,5 +324,148 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         ),
       ),
     ],
+  );
+}
+
+Future<void> showIGDBImportDialog(BuildContext context, LibraryState<Game> library) {
+  TextEditingController controller = TextEditingController();
+
+  bool confirmed    = false; // Flag to track if the choice was confirmed or not.
+  bool dataGathered = false; // Flag to track if the data was received from IGDB.
+  bool invalidId    = false; // Flag to track if the id was invalid.
+  String gameName   = '';
+
+  List<Widget> invalidIdWidgets = [
+    Text(
+      'The ID is invalid',
+      style: subtitleStyle,
+      textAlign: TextAlign.center,
+    ),
+    SizedBox(
+      height: 20,
+    ),
+    Icon(
+      Icons.sentiment_dissatisfied_rounded,
+      size: 50,
+    ),
+  ];
+
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          if (confirmed) {
+            if (!invalidId) {
+              return AlertDialog(
+                content: Container(
+                  constraints: BoxConstraints(maxHeight: 140),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: Center(
+                          child: loadingWidget(
+                            context
+                          ),
+                        ),
+                      ),
+                      Text(dataGathered
+                          ? 'Adding $gameName to database'
+                          : 'Waiting for IGDB to finnish',
+                        style: titleStyle,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return AlertDialog(
+              title: const Text('Invalid ID'),
+              content: Column(
+                children: invalidIdWidgets,
+              ),
+            );
+          }
+          else {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Import game using IGDB ID'),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 350,
+                height: 100,
+                child: Column(
+                  children: [
+                    Link(
+                      uri: Uri.parse('https://duckduckgo.com'), // TODO: Replace this with a link to some tutorial on getting the IGDB id.
+                      builder: (context, followLink) => RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'How to get IGDB ID',
+                              style: TextStyle(
+                                color: linkColor,
+                                decoration: TextDecoration.underline,
+                                fontSize: 22,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = followLink,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    TextField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        labelText: 'Insert IGDB ID',
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () async {
+                            String query = controller.text;
+                            if (query.isNotEmpty) {
+                              confirmed = true;
+                              setState(() {});
+                              Map<String, dynamic> gameData = {};
+                              try {
+                                gameData = await getInfoIGDB({'id': query});
+                              }
+                              catch(e) {
+                                invalidId = true;
+                                return;
+                              }
+                              gameName = gameData['originalname'];
+                              dataGathered = true;
+                              setState(() {});
+                              var result = await library.createGame(gameData);
+                              await library.addToLibraryOrWishlist(
+                                result.key,
+                                result.value,
+                              );
+                              Navigator.of(context).pop();
+                              setState(() {});
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      );
+    },
   );
 }

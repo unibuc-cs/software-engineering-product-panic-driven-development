@@ -1,4 +1,3 @@
-import '../Models/tag.dart';
 import '../Models/genre.dart';
 import '../Services/anime_service.dart';
 import '../Services/app_achievement_service.dart';
@@ -16,7 +15,7 @@ import '../Services/media_publisher_service.dart';
 import '../Services/media_retailer_service.dart';
 import '../Services/media_series_service.dart';
 import '../Services/media_service.dart';
-import '../Services/media_user_genre_service.dart';
+import '../Services/media_genre_service.dart';
 import '../Services/media_user_service.dart';
 import '../Services/media_user_tag_service.dart';
 import '../Services/movie_service.dart';
@@ -26,32 +25,33 @@ import '../Services/publisher_service.dart';
 import '../Services/retailer_service.dart';
 import '../Services/season_service.dart';
 import '../Services/series_service.dart';
-import '../Services/tag_service.dart';
+import '../Services/user_tag_service.dart';
 import '../Services/genre_service.dart';
 import '../Services/tv_series_service.dart';
 import '../Services/user_achievement_service.dart';
 import '../Services/wishlist_service.dart';
 
 Future<void> seedData() async {
-  TagService tagServ = TagService.instance;
+  // UserTagService userTagServ = UserTagService.instance;
   GenreService genreServ = GenreService.instance;
   List<Future<void>> allFutures = [];
 
-  if ((await tagServ.readAll()).isEmpty) {
-    var tagsToAdd = [
-      'Singleplayer',
-      'Multiplayer',
-      'Casual',
-      'Competitive',
-      'VR',
-      'Indie',
-      'Co-Op',
-      'Local Co-Op',
-      'MMO',
-    ];
+  // TODO: Move this to signup or something similar
+  // if ((await userTagServ.readAll()).isEmpty) {
+  //   var tagsToAdd = [
+  //     'Singleplayer',
+  //     'Multiplayer',
+  //     'Casual',
+  //     'Competitive',
+  //     'VR',
+  //     'Indie',
+  //     'Co-Op',
+  //     'Local Co-Op',
+  //     'MMO',
+  //   ];
 
-    allFutures.addAll(tagsToAdd.map((tagName) => tagServ.create(Tag(name: tagName))));
-  }
+  //   allFutures.addAll(tagsToAdd.map((tagName) => userTagServ.create(UserTag(name: tagName))));
+  // }
 
   if ((await genreServ.readAll()).isEmpty) {
     var genresToAdd = [
@@ -112,6 +112,7 @@ Future<void> HydrateWithoutUser() async {
     MangaService.instance,
     MediaService.instance,
     MediaCreatorService.instance,
+    MediaGenreService.instance,
     MediaLinkService.instance,
     MediaPlatformService.instance,
     MediaPublisherService.instance,
@@ -123,34 +124,28 @@ Future<void> HydrateWithoutUser() async {
     RetailerService.instance,
     SeasonService.instance,
     SeriesService.instance,
-    TagService.instance,
     TVSeriesService.instance,
   ];
 
-  for (dynamic service in services) {
-    service.hydrate();
-  }
+  await Future.wait(services.map((service) => service.hydrate()).toList());
 }
 
 Future<void> HydrateWithUser() async {
   List<Service> services = [
     MediaUserService.instance,
-    MediaUserGenreService.instance,
     MediaUserTagService.instance,
     NoteService.instance,
     UserAchievementService.instance,
+    UserTagService.instance,
     WishlistService.instance,
   ];
 
-  for (dynamic service in services) {
-    service.hydrate();
-  }
+  await Future.wait(services.map((service) => service.hydrate()).toList());
 }
 
-Future<void> UnhydrateWithUser() async {
+void UnhydrateWithUser() {
   List<Service> services = [
     MediaUserService.instance,
-    MediaUserGenreService.instance,
     MediaUserTagService.instance,
     NoteService.instance,
     UserAchievementService.instance,

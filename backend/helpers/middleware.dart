@@ -1,7 +1,8 @@
+import 'io.dart';
 import 'jwt.dart';
 import 'utils.dart';
 import 'responses.dart';
-import 'db_connection.dart';
+import 'db.dart';
 import 'package:shelf/shelf.dart';
 
 Handler extractUserId(innerHandler) {
@@ -10,7 +11,7 @@ Handler extractUserId(innerHandler) {
     if (token != null && token.isNotEmpty) {
       try {
         final userId = getPayload(token)['id'];
-        await SupabaseClientSingleton.client.auth.admin.getUserById(userId);
+        await SupabaseManager.client.auth.admin.getUserById(userId);
         return await innerHandler(request.change(context: {'userId': userId }));
       }
       catch (e) {
@@ -23,7 +24,7 @@ Handler extractUserId(innerHandler) {
 
 Handler requireAuth(innerHandler) {
   return (Request request) async {
-    if (request.method != 'GET' && request.context['userId'] == null) {
+    if (request.context['userId'] == null) {
       return sendUnauthorized('Unauthorized');
     }
     return await innerHandler(request);

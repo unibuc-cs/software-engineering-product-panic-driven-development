@@ -30,19 +30,22 @@ class Steam extends Provider {
         .then((req) => req.close());
 
       if (response.statusCode != 200) {
-        return {'error': 'User not found'};
+        return {
+          'games': []
+        };
       }
 
       final body = await response.transform(utf8.decoder).join();
       final List<dynamic>? games = jsonDecode(body)['response']?['games'];
 
       if (games == null || games.isEmpty) {
-        return {'error': 'No games found'};
+        return {
+          'games': []
+        };
       }
 
       games.sort((game1, game2) => game1['name'].compareTo(game2['name']));
       return {
-        // image url: https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/<id>/<icon>.jpg
         'games': games
           .where((game) =>
             !game['name'].toLowerCase().contains('public test') &&
@@ -50,7 +53,7 @@ class Steam extends Provider {
             !game['name'].toLowerCase().contains('open beta'))
           .map((game) {
             return {
-              'id': game['appid'],
+              'id'  : game['appid'],
               'name': game['name']
                 .replaceAll('™', '')
                 .replaceAll('®', '')
@@ -60,7 +63,7 @@ class Steam extends Provider {
                 .replaceAll(RegExp(r'\(.*?\)'), '')
                 .replaceAll('’', '\'')
                 .trim(),
-              'icon': game['img_icon_url'],
+              'icon'       : 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/${game['appid']}/${game['img_icon_url']}.jpg',
               'time_played': game['playtime_forever'],
               'last_played': _getDate(game['rtime_last_played'] ?? 0)
             };
@@ -69,7 +72,9 @@ class Steam extends Provider {
       };
     }
     catch (e) {
-      return {'error': e.toString()};
+      return {
+        'games': []
+      };
     }
   }
 

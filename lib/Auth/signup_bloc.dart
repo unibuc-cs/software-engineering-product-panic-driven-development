@@ -21,8 +21,8 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
     try {
       await AuthService.instance.signup(
-        name: body['name']!,
-        email: body['email']!,
+        name    : body['name']!,
+        email   : body['email']!,
         password: body['password']!,
       );
     }
@@ -38,14 +38,15 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
         await Future.delayed(const Duration(seconds: 1));
         List<Object> list = event.props;
         await addUser({
-          'name'              : list[1].toString(),
-          'email'             : list[2].toString(),
-          'password'          : list[3].toString(),
-          'confirmedPassword' : list[4].toString(),
+          'name'             : list[1].toString(),
+          'email'            : list[2].toString(),
+          'password'         : list[3].toString(),
+          'confirmedPassword': list[4].toString(),
         });
         emit(SignUpSuccess());
         Navigator.pop(list[0] as BuildContext);
-      } catch (error) {
+      }
+      catch (error) {
         emit(SignUpFailure(error: error.toString()));
       }
   }

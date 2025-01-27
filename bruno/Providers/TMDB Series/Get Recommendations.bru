@@ -1,0 +1,15 @@
+meta {
+  name: Get Recommendations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{URL}}/tmdbseries/recommendations?id=94605
+  body: none
+  auth: none
+}
+
+params:query {
+  id: 94605
+}

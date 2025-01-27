@@ -14,7 +14,7 @@ void main() async {
       service: SeriesService.instance,
       backup : series
     ),
-    index   : 1.0,
+    index   : '1.0',
   );
 
   await runService(

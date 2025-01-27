@@ -1,3 +1,5 @@
+import 'package:mediamaster/Widgets/themes.dart';
+
 import 'Helpers/database.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,8 @@ import 'Auth/signup_screen.dart';
 import 'Auth/signup_bloc.dart';
 import 'Auth/login_screen.dart';
 import 'Auth/login_bloc.dart';
+import 'Auth/guest_screen.dart';
+import 'Auth/guest_bloc.dart';
 
 void main() async {
   DotEnv(includePlatformEnvironment: true)..load();
@@ -27,10 +31,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return AdaptiveTheme(
       light: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.light(primary: const Color.fromARGB(219, 10, 94, 87)),
+        colorScheme: ColorScheme.light(
+          primary: Color.fromARGB(255, 0, 0, 190),
+        ),
       ),
       dark: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.dark(primary: const Color.fromARGB(219, 10, 94, 87)),
+        colorScheme: ColorScheme.dark(
+          primary: Color.fromARGB(255, 150, 150, 255),
+        ),
       ),
       initial: AdaptiveThemeMode.light,
       builder: (theme, darkTheme) => MaterialApp(
@@ -74,33 +82,57 @@ class HomeState extends State<Home> {
           children: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => BlocProvider(
-                          create: (context) => SignUpBloc(),
-                          child: const SignUpScreen(),
-                        )));
+                Navigator
+                  .of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                        create: (context) => SignUpBloc(),
+                        child: const SignUpScreen(),
+                      )
+                    )
+                  );
               },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              ),
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
               child: const Text('Sign Up'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => BlocProvider(
-                          create: (context) => LoginBloc(),
-                          child: const LoginScreen(),
-                        )));
+                Navigator
+                  .of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                            create: (context) => LoginBloc(),
+                            child: const LoginScreen(),
+                      )
+                    )
+                  );
               },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    const Color.fromARGB(219, 10, 94, 87)),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-              ),
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
               child: const Text('Log in'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator
+                  .of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                            create: (context) => GuestBloc(),
+                            child: const GuestScreen(),
+                      )
+                    )
+                  );
+              },
+              style: navigationButton(context)
+                .filledButtonTheme
+                .style,
+              child: const Text('Try as guest'),
             ),
           ],
         ),
