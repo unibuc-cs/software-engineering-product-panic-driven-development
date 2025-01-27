@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import '../Services/auth_service.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 
@@ -9,6 +10,7 @@ part 'signup_state.dart';
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   SignUpBloc() : super(SignUpInitial()) {
     on<SignUpButtonPressed>(_onSignUpButtonPressed);
+    on<SignUpWithGooglePressed>(_onSignUpWithGooglePressed);
   }
 
   Future<void> addUser(
@@ -49,5 +51,43 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       catch (error) {
         emit(SignUpFailure(error: error.toString()));
       }
+  }
+
+  Future<void> _onSignUpWithGooglePressed(SignUpWithGooglePressed event, Emitter<SignUpState> emit) async {
+    emit(SignUpLoading()); 
+    try {
+      String googleAuthUrl = await AuthService.instance.getGoogleLoginUrl();
+      await _launchGoogleAuth(googleAuthUrl, emit);
+    } catch (e) {
+      emit(SignUpFailure(error: e.toString())); 
+    }
+  }
+
+  Future<void> _launchGoogleAuth(String googleAuthUrl, Emitter<SignUpState> emit) async {
+    final flutterWebviewPlugin = FlutterWebviewPlugin();
+
+    flutterWebviewPlugin.launch(
+      googleAuthUrl,
+      withZoom: true,
+      hidden: true,
+      clearCache: true,
+      clearCookies: true,
+    );
+
+
+    flutterWebviewPlugin.onUrlChanged.listen((url) async {
+      if (url.contains('code=')) {
+        final uri = Uri.parse(url);
+        final authorizationCode = uri.queryParameters['code'];
+
+        if (authorizationCode != null) {
+          final token = await AuthService.instance.handleGoogleCallback(authorizationCode);
+          emit(SignUpSuccess());
+          flutterWebviewPlugin.close();
+        } else {
+          emit(SignUpFailure(error: "Google authentication failed"));
+        }
+      }
+    });
   }
 }

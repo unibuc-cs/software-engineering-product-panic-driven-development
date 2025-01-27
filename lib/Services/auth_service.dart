@@ -31,6 +31,25 @@ class AuthService {
     ))['token'];
   }
 
+  Future<String> getGoogleLoginUrl() async {
+    final response = await postRequest<Map<String, dynamic>>(
+      endpoint: '$endpoint/login-google',
+      body: {},
+      fromJson: (json) => json,
+    );
+    return response['authUrl'] as String;
+  }
+
+  Future<Map<String, dynamic>> handleGoogleCallback(String token) async {
+    final response = await postRequest<Map<String, dynamic>>(
+      endpoint: '$endpoint/callback-google',
+      body: {'token': token},
+      fromJson: (json) => json,
+    );
+    Config.instance.token = response['token'];
+    return response;
+  }
+
   Future<Map<String, dynamic>> signup({
     required String name,
     required String email,

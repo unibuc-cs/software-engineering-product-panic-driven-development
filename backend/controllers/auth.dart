@@ -38,6 +38,33 @@ RouterPlus authRouter() {
     return sendOk({ 'token': getToken(user?.id) });  
   });
 
+    router.post('/login-google', (Request req) async {
+    final authUrl = supabase.auth.getOAuthSignInUrl(Provider.google);
+
+    return sendOk({'authUrl': authUrl});
+  });
+
+  router.post('/callback-google', (Request req) async {
+    final body = await req.body.asJson;
+    validateFromBody(body, fields: [token]);
+
+    final token = body['token'];
+    final response = await supabase.auth.getSessionFromToken(token);
+
+    if (response.error != null) {
+      return sendBadRequest({'error': response.error!.message});
+    }
+
+    final user = response.session?.user;
+
+    return sendOk({
+      'id': user?.id,
+      'email': user?.email,
+      'name': user?.userMetadata?['name'],
+      'token': response.session?.accessToken, 
+    });
+  });
+  
   router.post('/signup', (Request req) async {
     final body = await req.body.asJson;
     validateFromBody(body, fields:

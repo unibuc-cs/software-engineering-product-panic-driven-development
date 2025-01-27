@@ -28,3 +28,13 @@ class SignUpButtonPressed extends SignUpEvent {
   @override
   String toString() => 'SignUpButtonPressed';
 }
+
+class SignUpWithGooglePressed extends SignUpEvent {
+  const SignUpWithGooglePressed();
+
+  @override
+  List<Object> get props => [];
+
+  @override
+  String toString() => 'SignUpWithGooglePressed';
+}
