@@ -31,20 +31,16 @@ class MediaUserTag implements Model {
   dynamic get id => [mediaId, tagId];
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'userid' : userId,
-      'tagid'  : tagId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid': mediaId,
+    'userid' : userId,
+    'tagid'  : tagId,
+  };
 
   @override
-  factory MediaUserTag.from(Map<String, dynamic> json) {
-    return MediaUserTag(
-      mediaId: json['mediaid'],
-      userId : json['userid'],
-      tagId  : json['tagid'],
-    );
-  }
+  factory MediaUserTag.from(Map<String, dynamic> json) => MediaUserTag(
+    mediaId: json['mediaid'],
+    userId : json['userid'],
+    tagId  : json['tagid'],
+  );
 }

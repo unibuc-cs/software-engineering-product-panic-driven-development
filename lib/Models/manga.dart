@@ -12,13 +12,13 @@ class Manga extends MediaType implements Model {
   int anilistId;
 
   Manga({
-    this.id = -1,
     required this.mediaId,
-    this.language = '',
+    this.id         = -1,
+    this.language   = '',
     this.totalPages = 0,
     this.nrChapters = 0,
-    this.nrVolumes = 0,
-    this.anilistId = -1,
+    this.nrVolumes  = 0,
+    this.anilistId  = -1,
   });
 
   static String get endpoint => 'manga';
@@ -32,35 +32,29 @@ class Manga extends MediaType implements Model {
   }
 
   @override
-  int getMediaId() {
-    return mediaId;
-  }
+  int getMediaId() => mediaId;
 
   @override
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'language': language,
-      'totalpages': totalPages,
-      'nrchapters': nrChapters,
-      'nrvolumes': nrVolumes,
-      'anilistid': anilistId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'   : mediaId,
+    'language'  : language,
+    'totalpages': totalPages,
+    'nrchapters': nrChapters,
+    'nrvolumes' : nrVolumes,
+    'anilistid' : anilistId,
+  };
 
   @override
-  factory Manga.from(Map<String, dynamic> json) {
-    return Manga(
-      id: json['id'],
-      mediaId: json['mediaid'],
-      language: json['language'] ?? '',
-      totalPages: json['totalpages'] ?? 0,
-      nrChapters: json['nrchapters'] ?? 0,
-      nrVolumes: json['nrvolumes'] ?? 0,
-      anilistId: json['anilistid'] ?? -1,
-    );
-  }
+  factory Manga.from(Map<String, dynamic> json) => Manga(
+    id        : json['id'],
+    mediaId   : json['mediaid'],
+    language  : json['language'] ?? '',
+    totalPages: json['totalpages'] ?? 0,
+    nrChapters: json['nrchapters'] ?? 0,
+    nrVolumes : json['nrvolumes'] ?? 0,
+    anilistId : json['anilistid'] ?? -1,
+  );
 }

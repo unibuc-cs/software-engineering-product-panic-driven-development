@@ -7,7 +7,7 @@ class MediaPlatform implements Model {
 
   MediaPlatform({
     required this.mediaId,
-    required this.platformId
+    required this.platformId,
   });
 
   static String get endpoint => 'mediaplatforms';
@@ -18,7 +18,7 @@ class MediaPlatform implements Model {
       return false;
     }
     return mediaId == (other as MediaPlatform).mediaId &&
-        platformId == other.platformId;
+           platformId == other.platformId;
   }
 
   @override
@@ -28,18 +28,14 @@ class MediaPlatform implements Model {
   dynamic get id => [mediaId, platformId];
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'platformid': platformId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'   : mediaId,
+    'platformid': platformId,
+  };
 
   @override
-  factory MediaPlatform.from(Map<String, dynamic> json) {
-    return MediaPlatform(
-      mediaId: json['mediaid'],
-      platformId: json['platformid'],
-    );
-  }
+  factory MediaPlatform.from(Map<String, dynamic> json) => MediaPlatform(
+    mediaId   : json['mediaid'],
+    platformId: json['platformid'],
+  );
 }

@@ -29,20 +29,16 @@ class MediaSeries implements Model {
   dynamic get id => [mediaId, seriesId];
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'seriesid': seriesId,
-      'index': index,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid' : mediaId,
+    'seriesid': seriesId,
+    'index'   : index,
+  };
 
   @override
-  factory MediaSeries.from(Map<String, dynamic> json) {
-    return MediaSeries(
-      mediaId: json['mediaid'],
-      seriesId: json['seriesid'],
-      index: json['index'],
-    );
-  }
+  factory MediaSeries.from(Map<String, dynamic> json) => MediaSeries(
+    mediaId : json['mediaid'],
+    seriesId: json['seriesid'],
+    index   : json['index'],
+  );
 }

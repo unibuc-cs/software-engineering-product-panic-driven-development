@@ -7,7 +7,7 @@ class MediaCreator implements Model {
 
   MediaCreator({
     required this.mediaId,
-    required this.creatorId
+    required this.creatorId,
   });
 
   static String get endpoint => 'mediacreators';
@@ -18,7 +18,7 @@ class MediaCreator implements Model {
       return false;
     }
     return mediaId == (other as MediaCreator).mediaId &&
-        creatorId == other.creatorId;
+           creatorId == other.creatorId;
   }
 
   @override
@@ -28,18 +28,14 @@ class MediaCreator implements Model {
   dynamic get id => [mediaId, creatorId];
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'creatorid': creatorId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'  : mediaId,
+    'creatorid': creatorId,
+  };
 
   @override
-  factory MediaCreator.from(Map<String, dynamic> json) {
-    return MediaCreator(
-      mediaId: json['mediaid'],
-      creatorId: json['creatorid'],
-    );
-  }
+  factory MediaCreator.from(Map<String, dynamic> json) => MediaCreator(
+    mediaId  : json['mediaid'],
+    creatorId: json['creatorid'],
+  );
 }

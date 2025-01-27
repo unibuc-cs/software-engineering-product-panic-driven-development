@@ -9,7 +9,7 @@ class Link implements Model {
   Link({
     this.id = -1,
     required this.name,
-    required this.href
+    required this.href,
   });
 
   static String get endpoint => 'links';
@@ -26,19 +26,15 @@ class Link implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'href': href,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'href': href,
+  };
 
   @override
-  factory Link.from(Map<String, dynamic> json) {
-    return Link(
-      id: json['id'],
-      name: json['name'],
-      href: json['href'],
-    );
-  }
+  factory Link.from(Map<String, dynamic> json) => Link(
+    id  : json['id'],
+    name: json['name'],
+    href: json['href'],
+  );
 }

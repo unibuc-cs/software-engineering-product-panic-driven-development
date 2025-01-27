@@ -7,7 +7,7 @@ class MediaRetailer implements Model {
 
   MediaRetailer({
     required this.mediaId,
-    required this.retailerId
+    required this.retailerId,
   });
 
   static String get endpoint => 'mediaretailers';
@@ -28,18 +28,14 @@ class MediaRetailer implements Model {
   dynamic get id => [mediaId, retailerId];
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'retailerid': retailerId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'   : mediaId,
+    'retailerid': retailerId,
+  };
 
   @override
-  factory MediaRetailer.from(Map<String, dynamic> json) {
-    return MediaRetailer(
-      mediaId: json['mediaid'],
-      retailerId: json['retailerid'],
-    );
-  }
+  factory MediaRetailer.from(Map<String, dynamic> json) => MediaRetailer(
+    mediaId   : json['mediaid'],
+    retailerId: json['retailerid'],
+  );
 }

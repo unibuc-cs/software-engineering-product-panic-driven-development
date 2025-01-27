@@ -8,10 +8,10 @@ class AppAchievement implements Model {
   int xp;
 
   AppAchievement({
-    this.id = -1,
     required this.name,
     required this.description,
-    this.xp = 100
+    this.id = -1,
+    this.xp = 100,
   });
 
   static String get endpoint => 'appachievements';
@@ -28,21 +28,17 @@ class AppAchievement implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'description': description,
-      'xp': xp,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'name'       : name,
+    'description': description,
+    'xp'         : xp,
+  };
 
   @override
-  factory AppAchievement.from(Map<String, dynamic> json) {
-    return AppAchievement(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      xp: json['xp'],
-    );
-  }
+  factory AppAchievement.from(Map<String, dynamic> json) => AppAchievement(
+    id         : json['id'],
+    name       : json['name'],
+    description: json['description'],
+    xp         : json['xp'],
+  );
 }

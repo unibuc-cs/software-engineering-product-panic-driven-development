@@ -24,17 +24,13 @@ class Creator implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'name': name,
+  };
 
   @override
-  factory Creator.from(Map<String, dynamic> json) {
-    return Creator(
-      id: json['id'],
-      name: json['name'],
-    );
-  }
+  factory Creator.from(Map<String, dynamic> json) => Creator(
+    id  : json['id'],
+    name: json['name'],
+  );
 }

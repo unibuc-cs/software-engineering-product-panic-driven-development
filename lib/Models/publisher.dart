@@ -24,17 +24,13 @@ class Publisher implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'name': name,
+  };
 
   @override
-  factory Publisher.from(Map<String, dynamic> json) {
-    return Publisher(
-      id: json['id'],
-      name: json['name'],
-    );
-  }
+  factory Publisher.from(Map<String, dynamic> json) => Publisher(
+    id  : json['id'],
+    name: json['name'],
+  );
 }
