@@ -15,7 +15,7 @@ Future<dynamic> request<T>({
   dynamic body,
   required T Function(dynamic) fromJson,
 }) async {
-  http.Response response;;
+  http.Response response;
   final Config config = Config.instance;
   String errMsg, methodUpper = method.toUpperCase();
   Map<String, String> headers = {

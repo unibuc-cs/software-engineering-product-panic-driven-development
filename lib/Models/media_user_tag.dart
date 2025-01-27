@@ -34,8 +34,8 @@ class MediaUserTag implements Model {
   Map<String, dynamic> toJson() {
     return {
       'mediaid': mediaId,
-      'userid': userId,
-      'tagid': tagId,
+      'userid' : userId,
+      'tagid'  : tagId,
     };
   }
 
@@ -43,8 +43,8 @@ class MediaUserTag implements Model {
   factory MediaUserTag.from(Map<String, dynamic> json) {
     return MediaUserTag(
       mediaId: json['mediaid'],
-      userId: json['userid'],
-      tagId: json['tagid'],
+      userId : json['userid'],
+      tagId  : json['tagid'],
     );
   }
 }

@@ -30,8 +30,8 @@ class UserTag implements Model {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'userid': userId,
-      'name'  : name,
+      'userid'   : userId,
+      'name'     : name,
       'mediatype': mediaType,
     };
   }
@@ -39,9 +39,9 @@ class UserTag implements Model {
   @override
   factory UserTag.from(Map<String, dynamic> json) {
     return UserTag(
-      id: json['id'],
-      userId: json['userid'],
-      name: json['name'],
+      id       : json['id'],
+      userId   : json['userid'],
+      name     : json['name'],
       mediaType: json['mediatype'],
     );
   }

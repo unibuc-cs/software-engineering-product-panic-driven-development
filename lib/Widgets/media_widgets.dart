@@ -281,15 +281,18 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     statusValue = (customizations as MediaUser).status;
   }
 
-  TextEditingController nameController = TextEditingController(
+  TextEditingController nameController     = TextEditingController(
     text: customizations.name,
   );
-  TextEditingController ratingController = TextEditingController(
+  TextEditingController ratingController   = TextEditingController(
     text: customizations.userScore == -1 
       ? ''
       : customizations.userScore.toString()
   );
   TextEditingController progressController = TextEditingController(
+    text: '',
+  );
+  TextEditingController newTagController   = TextEditingController(
     text: '',
   );
 
@@ -381,7 +384,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                       'Custom name',
                       style: titleStyle,
                     ),
-                    TextField(
+                    TextField( // Custom name
                       controller: nameController,
                       maxLength: 64,
                       decoration: InputDecoration(
@@ -409,7 +412,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                       'Personal rating',
                       style: titleStyle,
                     ),
-                    TextField(
+                    TextField(  // Custom rating
                       controller: ratingController,
                       maxLength: 3,
                       inputFormatters: [
@@ -445,7 +448,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                               : 'Update progress (out of $maxProgressValue)',
                             style: titleStyle,
                           ),
-                          TextField(
+                          TextField(  // Progress
                             controller: progressController,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly 
@@ -520,8 +523,8 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                             onChanged: (value) async {
                               MediaUserTag mut = MediaUserTag(
                                 mediaId: mt.getMediaId(),
-                                userId: UserSystem.instance.getCurrentUserId(),
-                                tagId: userTag.id,
+                                userId : UserSystem.instance.getCurrentUserId(),
+                                tagId  : userTag.id,
                               );
 
                               if (value == true) {
@@ -541,6 +544,40 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                           ),
                         ],
                       ),
+                    TextField(
+                      controller: newTagController,
+                      maxLength: 32,
+                      decoration: InputDecoration(
+                        labelText: 'Make a new $mediaType tag',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () async {
+                            String tagName = newTagController.text;
+                            bool prezentAlready = UserTagService
+                              .instance
+                              .items
+                              .where((userTag) => userTag.name == tagName)
+                              .length != 0;
+                            if (prezentAlready) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('$tagName already exists')),
+                              );
+                            }
+                            else {
+                              UserTag userTag = UserTag(
+                                userId: UserSystem.instance.getCurrentUserId(),
+                                name: tagName,
+                                mediaType: getMediaTypeDbName(MT),
+                              );
+                              await UserTagService
+                                .instance
+                                .create(userTag);
+                            }
+                            setFullState();
+                          },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

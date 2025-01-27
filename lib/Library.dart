@@ -487,6 +487,14 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         ),
                         tooltip: 'Import from Steam',
                       ),
+                    if (!isWishlist && MT == Game) // IGDB import button
+                      IconButton(
+                        onPressed: () {
+                          showIGDBImportDialog(context, this as Library<Game>);
+                        },
+                        icon: const Icon(Icons.add_link),
+                        tooltip: 'Add game using IGDB id',
+                      ),
                   ],
                 ),
                 Row(

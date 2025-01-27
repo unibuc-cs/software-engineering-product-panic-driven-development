@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:mediamaster/Library.dart';
 import 'package:mediamaster/Widgets/themes.dart';
 import '../Models/game.dart';
 import 'media_widgets.dart';
@@ -320,5 +321,18 @@ Widget getAdditionalButtonsForGame(Game game, BuildContext context, Function() r
         ),
       ),
     ],
+  );
+}
+
+Future<void> showIGDBImportDialog(BuildContext context, Library<Game> library) {
+  return showDialog(
+    context: context,
+    builder: (context) => StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return AlertDialog(
+          
+        );
+      }
+    ),
   );
 }
