@@ -42,7 +42,7 @@ class GoodReadsList extends Provider {
 
   Future<Map<String, dynamic>> _getBookList(String userId) async {
     try {
-      final document = await _getDocument('https://www.goodreads.com/review/list/${userId}?shelf=currently-reading');
+      final document = await _getDocument('https://www.goodreads.com/review/list/${userId}?shelf=currently-reading&per_page=100');
 
       if (document == Document.html('')) {
         return {

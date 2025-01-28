@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mediamaster/Imports/goodreads_import.dart';
+import 'package:mediamaster/Imports/my_anime_list_import.dart';
+import 'package:mediamaster/Imports/my_manga_list_import.dart';
+import 'package:mediamaster/Imports/provider_import.dart';
+import 'package:mediamaster/Imports/steam_import.dart';
+import 'package:mediamaster/Imports/trakt_movies_import.dart';
+import 'package:mediamaster/Imports/trakt_series_import.dart';
 import '../Models/anime.dart';
 import '../Models/book.dart';
 import '../Models/game.dart';
@@ -33,6 +40,7 @@ dynamic getForType(Type type, String request) {
       'options'             : getOptionsAnime,
       'info'                : getInfoAnime,
       'recs'                : getRecsAnime,
+      'importer'            : myAnimeListImport,
     },
     Book : {
       'serviceInstance'     : BookService.instance,
@@ -49,6 +57,7 @@ dynamic getForType(Type type, String request) {
       'options'             : getOptionsBook,
       'info'                : getInfoBook,
       'recs'                : getRecsBook,
+      'importer'            : goodreadsImport,
     },
     Game : {
       'serviceInstance'     : GameService.instance,
@@ -65,6 +74,7 @@ dynamic getForType(Type type, String request) {
       'options'             : getOptionsIGDB,
       'info'                : getInfoIGDB,
       'recs'                : getRecsIGDB,
+      'importer'            : steamImport,
     },
     Manga : {
       'serviceInstance'     : MangaService.instance,
@@ -81,6 +91,7 @@ dynamic getForType(Type type, String request) {
       'options'             : getOptionsManga,
       'info'                : getInfoManga,
       'recs'                : getRecsManga,
+      'importer'            : myMangaListImport,
     },
     Movie : {
       'serviceInstance'     : MovieService.instance,
@@ -97,6 +108,7 @@ dynamic getForType(Type type, String request) {
       'options'             : getOptionsMovie,
       'info'                : getInfoMovie,
       'recs'                : getRecsMovie,
+      'importer'            : traktMoviesImport,
     },
     TVSeries : {
       'serviceInstance'     : TVSeriesService.instance,
@@ -113,6 +125,7 @@ dynamic getForType(Type type, String request) {
       'options'             : getOptionsSeries,
       'info'                : getInfoSeries,
       'recs'                : getRecsSeries,
+      'importer'            : traktSeriesImport,
     },
   };
 
@@ -204,4 +217,8 @@ List<MediaType> getAllFromService(Type type, String serviceType) {
     .items
     .where((mt) => ids.contains(mt.mediaId))
     .toList();
+}
+
+ProviderImport getImporterForType(Type type) {
+  return getForType(type, 'importer');
 }
