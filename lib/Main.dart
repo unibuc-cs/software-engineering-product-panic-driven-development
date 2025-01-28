@@ -16,9 +16,6 @@ import 'Auth/guest_bloc.dart';
 void main() async {
   DotEnv(includePlatformEnvironment: true)..load();
 
-  // TODO: remove this from client side
-  await seedData();
-
   await HydrateWithoutUser();
 
   runApp(MyApp());

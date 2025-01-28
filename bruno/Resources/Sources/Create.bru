@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{URL}}/mediausertags
+  url: {{URL}}/sources
   body: json
   auth: none
 }
@@ -16,7 +16,7 @@ headers {
 
 body:json {
   {
-    "mediaid": 1,
-    "tagid": 1
+    "name": "digital",
+    "mediatype": "all"
   }
 }

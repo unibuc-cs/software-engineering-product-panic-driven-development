@@ -94,6 +94,7 @@ scripts:
   test:mediaretailer  : dart --define=LOCAL=true test/resources/media_retailer_test.dart
   test:mediaseries    : dart --define=LOCAL=true test/resources/media_series_test.dart
   test:mediauser      : dart --define=LOCAL=true test/resources/media_user_test.dart
+  test:mediausersource: dart --define=LOCAL=true test/resources/media_user_source_test.dart
   test:mediausertag   : dart --define=LOCAL=true test/resources/media_user_tag_test.dart
   test:movie          : dart --define=LOCAL=true test/resources/movie_test.dart
   test:note           : dart --define=LOCAL=true test/resources/note_test.dart
@@ -102,7 +103,8 @@ scripts:
   test:retailer       : dart --define=LOCAL=true test/resources/retailer_test.dart
   test:season         : dart --define=LOCAL=true test/resources/season_test.dart
   test:series         : dart --define=LOCAL=true test/resources/series_test.dart
-  test:tag            : dart --define=LOCAL=true test/resources/tag_test.dart
+  test:source         : dart --define=LOCAL=true test/resources/source_test.dart
+  test:user_tag       : dart --define=LOCAL=true test/resources/user_tag_test.dart
   test:tvseries       : dart --define=LOCAL=true test/resources/tv_series_test.dart
   test:userachievement: dart --define=LOCAL=true test/resources/user_achievement_test.dart
   test:wishlist       : dart --define=LOCAL=true test/resources/wishlist_test.dart

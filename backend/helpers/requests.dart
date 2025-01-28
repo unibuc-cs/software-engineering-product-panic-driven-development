@@ -52,6 +52,9 @@ Future<Map<String, dynamic>> postRequest(body, endpoint) async =>
 Future<Map<String, dynamic>> getByNameRequest(name, endpoint) async =>
   await _makeRequest('GET', '/$endpoint/name?query=$name');
 
+Future<bool> isTableEmpty(String table) async =>
+  0 == await SupabaseManager.client.from(table).count();
+
 String _extractLinkName(String entry) => entry.replaceAll(RegExp(r'^https?://'), '').split('/')[0];
 
 Map<String, dynamic> createAttributes(String tableName, dynamic entry) => tableName == 'link'
@@ -327,4 +330,116 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
   removeIfEmpty(result, 'mediaseries');
 
   return sendOk(result);
+}
+
+Future<void> seedData() async {
+  if (await isTableEmpty('source')) {
+    var sourcesToAddForAll = [
+      'digital',
+      'physical',
+    ];
+
+    // TODO: Add other sources
+    var sourcesToAddForStreaming = [
+      'Amazon Prime',
+      'Disney+'
+      'HBO Max',
+      'Hulu',
+      'Netflix',
+    ];
+
+    var sourcesToAddForAnime = [
+      'Crunchyroll',
+      'Funimation',
+    ];
+
+    var sourcesToAddForBook = [
+      'Internet Archive',
+      'Zlibrary',
+    ];
+
+    var sourcesToAddForGame = [
+      'Amazon Games',
+      'Battle.net',
+      'EA Origin',
+      'Epic Games',
+      'GOG',
+      'Playstation',
+      'Riot Games',
+      'Rockstar Games',
+      'REDLauncher',
+      'Steam',
+      'Ubisoft Connect',
+      'Xbox',
+      'Xbox Game Pass',
+    ];
+
+    var sourcesToAddForManga = [
+      'K Manga',
+    ];
+
+    List<Map<String, String>> sources = [];
+    Map<String, List<String>> sourcesToAdd = {
+      'all'      : sourcesToAddForAll,
+      'streaming': sourcesToAddForStreaming,
+      'anime'    : sourcesToAddForAnime,
+      'book'     : sourcesToAddForBook,
+      'game'     : sourcesToAddForGame,
+      'manga'    : sourcesToAddForManga,
+    };
+
+    sourcesToAdd.forEach((mediaType, sourcesList) =>
+      sourcesList.forEach((sourceName) =>
+        sources.add({
+          'name'     : sourceName,
+          'mediatype': mediaType,
+        })
+      )
+    );
+
+    await SupabaseManager.client.from('source').insert(sources);
+  }
+
+  if (await isTableEmpty('genre')) {
+    var genresToAdd = [
+      'Shooter',
+      'Strategy',
+      'Role Playing',
+      'Survival',
+      'Fighting',
+      'Horror',
+      'Sandbox',
+      'Tower Defense',
+      'Simulator',
+      'Action',
+      'Adventure',
+      'Party Game',
+      'Trivia',
+      'Puzzle',
+      'Board Game',
+      'Sports',
+      'Racing',
+      'Rhythm',
+      'Platformer',
+      'Battle Royale',
+      'Metroidvania',
+      'Roguelike',
+      'Soulslike',
+      'Idle',
+      'Open World',
+      'Point and Click',
+      'Real Time Strategy',
+      'Visual Novel',
+      'Superhero',
+      'Stealth',
+      'Detective',
+      'Management',
+      'Comedy',
+      'Difficult',
+      'Cooking',
+      'MOBA',
+    ];
+
+    await SupabaseManager.client.from('genre').insert(genresToAdd.map((genreName) => {'name': genreName}).toList());
+  }
 }

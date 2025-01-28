@@ -1,4 +1,6 @@
-import '../Models/genre.dart';
+import 'package:mediamaster/Services/media_user_source_service.dart';
+import 'package:mediamaster/Services/source_service.dart';
+
 import '../Services/anime_service.dart';
 import '../Services/app_achievement_service.dart';
 import '../Services/book_service.dart';
@@ -31,74 +33,6 @@ import '../Services/tv_series_service.dart';
 import '../Services/user_achievement_service.dart';
 import '../Services/wishlist_service.dart';
 
-Future<void> seedData() async {
-  // UserTagService userTagServ = UserTagService.instance;
-  GenreService genreServ = GenreService.instance;
-  List<Future<void>> allFutures = [];
-
-  // TODO: Move this to signup or something similar
-  // if ((await userTagServ.readAll()).isEmpty) {
-  //   var tagsToAdd = [
-  //     'Singleplayer',
-  //     'Multiplayer',
-  //     'Casual',
-  //     'Competitive',
-  //     'VR',
-  //     'Indie',
-  //     'Co-Op',
-  //     'Local Co-Op',
-  //     'MMO',
-  //   ];
-
-  //   allFutures.addAll(tagsToAdd.map((tagName) => userTagServ.create(UserTag(name: tagName))));
-  // }
-
-  if ((await genreServ.readAll()).isEmpty) {
-    var genresToAdd = [
-      'Shooter',
-      'Strategy',
-      'Role Playing',
-      'Survival',
-      'Fighting',
-      'Horror',
-      'Sandbox',
-      'Tower Defense',
-      'Simulator',
-      'Action',
-      'Adventure',
-      'Party Game',
-      'Trivia',
-      'Puzzle',
-      'Board Game',
-      'Sports',
-      'Racing',
-      'Rhythm',
-      'Platformer',
-      'Battle Royale',
-      'Metroidvania',
-      'Roguelike',
-      'Soulslike',
-      'Idle',
-      'Open World',
-      'Point and Click',
-      'Real Time Strategy',
-      'Visual Novel',
-      'Superhero',
-      'Stealth',
-      'Detective',
-      'Management',
-      'Comedy',
-      'Difficult',
-      'Cooking',
-      'MOBA',
-    ];
-
-    allFutures.addAll(genresToAdd.map((genreName) => genreServ.create(Genre(name: genreName))));
-  }
-
-  await Future.wait(allFutures);
-}
-
 Future<void> HydrateWithoutUser() async {
   List<Service> services = [
     AnimeService.instance,
@@ -124,6 +58,7 @@ Future<void> HydrateWithoutUser() async {
     RetailerService.instance,
     SeasonService.instance,
     SeriesService.instance,
+    SourceService.instance,
     TVSeriesService.instance,
   ];
 
@@ -133,6 +68,7 @@ Future<void> HydrateWithoutUser() async {
 Future<void> HydrateWithUser() async {
   List<Service> services = [
     MediaUserService.instance,
+    MediaUserSourceService.instance,
     MediaUserTagService.instance,
     NoteService.instance,
     UserAchievementService.instance,
@@ -146,9 +82,11 @@ Future<void> HydrateWithUser() async {
 void UnhydrateWithUser() {
   List<Service> services = [
     MediaUserService.instance,
+    MediaUserSourceService.instance,
     MediaUserTagService.instance,
     NoteService.instance,
     UserAchievementService.instance,
+    UserTagService.instance,
     WishlistService.instance,
   ];
 

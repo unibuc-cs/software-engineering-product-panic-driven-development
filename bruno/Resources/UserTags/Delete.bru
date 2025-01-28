@@ -5,7 +5,11 @@ meta {
 }
 
 delete {
-  url: {{URL}}/usertags/3
+  url: {{URL}}/usertags/1
   body: none
   auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenValid}}
 }
