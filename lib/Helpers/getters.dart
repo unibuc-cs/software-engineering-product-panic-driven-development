@@ -41,6 +41,7 @@ dynamic getForType(Type type, String request) {
       'info'                : getInfoAnime,
       'recs'                : getRecsAnime,
       'importer'            : myAnimeListImport,
+      'importerName'        : 'MyAnimeList',
     },
     Book : {
       'serviceInstance'     : BookService.instance,
@@ -58,6 +59,7 @@ dynamic getForType(Type type, String request) {
       'info'                : getInfoBook,
       'recs'                : getRecsBook,
       'importer'            : goodreadsImport,
+      'importerName'        : 'Goodreads',
     },
     Game : {
       'serviceInstance'     : GameService.instance,
@@ -75,6 +77,7 @@ dynamic getForType(Type type, String request) {
       'info'                : getInfoIGDB,
       'recs'                : getRecsIGDB,
       'importer'            : steamImport,
+      'importerName'        : 'Steam',
     },
     Manga : {
       'serviceInstance'     : MangaService.instance,
@@ -92,6 +95,7 @@ dynamic getForType(Type type, String request) {
       'info'                : getInfoManga,
       'recs'                : getRecsManga,
       'importer'            : myMangaListImport,
+      'importerName'        : 'MyAnimeList',
     },
     Movie : {
       'serviceInstance'     : MovieService.instance,
@@ -109,6 +113,7 @@ dynamic getForType(Type type, String request) {
       'info'                : getInfoMovie,
       'recs'                : getRecsMovie,
       'importer'            : traktMoviesImport,
+      'importerName'        : 'Trakt',
     },
     TVSeries : {
       'serviceInstance'     : TVSeriesService.instance,
@@ -126,6 +131,7 @@ dynamic getForType(Type type, String request) {
       'info'                : getInfoSeries,
       'recs'                : getRecsSeries,
       'importer'            : traktSeriesImport,
+      'importerName'        : 'Trakt',
     },
   };
 
@@ -221,4 +227,8 @@ List<MediaType> getAllFromService(Type type, String serviceType) {
 
 ProviderImport getImporterForType(Type type) {
   return getForType(type, 'importer');
+}
+
+String getImporterNameForType(Type type) {
+  return getForType(type, 'importerName');
 }

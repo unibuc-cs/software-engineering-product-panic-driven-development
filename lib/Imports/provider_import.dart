@@ -15,7 +15,8 @@ class ProviderImport<MT extends MediaType> {
   Future<List<dynamic>> Function(String) listProvider;
   Future<List<Map<String, dynamic>>> Function(String) optionsProvider;
   Map<String, dynamic> Function(dynamic) customizations;
-  int milisecondsDelay;
+  int millisecondsDelay;
+  int importMillisecondsDelay;
   String providerName;
   String howToGetIdLink;
   String libraryName; // Trakt is special. It is not "Trakt library", but rather "Trakt watchlist"
@@ -24,10 +25,11 @@ class ProviderImport<MT extends MediaType> {
     required this.listProvider,
     required this.optionsProvider,
     this.customizations = _doNothing,
-    this.milisecondsDelay = 100,
+    this.millisecondsDelay = 100,
     required this.providerName,
     required this.howToGetIdLink,
     this.libraryName = 'library',
+    this.importMillisecondsDelay = 0,
   });
 
   Map<String, dynamic> _getBestMatch(String searchName, List<Map<String, dynamic>> searchOptions) {
@@ -76,7 +78,7 @@ class ProviderImport<MT extends MediaType> {
     Mutex mutex = Mutex();
 
     for (var i = 0; i < mediasList.length; i++) {
-      futures.add(Future.delayed(Duration(milliseconds: milisecondsDelay * i), () async {
+      futures.add(Future.delayed(Duration(milliseconds: millisecondsDelay * i), () async {
         final media = mediasList[i];
         final name = (media['name'] ?? '')
           .replaceAll(':', '')
@@ -118,14 +120,15 @@ class ProviderImport<MT extends MediaType> {
 
     // This for loop cannot (most likely) be made concurrent because of rate limits
     for (var data in entriesList) {
+      print('Test0');
+      await Future.delayed(Duration(milliseconds: importMillisecondsDelay));
+      print('Test1');
       dynamic id = data.value['id'] ?? data.value['link'];
       data.value.remove('id');
-      data.value.remove('link');
       data.value.remove('name');
       for (int trial = 0; trial < 3; ++trial) {
         try {
           await library.import(id, data.value);
-          print('Test\n');
           done.add(data.key);
           workingOn.remove(data.key);
           break;

@@ -480,7 +480,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                         icon: Icon(
                           Icons.library_add_outlined,
                         ),
-                        tooltip: 'Import from Steam',
+                        tooltip: 'Import from ${getImporterNameForType(MT)}',
                       ),
                     if (MT == Game) // IGDB import button
                       IconButton(
@@ -1243,7 +1243,16 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   }
 
   Future<void> import(dynamic id, Map<String, dynamic> userData) async {
-    Pair<Map<String, dynamic>, MT> result = await createMT(await getInfoForType(MT, {'id': id}));
+    Pair<Map<String, dynamic>, MT> result = await createMT(
+      await getInfoForType(
+        MT,
+        {
+          'id': id,
+          // This is here because of GoodReads
+          'link': id,
+        },
+      )
+    );
     await addToLibraryOrWishlist({
         ...result.key,
         ...userData,
