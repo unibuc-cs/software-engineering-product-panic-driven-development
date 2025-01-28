@@ -442,6 +442,7 @@ Future<void> showIGDBImportDialog(BuildContext context, LibraryState<Game> libra
                               }
                               catch(e) {
                                 invalidId = true;
+                                setState(() {});
                                 return;
                               }
                               gameName = gameData['originalname'];

@@ -15,21 +15,23 @@ class ProviderImport<MT extends MediaType> {
   Future<List<dynamic>> Function(String) listProvider;
   Future<List<Map<String, dynamic>>> Function(String) optionsProvider;
   Map<String, dynamic> Function(dynamic) customizations;
-  int millisecondsDelay;
+  int optionsMillisecondsDelay;
   int importMillisecondsDelay;
   String providerName;
   String howToGetIdLink;
   String libraryName; // Trakt is special. It is not "Trakt library", but rather "Trakt watchlist"
+  String idName;
 
   ProviderImport({
     required this.listProvider,
     required this.optionsProvider,
     this.customizations = _doNothing,
-    this.millisecondsDelay = 100,
+    this.optionsMillisecondsDelay = 100,
     required this.providerName,
     required this.howToGetIdLink,
     this.libraryName = 'library',
     this.importMillisecondsDelay = 0,
+    this.idName = 'ID',
   });
 
   Map<String, dynamic> _getBestMatch(String searchName, List<Map<String, dynamic>> searchOptions) {
@@ -78,7 +80,7 @@ class ProviderImport<MT extends MediaType> {
     Mutex mutex = Mutex();
 
     for (var i = 0; i < mediasList.length; i++) {
-      futures.add(Future.delayed(Duration(milliseconds: millisecondsDelay * i), () async {
+      futures.add(Future.delayed(Duration(milliseconds: optionsMillisecondsDelay * i), () async {
         final media = mediasList[i];
         final name = (media['name'] ?? '')
           .replaceAll(':', '')
@@ -120,9 +122,7 @@ class ProviderImport<MT extends MediaType> {
 
     // This for loop cannot (most likely) be made concurrent because of rate limits
     for (var data in entriesList) {
-      print('Test0');
-      await Future.delayed(Duration(milliseconds: importMillisecondsDelay));
-      print('Test1');
+      await Future.delayed(Duration(milliseconds: importMillisecondsDelay), () {});
       dynamic id = data.value['id'] ?? data.value['link'];
       data.value.remove('id');
       data.value.remove('name');
@@ -160,6 +160,8 @@ class ProviderImport<MT extends MediaType> {
     Set<String> done = {};
     Set<String> failed = {};
 
+    bool isGettingOptions = false;
+
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -193,7 +195,7 @@ class ProviderImport<MT extends MediaType> {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: 'How to get $providerName ID',
+                              text: 'How to get $providerName $idName',
                               style: TextStyle(
                                 color: linkColor,
                                 decoration: TextDecoration.underline,
@@ -217,15 +219,18 @@ class ProviderImport<MT extends MediaType> {
                     TextField(
                       controller: controller,
                       decoration: InputDecoration(
-                        labelText: '$providerName ID',
+                        labelText: '$providerName $idName',
                         suffixIcon: IconButton(
                           icon: const Icon(
                             Icons.search,
                           ),
                           onPressed: () async {
                             String userId = controller.text;
-                            if (userId.isNotEmpty) {
+                            if (userId.isNotEmpty && !isGettingOptions) {
+                              isGettingOptions = true;
+                              setState(() {});
                               searchResults = await _getOptionsForID(userId);
+                              isGettingOptions = false;
 
                               // To show the options in lexicographical order
                               searchResultsEntries = searchResults.entries.toList();
@@ -243,106 +248,116 @@ class ProviderImport<MT extends MediaType> {
                     SizedBox(
                       height: 10,
                     ),
-                    if (searchResults.isNotEmpty) // Select / Deselect all
-                      Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                wanted = searchResults.keys.toSet();
-                                setState(() {});
+                    if (isGettingOptions)
+                      ...[
+                        SizedBox(
+                          height: 100,
+                        ),
+                        loadingWidget(context),
+                      ]
+                    else
+                      ...[
+                        if (searchResults.isNotEmpty) // Select / Deselect all
+                          Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    wanted = searchResults.keys.toSet();
+                                    setState(() {});
+                                  },
+                                  child: Text('Select all'),
+                                  style: greenFillButton(context)
+                                    .filledButtonTheme
+                                    .style,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    wanted = {};
+                                    setState(() {});
+                                  },
+                                  child: Text('Deselect all'),
+                                  style: redFillButton(context)
+                                    .filledButtonTheme
+                                    .style,
+                                ),
+                              ],
+                            ),
+                          ),
+                        SizedBox(
+                          height: 7,
+                        ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                for (var entry in searchResultsEntries)
+                                  Container(
+                                    child: Row(
+                                      children: [
+                                        Checkbox(
+                                          value: wanted.contains(entry.key),
+                                          onChanged: workingOn.isEmpty
+                                            ? (onOff) {
+                                                if (onOff == null) {
+                                                  return;
+                                                }
+
+                                                if (onOff) {
+                                                  wanted.add(entry.key);
+                                                }
+                                                else {
+                                                  wanted.remove(entry.key);
+                                                }
+
+                                                setState(() {});
+                                              }
+                                            : null, // This makes the box gray and non changeable when there is an import going on
+                                        ),
+                                        Expanded(
+                                          child: Text(entry.key),
+                                        ),
+                                        SizedBox(
+                                          child: Center(
+                                            child: workingOn.contains(entry.key)
+                                            ? loadingWidget(context)
+                                            : done.contains(entry.key)
+                                              ? checkMarkWidget(context)
+                                              : failed.contains(entry.key)
+                                                ? failMarkWidget(context)
+                                                : null,
+                                          ),
+                                          height: 20,
+                                          width: 20,
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                      ]
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (searchResults.isNotEmpty) // Space for buttons
+                          SizedBox(
+                            height: 7,
+                          ),
+                        if (searchResults.isNotEmpty) // Confirm button
+                          Center(
+                            child: TextButton(
+                              onPressed: () async {
+                                await confirmImport(searchResults, library, wanted, () => setState(() {}), workingOn, done, failed);
                               },
-                              child: Text('Select all'),
+                              child: Text('Confirm import'),
                               style: greenFillButton(context)
                                 .filledButtonTheme
                                 .style,
                             ),
-                            TextButton(
-                              onPressed: () {
-                                wanted = {};
-                                setState(() {});
-                              },
-                              child: Text('Deselect all'),
-                              style: redFillButton(context)
-                                .filledButtonTheme
-                                .style,
-                            ),
-                          ],
-                        ),
-                      ),
-                    SizedBox(
-                      height: 7,
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            for (var entry in searchResultsEntries)
-                              Container(
-                                child: Row(
-                                  children: [
-                                    Checkbox(
-                                      value: wanted.contains(entry.key),
-                                      onChanged: workingOn.isEmpty
-                                        ? (onOff) {
-                                            if (onOff == null) {
-                                              return;
-                                            }
-
-                                            if (onOff) {
-                                              wanted.add(entry.key);
-                                            }
-                                            else {
-                                              wanted.remove(entry.key);
-                                            }
-
-                                            setState(() {});
-                                          }
-                                        : null, // This makes the box gray and non changeable when there is an import going on
-                                    ),
-                                    Expanded(
-                                      child: Text(entry.key),
-                                    ),
-                                    SizedBox(
-                                      child: Center(
-                                        child: workingOn.contains(entry.key)
-                                        ? loadingWidget(context)
-                                        : done.contains(entry.key)
-                                          ? checkMarkWidget(context)
-                                          : failed.contains(entry.key)
-                                            ? failMarkWidget(context)
-                                            : null,
-                                      ),
-                                      height: 20,
-                                      width: 20,
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                  ]
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (searchResults.isNotEmpty) // Space for buttons
-                      SizedBox(
-                        height: 7,
-                      ),
-                    if (searchResults.isNotEmpty) // Confirm button
-                      Center(
-                        child: TextButton(
-                          onPressed: () async {
-                            await confirmImport(searchResults, library, wanted, () => setState(() {}), workingOn, done, failed);
-                          },
-                          child: Text('Confirm import'),
-                          style: greenFillButton(context)
-                            .filledButtonTheme
-                            .style,
-                        ),
-                      ),
+                          ),
+                        ],
                   ],
                 ),
               ),
