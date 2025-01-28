@@ -266,6 +266,7 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     }());
   }
   await Future.wait(tasks);
+  tasks.clear();
   removeIfEmpty(result, 'series');
 
   if (body['mediaseriesBody']?['series'].length == 0) {
@@ -275,9 +276,10 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     return sendOk(result);
   }
 
+  // TODO: This adds "empty" medias in the database. If we want this then implement in frontend as well
+  /*
   // Check here in case of errors with the series
   int seriesId = seriesList[0]['id'];
-  tasks.clear();
 
   for (var entry in body['mediaseriesBody']?['series']) {
     tasks.add(() async {
@@ -324,6 +326,8 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     }());
   }
   await Future.wait(tasks);
+  tasks.clear();
+  */
 
   removeIfEmpty(result, 'related_medias');
   removeIfEmpty(result, 'related_$mediaTypePlural');
