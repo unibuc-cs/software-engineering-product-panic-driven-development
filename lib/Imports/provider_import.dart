@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mediamaster/Helpers/getters.dart';
 import 'package:mediamaster/Library.dart';
 import 'package:mediamaster/Models/general/media_type.dart';
 import 'package:mediamaster/Widgets/themes.dart';
 import 'package:mutex/mutex.dart';
-import 'package:url_launcher/link.dart';
 
 Map<String, dynamic> _doNothing(_) => {};
 
@@ -188,27 +186,7 @@ class ProviderImport<MT extends MediaType> {
                       ),
                     ],
                   ),
-                  Link( // This is modified from https://androidride.com/flutter-hyperlink-text/ first example
-                    uri: Uri.parse(howToGetIdLink),
-                    builder: (context, followLink) {
-                      return RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'How to get $providerName $idName',
-                              style: TextStyle(
-                                color: linkColor,
-                                decoration: TextDecoration.underline,
-                                fontSize: 22,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = followLink,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                  displayLink(howToGetIdLink, 'How to get $providerName $idName'),
                 ],
               ),
               content: SizedBox(
@@ -234,7 +212,7 @@ class ProviderImport<MT extends MediaType> {
 
                               // To show the options in lexicographical order
                               searchResultsEntries = searchResults.entries.toList();
-                              searchResultsEntries.sort((a, b) => a.key.compareTo(b.key));
+                              searchResultsEntries.sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
                               
                               wanted = searchResults.keys.toSet();
                               if (context.mounted) {

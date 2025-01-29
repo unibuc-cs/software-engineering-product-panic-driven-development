@@ -1,10 +1,8 @@
 import 'dart:math';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mediamaster/Library.dart';
 import 'package:mediamaster/Services/provider_service.dart';
 import 'package:mediamaster/Widgets/themes.dart';
-import 'package:url_launcher/link.dart';
 import '../Models/game.dart';
 import 'media_widgets.dart';
 
@@ -406,25 +404,6 @@ Future<void> showIGDBImportDialog(BuildContext context, LibraryState<Game> libra
                 height: 100,
                 child: Column(
                   children: [
-                    Link(
-                      uri: Uri.parse('https://duckduckgo.com'), // TODO: Replace this with a link to some tutorial on getting the IGDB id.
-                      builder: (context, followLink) => RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'How to get IGDB ID',
-                              style: TextStyle(
-                                color: linkColor,
-                                decoration: TextDecoration.underline,
-                                fontSize: 22,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = followLink,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                     TextField(
                       controller: controller,
                       decoration: InputDecoration(

@@ -1,6 +1,8 @@
 // This file contains themes that we use throughout the app. This way we only need to modify this file.
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/link.dart';
 
 // All button styles get set using the filledButtonTheme as that member has a .style property.
 ThemeData greenFillButton(BuildContext context) => ThemeData(
@@ -96,4 +98,27 @@ Widget saveIcon(BuildContext context) => Icon(
     : Icons.save,
 );
 
-Color get linkColor => Color.fromARGB(255, 0, 128, 198);
+Color get linkColor => Color.fromARGB(255, 119, 164, 255);
+
+// This is modified from https://androidride.com/flutter-hyperlink-text/ first example
+Link displayLink(String uriLink, String displayText) => Link(
+  uri: Uri.parse(uriLink),
+  builder: (context, followLink) {
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: displayText,
+            style: TextStyle(
+              color: linkColor,
+              decoration: TextDecoration.underline,
+              fontSize: 22,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = followLink,
+          ),
+        ],
+      ),
+    );
+  },
+);

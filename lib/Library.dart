@@ -1232,6 +1232,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     setState(() {});
   }
 
+  // TODO: Remove this function
   Future<void> importIGDB(int igdbId, Map<String, dynamic> userData) async {
     Pair<Map<String, dynamic>, Game> result = await createGame(await getInfoIGDB({'id': igdbId}));
     await addToLibraryOrWishlist({
@@ -1248,8 +1249,6 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         MT,
         {
           'id': id,
-          // This is here because of GoodReads
-          'link': id,
         },
       )
     );
