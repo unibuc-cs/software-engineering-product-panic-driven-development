@@ -55,8 +55,6 @@ Future<Map<String, dynamic>> getByNameRequest(name, endpoint) async =>
 Future<bool> isTableEmpty(String table) async =>
   0 == await SupabaseManager.client.from(table).count();
 
-String _extractLinkName(String entry) => entry.replaceAll(RegExp(r'^https?://'), '').split('/')[0];
-
 Map<String, dynamic> createAttributes(String tableName, dynamic entry) => tableName == 'link'
   ? entry
   : {'name': entry};
@@ -113,8 +111,8 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
       for (String field in fields) {
         if (body[field] != null) {
           result[key]![field] = body[field];
-          body.remove(field);
         }
+        body.remove(field);
       }
     });
     result['${mediaType}Body'] = body;

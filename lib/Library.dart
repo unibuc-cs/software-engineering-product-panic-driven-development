@@ -1232,26 +1232,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     setState(() {});
   }
 
-  // TODO: Remove this function
-  Future<void> importIGDB(int igdbId, Map<String, dynamic> userData) async {
-    Pair<Map<String, dynamic>, Game> result = await createGame(await getInfoIGDB({'id': igdbId}));
-    await addToLibraryOrWishlist({
-        ...result.key,
-        ...userData,
-      },
-      result.value as MT,
-    );
-  }
-
   Future<void> import(dynamic id, Map<String, dynamic> userData) async {
-    Pair<Map<String, dynamic>, MT> result = await createMT(
-      await getInfoForType(
-        MT,
-        {
-          'id': id,
-        },
-      )
-    );
+    Pair<Map<String, dynamic>, MT> result = await createMT(await getInfoForType(MT, {'id': id}));
     await addToLibraryOrWishlist({
         ...result.key,
         ...userData,
