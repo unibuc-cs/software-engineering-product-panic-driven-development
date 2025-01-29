@@ -32,25 +32,21 @@ class Note implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'userid': userId,
-      'content': content,
-      'creationdate': creationDate.toIso8601String(),
-      'modifieddate': modifiedDate.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'     : mediaId,
+    'userid'      : userId,
+    'content'     : content,
+    'creationdate': creationDate.toIso8601String(),
+    'modifieddate': modifiedDate.toIso8601String(),
+  };
 
   @override
-  factory Note.from(Map<String, dynamic> json) {
-    return Note(
-      id: json['id'],
-      mediaId: json['mediaid'],
-      userId: json['userid'],
-      content: json['content'],
-      creationDate: DateTime.parse(json['creationdate']),
-      modifiedDate: DateTime.parse(json['modifieddate']),
-    );
-  }
+  factory Note.from(Map<String, dynamic> json) => Note(
+    id          : json['id'],
+    mediaId     : json['mediaid'],
+    userId      : json['userid'],
+    content     : json['content'],
+    creationDate: DateTime.parse(json['creationdate']),
+    modifiedDate: DateTime.parse(json['modifieddate']),
+  );
 }

@@ -57,12 +57,12 @@ Future<List<Map<String, dynamic>>> getOptionsHLTB(String query) async =>
 Future<Map<String, dynamic>> getInfoHLTB(Map<String, dynamic> game) async =>
   await _fetchInfo('howlongtobeat', game['id'].toString());
 
-// Goodreads, key is link
+// Goodreads, key is id
 Future<List<Map<String, dynamic>>> getOptionsBook(String query) async =>
   await _fetchOptions('goodreads', query);
 
 Future<Map<String, dynamic>> getInfoBook(Map<String, dynamic> book) async =>
-  await _fetchInfo('goodreads', book['link']);
+  await _fetchInfo('goodreads', book['id']);
 
 Future<List<Map<String, dynamic>>> getRecsBook(Map<String, dynamic> book) async =>
   await _fetchRecommendations('goodreads', book['goodreadslink']);

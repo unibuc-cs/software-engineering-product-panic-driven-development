@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mediamaster/Models/link.dart';
 import 'package:mediamaster/Services/anime_service.dart';
 import 'package:mediamaster/Services/book_service.dart';
+import 'package:mediamaster/Services/link_service.dart';
 import 'package:mediamaster/Services/manga_service.dart';
+import 'package:mediamaster/Services/media_link_service.dart';
 import '../Helpers/getters.dart';
 import '../Models/book.dart';
 import '../Models/game.dart';
@@ -157,6 +160,61 @@ dynamic getCustomizations(int mediaId, bool isWishlist) {
     .first;
 }
 
+Widget getLinkWidget(int mediaId) {
+  Set<int> ids = MediaLinkService
+    .instance
+    .items
+    .where((ml) => ml.mediaId == mediaId)
+    .map((ml) => ml.linkId)
+    .toSet();
+
+  if (ids.isEmpty) {
+    return Container();
+  }
+  
+  List<Link> links = LinkService
+    .instance
+    .items
+    .where((link) => ids.contains(link.id))
+    .toList();
+  
+  links.sort((la, lb) => la.name.compareTo(lb.name));
+
+  return Row(
+    children: [
+      SizedBox(
+        width: 45,
+      ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Useful links',
+            style: TextStyle(
+              color: Color.fromARGB(255, 255, 255, 255),
+              fontSize: 25,
+            ),
+          ),
+          for (Link link in links)
+            Row(
+              children: [
+                Icon(
+                  Icons.circle,
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  size: 10,
+                ),
+                SizedBox(
+                  width: 7,
+                ),
+                displayLink(link.href, link.name),
+              ],
+            ),
+        ],
+      )
+    ],
+  );
+}
+
 Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, bool isWishlist) {
   dynamic customizations = getCustomizations(media.id, isWishlist);
 
@@ -196,23 +254,33 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
                   children: [
                     Expanded(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           additionalButtons,
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                // Cover
-                                margin: const EdgeInsets.all(
-                                  20,
-                                ),
-                                child: Image(
-                                  image: NetworkImage(
-                                    coverUrl,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    // Cover
+                                    margin: const EdgeInsets.all(
+                                      20,
+                                    ),
+                                    child: Image(
+                                      image: NetworkImage(
+                                        coverUrl,
+                                      ),
+                                      width: 210,
+                                      height: 246,
+                                    ),
                                   ),
-                                  width: 210,
-                                  height: 246,
-                                ),
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: getLinkWidget(media.id),
+                                  ),
+                                ],
                               ),
                               Expanded(
                                 child: Container(

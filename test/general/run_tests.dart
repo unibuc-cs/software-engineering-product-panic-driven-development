@@ -16,6 +16,8 @@ void runTests({
     'media_publisher',
     'media_retailer',
     'media_series',
+    'media_user_source',
+    'media_user_tag',
     'anime',
     'book',
     'game',

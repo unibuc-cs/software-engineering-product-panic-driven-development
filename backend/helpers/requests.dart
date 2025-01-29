@@ -52,10 +52,11 @@ Future<Map<String, dynamic>> postRequest(body, endpoint) async =>
 Future<Map<String, dynamic>> getByNameRequest(name, endpoint) async =>
   await _makeRequest('GET', '/$endpoint/name?query=$name');
 
-String _extractLinkName(String entry) => entry.replaceAll(RegExp(r'^https?://'), '').split('/')[0];
+Future<bool> isTableEmpty(String table) async =>
+  0 == await SupabaseManager.client.from(table).count();
 
 Map<String, dynamic> createAttributes(String tableName, dynamic entry) => tableName == 'link'
-  ? {'name': _extractLinkName(entry), 'href': entry}
+  ? entry
   : {'name': entry};
 
 Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
@@ -110,8 +111,8 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
       for (String field in fields) {
         if (body[field] != null) {
           result[key]![field] = body[field];
-          body.remove(field);
         }
+        body.remove(field);
       }
     });
     result['${mediaType}Body'] = body;
@@ -263,6 +264,7 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     }());
   }
   await Future.wait(tasks);
+  tasks.clear();
   removeIfEmpty(result, 'series');
 
   if (body['mediaseriesBody']?['series'].length == 0) {
@@ -272,9 +274,10 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     return sendOk(result);
   }
 
+  // TODO: This adds "empty" medias in the database. If we want this then implement in frontend as well
+  /*
   // Check here in case of errors with the series
   int seriesId = seriesList[0]['id'];
-  tasks.clear();
 
   for (var entry in body['mediaseriesBody']?['series']) {
     tasks.add(() async {
@@ -321,10 +324,124 @@ Future<Response> createMediaType(Map<String, dynamic> initialBody) async {
     }());
   }
   await Future.wait(tasks);
+  tasks.clear();
+  */
 
   removeIfEmpty(result, 'related_medias');
   removeIfEmpty(result, 'related_$mediaTypePlural');
   removeIfEmpty(result, 'mediaseries');
 
   return sendOk(result);
+}
+
+Future<void> seedData() async {
+  if (await isTableEmpty('source')) {
+    var sourcesToAddForAll = [
+      'digital',
+      'physical',
+    ];
+
+    // TODO: Add other sources
+    var sourcesToAddForStreaming = [
+      'Amazon Prime',
+      'Disney+'
+      'HBO Max',
+      'Hulu',
+      'Netflix',
+    ];
+
+    var sourcesToAddForAnime = [
+      'Crunchyroll',
+      'Funimation',
+    ];
+
+    var sourcesToAddForBook = [
+      'Internet Archive',
+      'Zlibrary',
+    ];
+
+    var sourcesToAddForGame = [
+      'Amazon Games',
+      'Battle.net',
+      'EA Origin',
+      'Epic Games',
+      'GOG',
+      'Playstation',
+      'Riot Games',
+      'Rockstar Games',
+      'REDLauncher',
+      'Steam',
+      'Ubisoft Connect',
+      'Xbox',
+      'Xbox Game Pass',
+    ];
+
+    var sourcesToAddForManga = [
+      'K Manga',
+    ];
+
+    List<Map<String, String>> sources = [];
+    Map<String, List<String>> sourcesToAdd = {
+      'all'      : sourcesToAddForAll,
+      'streaming': sourcesToAddForStreaming,
+      'anime'    : sourcesToAddForAnime,
+      'book'     : sourcesToAddForBook,
+      'game'     : sourcesToAddForGame,
+      'manga'    : sourcesToAddForManga,
+    };
+
+    sourcesToAdd.forEach((mediaType, sourcesList) =>
+      sourcesList.forEach((sourceName) =>
+        sources.add({
+          'name'     : sourceName,
+          'mediatype': mediaType,
+        })
+      )
+    );
+
+    await SupabaseManager.client.from('source').insert(sources);
+  }
+
+  if (await isTableEmpty('genre')) {
+    var genresToAdd = [
+      'Shooter',
+      'Strategy',
+      'Role Playing',
+      'Survival',
+      'Fighting',
+      'Horror',
+      'Sandbox',
+      'Tower Defense',
+      'Simulator',
+      'Action',
+      'Adventure',
+      'Party Game',
+      'Trivia',
+      'Puzzle',
+      'Board Game',
+      'Sports',
+      'Racing',
+      'Rhythm',
+      'Platformer',
+      'Battle Royale',
+      'Metroidvania',
+      'Roguelike',
+      'Soulslike',
+      'Idle',
+      'Open World',
+      'Point and Click',
+      'Real Time Strategy',
+      'Visual Novel',
+      'Superhero',
+      'Stealth',
+      'Detective',
+      'Management',
+      'Comedy',
+      'Difficult',
+      'Cooking',
+      'MOBA',
+    ];
+
+    await SupabaseManager.client.from('genre').insert(genresToAdd.map((genreName) => {'name': genreName}).toList());
+  }
 }

@@ -24,17 +24,13 @@ class Series implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'name': name,
+  };
 
   @override
-  factory Series.from(Map<String, dynamic> json) {
-    return Series(
-      id: json['id'],
-      name: json['name'],
-    );
-  }
+  factory Series.from(Map<String, dynamic> json) => Series(
+    id  : json['id'],
+    name: json['name'],
+  );
 }

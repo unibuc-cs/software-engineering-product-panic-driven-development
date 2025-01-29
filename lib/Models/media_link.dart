@@ -7,7 +7,7 @@ class MediaLink implements Model {
 
   MediaLink({
     required this.mediaId,
-    required this.linkId
+    required this.linkId,
   });
 
   static String get endpoint => 'medialinks';
@@ -17,7 +17,8 @@ class MediaLink implements Model {
     if (runtimeType != other.runtimeType) {
       return false;
     }
-    return mediaId == (other as MediaLink).mediaId && linkId == other.linkId;
+    return mediaId == (other as MediaLink).mediaId &&
+           linkId == other.linkId;
   }
 
   @override
@@ -27,18 +28,14 @@ class MediaLink implements Model {
   dynamic get id => [mediaId, linkId];
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'linkid': linkId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid': mediaId,
+    'linkid' : linkId,
+  };
 
   @override
-  factory MediaLink.from(Map<String, dynamic> json) {
-    return MediaLink(
-      mediaId: json['mediaid'],
-      linkId: json['linkid'],
-    );
-  }
+  factory MediaLink.from(Map<String, dynamic> json) => MediaLink(
+    mediaId: json['mediaid'],
+    linkId : json['linkid'],
+  );
 }

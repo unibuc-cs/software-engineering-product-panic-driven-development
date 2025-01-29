@@ -1,4 +1,5 @@
 import 'auth.dart';
+import 'media_user_sources.dart';
 import 'notes.dart';
 import 'anime.dart';
 import 'books.dart';
@@ -13,6 +14,7 @@ import 'seasons.dart';
 import 'creators.dart';
 import 'platforms.dart';
 import 'retailers.dart';
+import 'sources.dart';
 import 'tv_series.dart';
 import 'user_tags.dart';
 import 'wishlists.dart';
@@ -50,6 +52,7 @@ RouterPlus apiRouter() {
   router.mount('/movies', moviesRouter().call);
   router.mount('/series', seriesRouter().call);
   router.mount('/seasons', seasonsRouter().call);
+  router.mount('/sources', sourcesRouter().call);
   router.mount('/creators', creatorsRouter().call);
   router.mount('/tvseries', TVSeriesRouter().call);
   router.mount('/platforms', platformsRouter().call);
@@ -69,6 +72,7 @@ RouterPlus apiRouter() {
   router.mount('/gameachievements', gameAchievementsRouter().call);
   router.mount('/mediausers', requireAuth(mediaUsersRouter().call));
   router.mount('/mediausertags', requireAuth(mediaUserTagsRouter().call));
+  router.mount('/mediausersources', requireAuth(mediaUserSourcesRouter().call));
   router.mount('/userachievements', requireAuth(userAchievementsRouter().call));
 
   router.get('/health', (Request request) {

@@ -24,17 +24,13 @@ class Retailer implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'name': name,
+  };
 
   @override
-  factory Retailer.from(Map<String, dynamic> json) {
-    return Retailer(
-      id: json['id'],
-      name: json['name'],
-    );
-  }
+  factory Retailer.from(Map<String, dynamic> json) => Retailer(
+    id  : json['id'],
+    name: json['name'],
+  );
 }

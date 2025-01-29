@@ -11,11 +11,11 @@ class Book extends MediaType implements Model {
   String goodreadsLink;
 
   Book({
-    this.id = -1,
     required this.mediaId,
-    this.language = '',
-    this.totalPages = 0,
-    this.format = '',
+    this.id            = -1,
+    this.language      = '',
+    this.totalPages    = 0,
+    this.format        = '',
     this.goodreadsLink = '',
   });
 
@@ -30,33 +30,27 @@ class Book extends MediaType implements Model {
   }
 
   @override
-  int getMediaId() {
-    return mediaId;
-  }
+  int getMediaId() => mediaId;
 
   @override
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'language': language,
-      'totalpages': totalPages,
-      'format': format,
-      'goodreadslink': goodreadsLink,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'      : mediaId,
+    'language'     : language,
+    'totalpages'   : totalPages,
+    'format'       : format,
+    'goodreadslink': goodreadsLink,
+  };
 
   @override
-  factory Book.from(Map<String, dynamic> json) {
-    return Book(
-      id: json['id'],
-      mediaId: json['mediaid'],
-      language: json['language'] ?? '',
-      totalPages: json['totalpages'] ?? 0,
-      format: json['format'] ?? '',
-      goodreadsLink: json['goodreadslink'] ?? '',
-    );
-  }
+  factory Book.from(Map<String, dynamic> json) => Book(
+    id           : json['id'],
+    mediaId      : json['mediaid'],
+    language     : json['language'] ?? '',
+    totalPages   : json['totalpages'] ?? 0,
+    format       : json['format'] ?? '',
+    goodreadsLink: json['goodreadslink'] ?? '',
+  );
 }

@@ -24,13 +24,13 @@ class Media implements Model {
   String mediaType;
 
   Media({
-    this.id = -1,
     required this.originalName,
-    this.description = '',
+    required this.mediaType,
     this.releaseDate,
-    this.criticScore = 0,
+    this.id             = -1,
+    this.description    = '',
+    this.criticScore    = 0,
     this.communityScore = 0,
-    required this.mediaType
   });
 
   static String get endpoint => 'medias';
@@ -47,29 +47,25 @@ class Media implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'originalname': originalName,
-      'description': description,
-      'releasedate': releaseDate?.toIso8601String(),
-      'criticscore': criticScore,
-      'communityscore': communityScore,
-      'mediatype': mediaType,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'originalname'  : originalName,
+    'description'   : description,
+    'releasedate'   : releaseDate?.toIso8601String(),
+    'criticscore'   : criticScore,
+    'communityscore': communityScore,
+    'mediatype'     : mediaType,
+  };
 
   @override
-  factory Media.from(Map<String, dynamic> json) {
-    return Media(
-      id: json['id'],
-      originalName: json['originalname'],
-      description: json['description'] ?? '',
-      releaseDate: json['releasedate'] == null ? null : DateTime.parse(json['releasedate']),
-      criticScore: json['criticscore'] ?? 0,
-      communityScore: json['communityscore'] ?? 0,
-      mediaType: json['mediatype'],
-    );
-  }
+  factory Media.from(Map<String, dynamic> json) => Media(
+    id            : json['id'],
+    originalName  : json['originalname'],
+    description   : json['description'] ?? '',
+    releaseDate   : json['releasedate'] == null ? null : DateTime.parse(json['releasedate']),
+    criticScore   : json['criticscore'] ?? 0,
+    communityScore: json['communityscore'] ?? 0,
+    mediaType     : json['mediatype'],
+  );
 
   List<Publisher> get publishers {
     Set<int> ids = MediaPublisherService

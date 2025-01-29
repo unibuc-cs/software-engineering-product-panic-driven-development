@@ -7,7 +7,7 @@ class Genre implements Model {
 
   Genre({
     this.id = -1,
-    required this.name
+    required this.name,
   });
 
   static String get endpoint => 'genres';
@@ -24,17 +24,13 @@ class Genre implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'name': name,
+  };
 
   @override
-  factory Genre.from(Map<String, dynamic> json) {
-    return Genre(
-      id: json['id'],
-      name: json['name'],
-    );
-  }
+  factory Genre.from(Map<String, dynamic> json) => Genre(
+    id  : json['id'],
+    name: json['name'],
+  );
 }

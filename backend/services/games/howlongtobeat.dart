@@ -72,7 +72,7 @@ class HowLongToBeat extends Provider {
 
   Future<List<Map<String, dynamic>>> _getGameOptions(String gameName) async {
     try {
-      final scriptPath = p.join(Directory.current.path, 'assets', 'howlongtobeat.py');
+      final scriptPath = p.join(Directory.current.path, 'assets', 'python', 'howlongtobeat.py');
       var result = await Process.run(
         'python',
         [scriptPath, gameName],

@@ -23,18 +23,18 @@ class MediaUser implements Model {
     required this.mediaId,
     required this.userId,
     required this.name,
-    this.userScore = 0,
     required this.addedDate,
-    this.coverImage = '',
-    this.status = '',
-    this.series = '',
-    this.icon = '',
-    this.backgroundImage = '',
     required this.lastInteracted,
-    this.gameTime = 0,
-    this.bookReadPages = 0,
-    this.nrEpisodesSeen = 0,
-    this.mangaReadChapters = 0,
+    this.userScore           = 0,
+    this.coverImage          = '',
+    this.status              = '',
+    this.series              = '',
+    this.icon                = '',
+    this.backgroundImage     = '',
+    this.gameTime            = 0,
+    this.bookReadPages       = 0,
+    this.nrEpisodesSeen      = 0,
+    this.mangaReadChapters   = 0,
     this.movieSecondsWatched = 0,
   });
 
@@ -55,46 +55,42 @@ class MediaUser implements Model {
   dynamic get id => mediaId;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid'            : mediaId,
-      'userid'             : userId,
-      'name'               : name,
-      'userscore'          : userScore,
-      'addeddate'          : addedDate.toIso8601String(),
-      'coverimage'         : coverImage,
-      'status'             : status,
-      'series'             : series,
-      'icon'               : icon,
-      'backgroundimage'    : backgroundImage,
-      'lastinteracted'     : lastInteracted.toIso8601String(),
-      'gametime'           : gameTime,
-      'bookreadpages'      : bookReadPages,
-      'nrepisodesseen'     : nrEpisodesSeen,
-      'mangareadchapters'  : mangaReadChapters,
-      'moviesecondswatched': movieSecondsWatched,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'            : mediaId,
+    'userid'             : userId,
+    'name'               : name,
+    'userscore'          : userScore,
+    'addeddate'          : addedDate.toIso8601String(),
+    'coverimage'         : coverImage,
+    'status'             : status,
+    'series'             : series,
+    'icon'               : icon,
+    'backgroundimage'    : backgroundImage,
+    'lastinteracted'     : lastInteracted.toIso8601String(),
+    'gametime'           : gameTime,
+    'bookreadpages'      : bookReadPages,
+    'nrepisodesseen'     : nrEpisodesSeen,
+    'mangareadchapters'  : mangaReadChapters,
+    'moviesecondswatched': movieSecondsWatched,
+  };
 
   @override
-  factory MediaUser.from(Map<String, dynamic> json) {
-    return MediaUser(
-      mediaId            : json['mediaid'],
-      userId             : json['userid'],
-      name               : json['name'],
-      userScore          : json['userscore'] ?? 0,
-      addedDate          : DateTime.parse(json['addeddate']),
-      coverImage         : json['coverimage'] ?? '',
-      status             : json['status'] ?? '',
-      series             : json['series'] ?? '',
-      icon               : json['icon'] ?? '',
-      backgroundImage    : json['backgroundimage'] ?? '',
-      lastInteracted     : DateTime.parse(json['lastinteracted']),
-      gameTime           : json['gametime'] ?? 0,
-      bookReadPages      : json['bookreadpages'] ?? 0,
-      nrEpisodesSeen     : json['nrepisodesseen'] ?? 0,
-      mangaReadChapters  : json['mangareadchapters'] ?? 0,
-      movieSecondsWatched: json['moviesecondswatched'] ?? 0,
-    );
-  }
+  factory MediaUser.from(Map<String, dynamic> json) => MediaUser(
+    mediaId            : json['mediaid'],
+    userId             : json['userid'],
+    name               : json['name'],
+    userScore          : json['userscore'] ?? 0,
+    addedDate          : DateTime.parse(json['addeddate']),
+    coverImage         : json['coverimage'] ?? '',
+    status             : json['status'] ?? '',
+    series             : json['series'] ?? '',
+    icon               : json['icon'] ?? '',
+    backgroundImage    : json['backgroundimage'] ?? '',
+    lastInteracted     : DateTime.parse(json['lastinteracted']),
+    gameTime           : json['gametime'] ?? 0,
+    bookReadPages      : json['bookreadpages'] ?? 0,
+    nrEpisodesSeen     : json['nrepisodesseen'] ?? 0,
+    mangaReadChapters  : json['mangareadchapters'] ?? 0,
+    movieSecondsWatched: json['moviesecondswatched'] ?? 0,
+  );
 }

@@ -29,20 +29,16 @@ class UserAchievement implements Model {
   dynamic get id => achievementId;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'userid': userId,
-      'achievementid': achievementId,
-      'unlockdate': unlockDate.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'userid'       : userId,
+    'achievementid': achievementId,
+    'unlockdate'   : unlockDate.toIso8601String(),
+  };
 
   @override
-  factory UserAchievement.from(Map<String, dynamic> json) {
-    return UserAchievement(
-      userId: json['userid'],
-      achievementId: json['achievementid'],
-      unlockDate: DateTime.parse(json['unlockdate']),
-    );
-  }
+  factory UserAchievement.from(Map<String, dynamic> json) => UserAchievement(
+    userId       : json['userid'],
+    achievementId: json['achievementid'],
+    unlockDate   : DateTime.parse(json['unlockdate']),
+  );
 }

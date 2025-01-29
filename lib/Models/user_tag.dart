@@ -28,21 +28,17 @@ class UserTag implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'userid'   : userId,
-      'name'     : name,
-      'mediatype': mediaType,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'userid'   : userId,
+    'name'     : name,
+    'mediatype': mediaType,
+  };
 
   @override
-  factory UserTag.from(Map<String, dynamic> json) {
-    return UserTag(
-      id       : json['id'],
-      userId   : json['userid'],
-      name     : json['name'],
-      mediaType: json['mediatype'],
-    );
-  }
+  factory UserTag.from(Map<String, dynamic> json) => UserTag(
+    id       : json['id'],
+    userId   : json['userid'],
+    name     : json['name'],
+    mediaType: json['mediatype'],
+  );
 }

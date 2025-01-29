@@ -1,7 +1,5 @@
 import 'package:mediamaster/Widgets/themes.dart';
-
 import 'UserSystem.dart';
-
 import 'Main.dart';
 import 'Library.dart';
 import 'Models/game.dart';
@@ -12,7 +10,6 @@ import 'Models/movie.dart';
 import 'Models/tv_series.dart';
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
-
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -41,16 +38,78 @@ class Menu extends StatefulWidget {
   const Menu({super.key});
 
   @override
-  MenuState createState() => MenuState();
+  State<StatefulWidget> createState() {
+    return MenuState();
+  }
 }
 
+enum MenuMediaType { Game, Book, Anime, Manga, Movie, TV_Series }
+
 class MenuState extends State<Menu> {
+  Map<MenuMediaType, Map<String, dynamic>> mapping = {
+    MenuMediaType.Anime: {
+      'backgroundImageHref': 'https://wallpaperaccess.com/full/39033.png',
+      'name': 'Anime',
+      'library': Library<Anime>(isWishlist: false),
+    },
+    MenuMediaType.Book: {
+      'backgroundImageHref': 'https://i.imgur.com/E15s94V.jpg',
+      'name': 'Books',
+      'library': Library<Book>(isWishlist: false),
+    },
+    MenuMediaType.Game: {
+      'backgroundImageHref': 'https://i.imgur.com/IjfhWy4.jpeg',
+      'name': 'Games',
+      'library': Library<Game>(isWishlist: false),
+    },
+    MenuMediaType.Manga: {
+      'backgroundImageHref': 'https://i.imgur.com/spRpvE7.png',
+      'name': 'Manga',
+      'library': Library<Manga>(isWishlist: false),
+    },
+    MenuMediaType.Movie: {
+      'backgroundImageHref': 'https://wallpaperset.com/w/full/2/7/8/366144.jpg',
+      'name': 'Movies',
+      'library': Library<Movie>(isWishlist: false),
+    },
+    MenuMediaType.TV_Series: {
+      'backgroundImageHref': 'https://wallpaperaccess.com/full/3726170.jpg',
+      'name': 'TV Series',
+      'library': Library<TVSeries>(isWishlist: false),
+    },
+  };
+
+  List<List<MenuMediaType>> matrixOrder = [
+    [
+      MenuMediaType.Game,
+      MenuMediaType.Anime,
+      MenuMediaType.Movie,
+    ],
+    [
+      MenuMediaType.Book,
+      MenuMediaType.Manga,
+      MenuMediaType.TV_Series,
+    ],
+  ];
+
+  void preload() {
+    for (MenuMediaType type in mapping.keys) {
+      mapping[type]!['backgroundImage'] = NetworkImage(
+        mapping[type]!['backgroundImageHref'] as String,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    preload();
+
+    MenuMediaType currentRendering = MenuMediaType.Game;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
-        actions: <Widget>[
+        actions: [
           IconButton(
             onPressed: () {
               AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
@@ -74,78 +133,67 @@ class MenuState extends State<Menu> {
               tooltip: 'Log out'),
         ],
       ),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Library<Game>(isWishlist: false),
-                ));
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('Games'),
+      body: StatefulBuilder(
+        builder: (context, setState) {
+          Widget option(MenuMediaType type) => InkWell(
+            child: Container(
+              constraints: BoxConstraints(
+                minHeight: 50,
+                minWidth: 130,
+              ),
+              child: Card(
+                child: Center(
+                  widthFactor: 1,
+                  heightFactor: 1,
+                  child: Text(
+                    mapping[type]!['name'],
+                    style: titleStyle,
+                  ),
+                ),
+                borderOnForeground: true,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Library<Book>(isWishlist: false),
-                ));
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('Books'),
+            onHover: (bool hover) {
+              if (hover) {
+                currentRendering = type;
+                setState(() {});
+              }
+            },
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => mapping[type]!['library']!,
+              ));
+            },
+          );
+
+          return Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: mapping[currentRendering]!['backgroundImage'],
+                fit: BoxFit.cover,
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Library<Anime>(isWishlist: false),
-                ));
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('Anime'),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (List<MenuMediaType> row in matrixOrder)
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        for (MenuMediaType type in row)
+                          option(type),
+                      ],
+                    ),
+                  ),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Library<Manga>(isWishlist: false),
-                ));
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('Manga'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Library<Movie>(isWishlist: false),
-                ));
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('Movies'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Library<TVSeries>(isWishlist: false),
-                ));
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('TV Series'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

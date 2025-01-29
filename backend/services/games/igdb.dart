@@ -9,14 +9,34 @@ class IGDB extends Provider {
   late final Map<String, String> _params;
   String _accessToken = '';
   String _cover = '';
-  final List<String>  _artworks    = [];
-  final List<String>  _collections = [];
-  final List<dynamic> _developers  = [];
-  final List<String>  _franchises  = [];
-  final List<String>  _genres      = [];
-  final List<dynamic> _platforms   = [];
-  final List<dynamic> _publishers  = [];
-  final List<String>  _websites    = [];
+  final List<String>  _artworks                = [];
+  final List<String>  _collections             = [];
+  final List<dynamic> _developers              = [];
+  final List<String>  _franchises              = [];
+  final List<String>  _genres                  = [];
+  final List<dynamic> _platforms               = [];
+  final List<dynamic> _publishers              = [];
+  final List<Map<String, dynamic>> _websites   = [];
+  final Map<int, String> _urlMapping = {
+    1 : 'Official',
+    2 : 'Wikia',
+    3 : 'Wikipedia',
+    4 : 'Facebook',
+    5 : 'Twitter',
+    6 : 'Twitch',
+    8 : 'Instagram',
+    9 : 'Youtube',
+    10: 'iPhone',
+    11: 'iPad',
+    12: 'Android',
+    13: 'Steam',
+    14: 'Reddit',
+    15: 'Itch',
+    16: 'Epic Games',
+    17: 'GOG',
+    18: 'Discord',
+    19: 'Bluesky',
+  };
 
   // Public constructor
   IGDB() {
@@ -251,18 +271,20 @@ class IGDB extends Provider {
     catch (_) {}
   }
 
-  Future<void> _getWebsites(
-      String accessToken, Map<String, dynamic> game) async {
+  Future<void> _getWebsites(String accessToken, Map<String, dynamic> game) async {
     try {
       final response = await _makeRequest(
         'websites',
         headers: _authHeaders(accessToken),
-        body: 'fields url; where game = ${game['id']};'
+        body: 'fields category,url; where game = ${game['id']};'
       );
 
       if (response != null) {
         for (var website in jsonDecode(response.body)) {
-          _websites.add(website['url']);
+          _websites.add({
+            'name': _urlMapping[website['category']] ?? 'Unknown',
+            'href': website['url'],
+          });
         }
       }
     }
@@ -490,7 +512,7 @@ class IGDB extends Provider {
 
       if (game['websites'] != null) {
         await _getWebsites(_accessToken, game);
-        game['links'] = _websites.toSet().toList();
+        game['links'] = _websites;
         game.remove('websites');
       }
       return game;

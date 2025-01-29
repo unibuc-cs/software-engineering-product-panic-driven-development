@@ -25,6 +25,7 @@ class RouterDefault extends RouterBase {
     Map<String, dynamic> populateInCreate = const {},
     List<String> discardInUpdate          = const ['id'],
     bool dependencyInDelete               = true,
+    bool userDependency                   = false,
     bool noDelete                         = false,
   }): super(resource) {
     Map<String, dynamic> _filters(Request req, [Map<String, dynamic> filters = const {}]) => {
@@ -100,7 +101,7 @@ class RouterDefault extends RouterBase {
       }
 
       if (dependencyInDelete) {
-        await SupabaseManager('media${resource}').delete(filters: {
+        await SupabaseManager('media${userDependency ? 'user' : ''}${resource}').delete(filters: {
           '${resource}id': id,
         });
       }
@@ -115,12 +116,13 @@ class RouterDefault extends RouterBase {
 class RouterMedia extends RouterBase {
   RouterMedia({
     required String resource,
-    bool requiresUser = false,
+    bool requiresUser   = false,
+    bool userDependency = false,
   }): super('media${requiresUser ? 'user' : ''}${resource}') {
     Future<void> _validate(Map<String, dynamic> body, String idField) async =>
       await Future.wait({
         'media': 'mediaid',
-        '${requiresUser ? 'user' : ''}${idField.split('id').first}': idField,
+        '${userDependency ? 'user' : ''}${idField.split('id').first}': idField,
       }.entries.map((entry) async => await validateExistence(body[entry.value], entry.key)));
 
     Map<String, dynamic> _filters(Request req, [String mediaId = '', Map<String, dynamic> filters = const {}]) => {

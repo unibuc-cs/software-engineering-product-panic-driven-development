@@ -7,7 +7,7 @@ class MediaPublisher implements Model {
 
   MediaPublisher({
     required this.mediaId,
-    required this.publisherId
+    required this.publisherId,
   });
 
   static String get endpoint => 'mediapublishers';
@@ -18,7 +18,7 @@ class MediaPublisher implements Model {
       return false;
     }
     return mediaId == (other as MediaPublisher).mediaId &&
-        publisherId == other.publisherId;
+           publisherId == other.publisherId;
   }
 
   @override
@@ -28,18 +28,14 @@ class MediaPublisher implements Model {
   dynamic get id => [mediaId, publisherId];
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'publisherid': publisherId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'    : mediaId,
+    'publisherid': publisherId,
+  };
 
   @override
-  factory MediaPublisher.from(Map<String, dynamic> json) {
-    return MediaPublisher(
-      mediaId: json['mediaid'],
-      publisherId: json['publisherid'],
-    );
-  }
+  factory MediaPublisher.from(Map<String, dynamic> json) => MediaPublisher(
+    mediaId    : json['mediaid'],
+    publisherId: json['publisherid'],
+  );
 }

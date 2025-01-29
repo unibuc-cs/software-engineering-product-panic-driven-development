@@ -10,11 +10,11 @@ class Movie extends MediaType implements Model {
   int TMDBId;
 
   Movie({
-    this.id = -1,
     required this.mediaId,
-    this.language = '',
+    this.id                = -1,
+    this.language          = '',
     this.durationInSeconds = 0,
-    this.TMDBId = -1,
+    this.TMDBId            = -1,
   });
 
   static String get endpoint => 'movies';
@@ -28,9 +28,7 @@ class Movie extends MediaType implements Model {
   }
 
   @override
-  int getMediaId() {
-    return mediaId;
-  }
+  int getMediaId() => mediaId;
 
   @override
   int get hashCode => id;

@@ -11,12 +11,12 @@ class Anime extends MediaType implements Model {
   int anilistId;
 
   Anime({
-    this.id = -1,
     required this.mediaId,
-    this.language = '',
-    this.nrEpisodes = 0,
+    this.id              = -1,
+    this.language        = '',
+    this.nrEpisodes      = 0,
     this.episodeDuration = 0,
-    this.anilistId = -1,
+    this.anilistId       = -1,
   });
 
   static String get endpoint => 'anime';
@@ -30,33 +30,27 @@ class Anime extends MediaType implements Model {
   }
 
   @override
-  int getMediaId() {
-    return mediaId;
-  }
+  int getMediaId() => mediaId;
 
   @override
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'language': language,
-      'nrepisodes': nrEpisodes,
-      'episodeduration': episodeDuration,
-      'anilistid': anilistId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid'        : mediaId,
+    'language'       : language,
+    'nrepisodes'     : nrEpisodes,
+    'episodeduration': episodeDuration,
+    'anilistid'      : anilistId,
+  };
 
   @override
-  factory Anime.from(Map<String, dynamic> json) {
-    return Anime(
-      id: json['id'],
-      mediaId: json['mediaid'],
-      language: json['language'] ?? '',
-      nrEpisodes: json['nrepisodes'] ?? 0,
-      episodeDuration: json['episodeduration'] ?? 0,
-      anilistId: json['anilistid'] ?? -1,
-    );
-  }
+  factory Anime.from(Map<String, dynamic> json) => Anime(
+    id             : json['id'],
+    mediaId        : json['mediaid'],
+    language       : json['language'] ?? '',
+    nrEpisodes     : json['nrepisodes'] ?? 0,
+    episodeDuration: json['episodeduration'] ?? 0,
+    anilistId      : json['anilistid'] ?? -1,
+  );
 }

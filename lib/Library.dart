@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 
 import 'Helpers/getters.dart';
-import 'Helpers/steam_import.dart';
 import 'Models/user_tag.dart';
 import 'Models/book.dart';
 import 'Models/game.dart';
@@ -356,28 +355,24 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   Widget build(BuildContext context) {
     _setSearchText();
 
-    IconButton? butonSearchReset;
-    if (searchFilterQuery == '') {
-      butonSearchReset = IconButton(
-        onPressed: () {
-          /*TODO: The search box gets activated only if you hold down at least 2 frames, 
-          I do not know the function to activate it when pressing this button. 
-          I also do not know if this should be our priority right now*/
-        },
-        icon: const Icon(Icons.search),
-      );
-    }
-    else {
-      butonSearchReset = IconButton(
-        onPressed: () {
-          setState(() {
-            _clearSearchFilter();
-            searchController.clear();
-          });
-        },
-        icon: const Icon(Icons.clear),
-      );
-    }
+    IconButton butonSearchReset = searchFilterQuery == ''
+      ? IconButton(
+          onPressed: () {
+            /*TODO: The search box gets activated only if you hold down at least 2 frames, 
+            I do not know the function to activate it when pressing this button. 
+            I also do not know if this should be our priority right now*/
+          },
+          icon: const Icon(Icons.search),
+        )
+      : IconButton(
+          onPressed: () {
+            setState(() {
+              _clearSearchFilter();
+              searchController.clear();
+            });
+          },
+          icon: const Icon(Icons.clear),
+        );
 
     String oppositeLibraryWishlistBig = isWishlist ? 'Library' : 'Wishlist';
 
@@ -477,15 +472,15 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                       icon: const Icon(Icons.filter_alt),
                       tooltip: 'Filter ${getForType(MT, "dbNamePlural")}',
                     ),
-                    if (!isWishlist && MT == Game) // Steam import button
+                    if (!isWishlist) // Library import button
                       IconButton(
                         onPressed: () async {
-                          await importSteam(context, this);
+                          await getImporterForType(MT).import(context, this);
                         },
                         icon: Icon(
                           Icons.library_add_outlined,
                         ),
-                        tooltip: 'Import from Steam',
+                        tooltip: 'Import from ${getImporterNameForType(MT)}',
                       ),
                     if (MT == Game) // IGDB import button
                       IconButton(
@@ -1054,6 +1049,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     setState(() {});
   }
 
+  // This function receives the result of getInfoIGDB and creates (if needed) the game in the db. It returns extra data and the game (created or received from the db)
   Future<Pair<Map<String, dynamic>, Game>> createGame(Map<String, dynamic> gameData) async {
     String name = gameData['originalname'];
     Game? nullableGame = mediaAlreadyInDB(name) as Game?;
@@ -1123,6 +1119,33 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
     gameData['name'] = name;
     return Pair(gameData, nullableGame);
+  }
+
+  // This function receives the result of getInfo and creates (if needed) the MT in the db. It returns extra data and the MT (created or received from the db)
+  // This should be called for basic MTs, like Anime or Book for which there is no other special logic or provider to be called
+  Future<Pair<Map<String, dynamic>, MT>> createMTBasic(Map<String, dynamic> mtData) async {
+    mtData[getAttributeNameForType(MT)] = mtData[getOldAttributeNameForType(MT)];
+    String name = mtData['originalname'];
+    MT? nullableMT = mediaAlreadyInDB(name);
+
+    if (nullableMT == null) {
+      nullableMT = await getServiceInstanceForType(MT).create(mtData);
+    }
+
+    mtData['name'] = mtData['originalname'];
+    return Pair(mtData, nullableMT!);
+  }
+
+  // This function receives the result of getInfo and creates (if needed) the MT in the db. It returns extra data and the MT (created or received from the db)
+  Future<Pair<Map<String, dynamic>, MT>> createMT(Map<String, dynamic> mtData) async {
+    if (MT == Game) {
+      // It has a special function because it has more providers and data stored.
+      return await createGame(mtData) as Pair<Map<String, dynamic>, MT>;
+    }
+    if ({Anime, Book, Manga, Movie, TVSeries}.contains(MT)) {
+      return await createMTBasic(mtData);
+    }
+    throw UnimplementedError('Create is not defined for ${getMediaTypeDbNameCapitalize(MT)}');
   }
 
   // Despite its name, this function only connects the User and the MT. Speciffic data is being sent throught the data parameter
@@ -1209,36 +1232,22 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     setState(() {});
   }
 
+  Future<void> import(dynamic id, Map<String, dynamic> userData) async {
+    Pair<Map<String, dynamic>, MT> result = await createMT(await getInfoForType(MT, {'id': id}));
+    await addToLibraryOrWishlist({
+        ...result.key,
+        ...userData,
+      },
+      result.value,
+    );
+  }
+
   // This function creates the Media object and the speciffic MediaType object in the database. After that it connects the user to the MediaType object with either MediaUser or Wishlist
   Future<void> addMediaType(Map<String, dynamic> option) async {
     if (UserSystem.instance.currentUserData == null) {
       return;
     }
-
-    // TODO: when adding a mediaType, you also add the others in the series, which are added with minimum content,
-    // so if the media is already in db but has minimum content, we should still do the api calls at this stage
-    Pair<Map<String, dynamic>, MT> result;
-
-    if (MT == Game) {
-      result = await createGame(await getInfoIGDB(option)) as Pair<Map<String, dynamic>, MT>;
-    }
-    else if (MT == Anime || MT == Book || MT == Manga || MT == Movie || MT == TVSeries) {
-      var data = await getInfoForType(MT, option);
-      data[getAttributeNameForType(MT)] = data[getOldAttributeNameForType(MT)];
-      String name = data['originalname'];
-      MT? nullableMT = mediaAlreadyInDB(name);
-
-      if (nullableMT == null) {
-        nullableMT = await getServiceInstanceForType(MT).create(data);
-      }
-
-      data['name'] = data['originalname'];
-      result = Pair(data, nullableMT as MT);
-    }
-    else {
-      throw UnimplementedError('AddMediaType with for type $MT is not implemented!');
-    }
-
+    Pair<Map<String, dynamic>, MT> result = await createMT(await getInfoForType(MT, option));
     await addToLibraryOrWishlist(result.key, result.value);
   }
 

@@ -11,7 +11,7 @@ class GameAchievement implements Model {
     this.id = -1,
     required this.gameId,
     required this.name,
-    required this.description
+    required this.description,
   });
 
   static String get endpoint => 'gameachievements';
@@ -28,21 +28,17 @@ class GameAchievement implements Model {
   int get hashCode => id;
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'gameid': gameId,
-      'name': name,
-      'description': description,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'gameid'     : gameId,
+    'name'       : name,
+    'description': description,
+  };
 
   @override
-  factory GameAchievement.from(Map<String, dynamic> json) {
-    return GameAchievement(
-      id: json['id'],
-      gameId: json['gameid'],
-      name: json['name'],
-      description: json['description'],
-    );
-  }
+  factory GameAchievement.from(Map<String, dynamic> json) => GameAchievement(
+    id         : json['id'],
+    gameId     : json['gameid'],
+    name       : json['name'],
+    description: json['description'],
+  );
 }

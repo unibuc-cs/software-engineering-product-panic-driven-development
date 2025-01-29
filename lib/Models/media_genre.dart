@@ -7,7 +7,7 @@ class MediaGenre implements Model {
 
   MediaGenre({
     required this.mediaId,
-    required this.genreId
+    required this.genreId,
   });
 
   static String get endpoint => 'mediagenres';
@@ -18,7 +18,7 @@ class MediaGenre implements Model {
       return false;
     }
     return mediaId == (other as MediaGenre).mediaId &&
-        genreId == other.genreId;
+           genreId == other.genreId;
   }
 
   @override
@@ -28,18 +28,14 @@ class MediaGenre implements Model {
   dynamic get id => [mediaId, genreId];
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'mediaid': mediaId,
-      'genreid': genreId,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'mediaid': mediaId,
+    'genreid': genreId,
+  };
 
   @override
-  factory MediaGenre.from(Map<String, dynamic> json) {
-    return MediaGenre(
-      mediaId: json['mediaid'],
-      genreId: json['genreid'],
-    );
-  }
+  factory MediaGenre.from(Map<String, dynamic> json) => MediaGenre(
+    mediaId: json['mediaid'],
+    genreId: json['genreid'],
+  );
 }
