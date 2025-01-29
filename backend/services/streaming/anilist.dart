@@ -117,6 +117,7 @@ class Anilist extends Provider {
             averageScore
             status
             externalLinks {
+              site
               url
             }
             ${customFields.join("\n")}
@@ -155,7 +156,10 @@ class Anilist extends Provider {
       'communityscore': media['meanScore'],
       'criticscore'   : media['averageScore'],
       'status'        : media['status'],
-      'links'         : media['externalLinks'].map((link) => link['url']).toSet().toList()
+      'links'         : media['externalLinks'].map((link) => {
+                          'name': link['site'],
+                          'href': link['url'],
+                        }).toList()
     };
   }
 

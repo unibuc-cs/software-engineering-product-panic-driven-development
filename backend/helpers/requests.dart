@@ -58,7 +58,7 @@ Future<bool> isTableEmpty(String table) async =>
 String _extractLinkName(String entry) => entry.replaceAll(RegExp(r'^https?://'), '').split('/')[0];
 
 Map<String, dynamic> createAttributes(String tableName, dynamic entry) => tableName == 'link'
-  ? {'name': _extractLinkName(entry), 'href': entry}
+  ? entry
   : {'name': entry};
 
 Future<Response> createMediaType(Map<String, dynamic> initialBody) async {

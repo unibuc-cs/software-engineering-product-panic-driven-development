@@ -66,8 +66,8 @@ class GoodReads extends Provider {
               ?.trim() ?? '';
             if (titleElement != null) {
               return {
+                'id'  : book.querySelector('a.bookTitle')?.attributes['href']?.replaceAll('/book/show/', '') ?? '',
                 'name': titleElement.text.split('(')[0].trim() + (releaseDate.isNotEmpty ? ' (${releaseDate})' : ''),
-                'link': 'https://www.goodreads.com${book.querySelector('a.bookTitle')?.attributes['href'] ?? ''}'
               };
             }
           })
@@ -109,8 +109,9 @@ class GoodReads extends Provider {
   }
 
 
-  Future<Map<String, dynamic>> _getBookInfo(String bookUrl) async {
+  Future<Map<String, dynamic>> _getBookInfo(String bookId) async {
     try {
+      final bookUrl = 'https://www.goodreads.com/book/show/$bookId';
       final document = await _getDocument(bookUrl);
 
       if (document == Document.html('')) {
@@ -132,7 +133,10 @@ class GoodReads extends Provider {
       return {
         'originalname'  : document.querySelector('h1.Text__title1')?.text.trim(),
         'creators'      : [document.querySelector('span.ContributorLink__name')?.text.trim()],
-        'links'         : [bookUrl],
+        'links'         : [{
+                            'name': 'Goodreads',
+                            'href': bookUrl,
+                          }],
         'communityscore': (double.parse(document.querySelector('div.RatingStatistics__rating')!.text.trim()) * 20).round().toString(),
         'releasedate'   : DateFormat('yyyy-MM-dd').format(parsedDate),
         'description'   : document.querySelector('span.Formatted')?.text.trim(),
@@ -214,17 +218,12 @@ class GoodReads extends Provider {
   }
 
   @override
-  Future<Map<String, dynamic>> getInfo(String bookUrl) async {
-    return instance._getBookInfo(bookUrl);
+  Future<Map<String, dynamic>> getInfo(String bookId) async {
+    return instance._getBookInfo(bookId);
   }
 
   @override
   Future<List<Map<String, dynamic>>> getRecommendations(String bookUrl) async {
     return instance._getBookRecommendations(bookUrl);
-  }
-
-  @override
-  String getKey() {
-    return 'link';
   }
 }
