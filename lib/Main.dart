@@ -1,3 +1,5 @@
+import 'package:mediamaster/Auth/guest_account.dart';
+import 'package:mediamaster/Menu.dart';
 import 'package:mediamaster/Widgets/themes.dart';
 
 import 'Helpers/database.dart';
@@ -10,8 +12,6 @@ import 'Auth/signup_screen.dart';
 import 'Auth/signup_bloc.dart';
 import 'Auth/login_screen.dart';
 import 'Auth/login_bloc.dart';
-import 'Auth/guest_screen.dart';
-import 'Auth/guest_bloc.dart';
 
 void main() async {
   DotEnv(includePlatformEnvironment: true)..load();
@@ -58,82 +58,120 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
-                  ? AdaptiveTheme.of(context).setDark()
-                  : AdaptiveTheme.of(context).setLight();
-            },
-            icon: const Icon(Icons.dark_mode),
-            tooltip: 'Toggle dark mode',
+    guestCreationStage currentGuestStage = guestCreationStage.notStarted;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Welcome'),
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
+                      ? AdaptiveTheme.of(context).setDark()
+                      : AdaptiveTheme.of(context).setLight();
+                },
+                icon: const Icon(Icons.dark_mode),
+                tooltip: 'Toggle dark mode',
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            TextButton(
-              onPressed: () {
-                Navigator
-                  .of(context)
-                  .push(
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider(
-                        create: (context) => SignUpBloc(),
-                        child: const SignUpScreen(),
-                      )
-                    )
-                  );
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('Sign Up'),
+          body: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    if (currentGuestStage != guestCreationStage.notStarted) {
+                      return;
+                    }
+
+                    Navigator
+                      .of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                            create: (context) => SignUpBloc(),
+                            child: const SignUpScreen(),
+                          )
+                        )
+                      );
+                  },
+                  style: navigationButton(context)
+                    .filledButtonTheme
+                    .style,
+                  child: const Text('Sign Up'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (currentGuestStage != guestCreationStage.notStarted) {
+                      return;
+                    }
+                    
+                    Navigator
+                      .of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                                create: (context) => LoginBloc(),
+                                child: const LoginScreen(),
+                          )
+                        )
+                      );
+                  },
+                  style: navigationButton(context)
+                    .filledButtonTheme
+                    .style,
+                  child: const Text('Log in'),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (currentGuestStage == guestCreationStage.workingOn)
+                      ...[
+                        SizedBox(
+                          height: 60,
+                        ),
+                      ],
+                    TextButton(
+                      onPressed: () async {
+                        if (currentGuestStage != guestCreationStage.notStarted) {
+                          return;
+                        }
+
+                        currentGuestStage = guestCreationStage.workingOn;
+                        setState(() {});
+                        await createGuestUser();
+                        Navigator.of(context).pop();
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => Menu(),
+                        ));
+                        currentGuestStage = guestCreationStage.notStarted;
+                      },
+                      style: navigationButton(context)
+                        .filledButtonTheme
+                        .style,
+                      child: const Text('Try as guest'),
+                    ),
+                    if (currentGuestStage == guestCreationStage.workingOn)
+                      ...[
+                        SizedBox(
+                          height: 30,
+                        ),
+                        SizedBox(
+                          height: 30,
+                          width : 30,
+                          child : loadingWidget(context),
+                        ),
+                      ],
+                  ],
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                Navigator
-                  .of(context)
-                  .push(
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider(
-                            create: (context) => LoginBloc(),
-                            child: const LoginScreen(),
-                      )
-                    )
-                  );
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('Log in'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator
-                  .of(context)
-                  .push(
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider(
-                            create: (context) => GuestBloc(),
-                            child: const GuestScreen(),
-                      )
-                    )
-                  );
-              },
-              style: navigationButton(context)
-                .filledButtonTheme
-                .style,
-              child: const Text('Try as guest'),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
