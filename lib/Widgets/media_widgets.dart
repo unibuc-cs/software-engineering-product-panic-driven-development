@@ -171,14 +171,18 @@ Widget getLinkWidget(int mediaId) {
   if (ids.isEmpty) {
     return Container();
   }
-  
+
   List<Link> links = LinkService
     .instance
     .items
     .where((link) => ids.contains(link.id))
     .toList();
-  
+
   links.sort((la, lb) => la.name.compareTo(lb.name));
+
+  if (links.isEmpty) {
+    return Container();
+  }
 
   return Row(
     children: [
@@ -340,7 +344,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
   String measureUnit          = getMeasureUnitForType(MT);
   String measureAttributeName = getMeasureAttributeNameForType(MT);
   List<String> statusOptions  = getStatusOptionsForType(MT);
-  
+
   dynamic serviceInstance = isWishlist ? WishlistService.instance : MediaUserService.instance;
 
   dynamic customizations = getCustomizations(mt.media.id, isWishlist);
@@ -353,7 +357,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     text: customizations.name,
   );
   TextEditingController ratingController   = TextEditingController(
-    text: customizations.userScore == -1 
+    text: customizations.userScore == -1
       ? ''
       : customizations.userScore.toString()
   );
@@ -484,7 +488,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                       controller: ratingController,
                       maxLength: 3,
                       inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly 
+                        FilteringTextInputFormatter.digitsOnly
                       ],
                       decoration: InputDecoration(
                         labelText: 'Enter your rating (out of 100)',
@@ -519,7 +523,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                           TextField(  // Progress
                             controller: progressController,
                             inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly 
+                              FilteringTextInputFormatter.digitsOnly
                             ],
                             decoration: InputDecoration(
                               labelText: 'Update your progress ($measureUnit)',

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 
 import 'Helpers/getters.dart';
+import 'Helpers/database.dart';
 import 'Models/user_tag.dart';
 import 'Models/book.dart';
 import 'Models/game.dart';
@@ -44,12 +45,12 @@ class Library<MT extends MediaType> extends StatefulWidget {
 
 class LibraryState<MT extends MediaType> extends State<Library> {
   late final isWishlist;
-  
+
   int selectedMediaId = -1;
-  
+
   TextEditingController searchController = TextEditingController();
   String searchFilterQuery = '';
-  
+
   bool increasingSorting = true;
   String selectedSortingMethod = 'By original name';
   Map<String, dynamic> mediaOrderComparators = {
@@ -103,7 +104,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       },
      // TODO: ADD OTHER SORTING METHODS
   };
-  
+
   bool filterAll = true;
   Set<int> selectedGenresIds = {};
   Set<int> selectedTagsIds   = {};
@@ -121,7 +122,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
   Widget getCustomIcon(MT mt) {
     String iconUrl = getCustomizations(mt.media.id, isWishlist).icon;
-    
+
     return Container(
       width: 40,
       height: 40,
@@ -159,7 +160,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   void initState() {
     super.initState();
   }
-  
+
   // Create and return a list view of the filtered media
   ListView _mediaListBuilder(BuildContext context) {
     List<ListTile> listTiles = List.empty(growable: true);
@@ -259,7 +260,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       )
       .map((media) => media.id)
       .toList();
-    
+
     if (mediaIds.isEmpty) {
       return null;
     }
@@ -323,7 +324,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     }
 
     int id = medias.first.id;
-    
+
     return MediaUserService
       .instance
       .items
@@ -343,7 +344,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
       .where((mt) => mt.mediaId == selectedMediaId)
       .map((mt) => mt as MT)
       .toList();
-    
+
     if (mts.isEmpty) {
       selectedMediaId = -1;
       return null;
@@ -358,8 +359,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     IconButton butonSearchReset = searchFilterQuery == ''
       ? IconButton(
           onPressed: () {
-            /*TODO: The search box gets activated only if you hold down at least 2 frames, 
-            I do not know the function to activate it when pressing this button. 
+            /*TODO: The search box gets activated only if you hold down at least 2 frames,
+            I do not know the function to activate it when pressing this button.
             I also do not know if this should be our priority right now*/
           },
           icon: const Icon(Icons.search),
@@ -419,8 +420,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             ],
           ),
         ),
-        
-        
+
+
         actions: [
           IconButton(
             onPressed: () {
@@ -736,7 +737,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
               setState(() {});
               resetGlobalState();
             };
-            
+
             Widget option(String description, String value, String groupValue, void Function() onChanged) {
               return Row(
                 children: [
@@ -755,7 +756,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 ],
               );
             }
-            
+
             return AlertDialog(
               title: Text('Sort $mediaTypePlural'),
               content: SizedBox(
@@ -853,7 +854,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 ],
               );
             }
-            
+
             Widget checkboxOption(String description, bool value, void Function(bool?) onChanged) {
               return Row(
                 children: [
@@ -871,7 +872,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
                 ],
               );
             }
-            
+
             return AlertDialog(
               title: Text('Filter $mediaType'),
               content: SizedBox(
@@ -1054,7 +1055,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     String name = gameData['originalname'];
     Game? nullableGame = mediaAlreadyInDB(name) as Game?;
     gameData[getAttributeNameForType(MT)] = gameData[getOldAttributeNameForType(MT)];
-    
+
     if (name[name.length - 1] == ')' && name.length >= 7) {
       name = name.substring(0, name.length - 7);
     }
@@ -1067,7 +1068,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         optionsPCGW.isEmpty ? Future.value(Map<String, dynamic>()) : getInfoPCGW(options[0][0]),
         optionsHLTB.isEmpty ? Future.value(Map<String, dynamic>()) : getInfoHLTB(options[1][0]),
       ]);
-      
+
       // Get information from PCGamingWiki
       Map<String, dynamic> resultPCGW = results[0];
       if (resultPCGW.containsKey('windows')) {
@@ -1150,6 +1151,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
 
   // Despite its name, this function only connects the User and the MT. Speciffic data is being sent throught the data parameter
   Future<void> addToLibraryOrWishlist(Map<String, dynamic> data, MT mt) async {
+    await HydrateWithoutUser();
+
     final String placeholderImage = 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
     String coverImage = placeholderImage, icon = placeholderImage, backgroundImage = placeholderImage;
 
@@ -1215,7 +1218,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
           .items
           .where((wish) => wish.mediaId == mt.getMediaId())
           .first;
-        
+
         // Move customizations over
         mu.name            = wishlist.name;
         mu.userScore       = wishlist.userScore;
@@ -1251,7 +1254,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     await addToLibraryOrWishlist(result.key, result.value);
   }
 
-  Widget _displayMedia(MT? mt) {  
+  Widget _displayMedia(MT? mt) {
     String mediaType = '';
     try {
       mediaType = getMediaTypeDbName(MT);
@@ -1277,7 +1280,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
     // TODO: Notes button
     // return StatefulBuilder(
     //   builder: (context, setState) {
-        
+
     //   },
     // );
 

@@ -31,8 +31,27 @@ class SupabaseManager {
   }
 
   Future<Response> read({bool single = false, Map<String, dynamic> filters = const {}}) async {
-    final result = await _addFilters(_tableQuery.select(), filters);
-    return sendOk(single ? result.first : result);
+    if (single) {
+      final result = await _addFilters(_tableQuery.select(), filters).maybeSingle();
+      return sendOk(result);
+    }
+
+    List<Map<String, dynamic>> allData = [];
+    int limit = 1000;
+    int offset = 0;
+
+    while (true) {
+      final batch = await _addFilters(_tableQuery.select(), filters)
+          .range(offset, offset + limit - 1);
+
+      if (batch.isEmpty) break;
+
+      allData.addAll(batch);
+      if (batch.length < limit) break;
+      offset += limit;
+    }
+
+    return sendOk(allData);
   }
 
   Future<Response> create(Map<String, dynamic> body) async =>

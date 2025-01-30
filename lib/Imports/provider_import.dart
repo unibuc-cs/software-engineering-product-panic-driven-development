@@ -39,7 +39,7 @@ class ProviderImport<MT extends MediaType> {
     if (searchName == '') {
       return {};
     }
-    
+
     for (final searchOption in searchOptions) {
       if (!searchOption.containsKey('name')) {
         continue;
@@ -113,7 +113,7 @@ class ProviderImport<MT extends MediaType> {
   ) async {
     List<MapEntry<String, Map<String, dynamic>>> entriesList = mediasData.entries.toList();
     entriesList = entriesList.where((entry) => wanted.contains(entry.key) && !library.mediaAlreadyInLibrary(entry.value['name'])).toList();
-    entriesList.sort((a, b) => a.key.compareTo(b.key));
+    entriesList.sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
 
     workingOn.addAll(entriesList.map((entry) => entry.key));
     setState();
@@ -213,7 +213,7 @@ class ProviderImport<MT extends MediaType> {
                               // To show the options in lexicographical order
                               searchResultsEntries = searchResults.entries.toList();
                               searchResultsEntries.sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
-                              
+
                               wanted = searchResults.keys.toSet();
                               if (context.mounted) {
                                 setState(() {});
@@ -335,7 +335,7 @@ class ProviderImport<MT extends MediaType> {
                                 .style,
                             ),
                           ),
-                        ],
+                      ],
                   ],
                 ),
               ),

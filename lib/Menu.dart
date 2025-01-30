@@ -92,18 +92,21 @@ class MenuState extends State<Menu> {
     ],
   ];
 
-  void preload() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     for (MenuMediaType type in mapping.keys) {
-      mapping[type]!['backgroundImage'] = NetworkImage(
-        mapping[type]!['backgroundImageHref'] as String,
-      );
+      if (mapping[type]!['backgroundImage'] == null) {
+        final imageProvider =
+            NetworkImage(mapping[type]!['backgroundImageHref'] as String);
+        mapping[type]!['backgroundImage'] = imageProvider;
+        precacheImage(imageProvider, context);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    preload();
-
     MenuMediaType currentRendering = MenuMediaType.Game;
 
     return Scaffold(
@@ -113,62 +116,61 @@ class MenuState extends State<Menu> {
           IconButton(
             onPressed: () {
               AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
-                ? AdaptiveTheme.of(context).setDark()
-                : AdaptiveTheme.of(context).setLight();
+                  ? AdaptiveTheme.of(context).setDark()
+                  : AdaptiveTheme.of(context).setLight();
             },
             icon: const Icon(Icons.dark_mode),
             tooltip: 'Toggle dark mode',
           ),
           IconButton(
-              onPressed: () async {
-                UserSystem.instance.logout();
-                Navigator.pop(context);
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const Home()
-                  )
-                );
-              },
-              icon: const Icon(Icons.logout),
-              tooltip: 'Log out'),
+            onPressed: () async {
+              UserSystem.instance.logout();
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const Home()),
+              );
+            },
+            icon: const Icon(Icons.logout),
+            tooltip: 'Log out',
+          ),
         ],
       ),
       body: StatefulBuilder(
         builder: (context, setState) {
           Widget option(MenuMediaType type) => InkWell(
-            child: Container(
-              constraints: BoxConstraints(
-                minHeight: 50,
-                minWidth: 130,
-              ),
-              child: Card(
-                child: Center(
-                  widthFactor: 1,
-                  heightFactor: 1,
-                  child: Text(
-                    mapping[type]!['name'],
-                    style: titleStyle,
+                child: Container(
+                  constraints: const BoxConstraints(
+                    minHeight: 50,
+                    minWidth: 130,
+                  ),
+                  child: Card(
+                    child: Center(
+                      widthFactor: 1,
+                      heightFactor: 1,
+                      child: Text(
+                        mapping[type]!['name'],
+                        style: titleStyle,
+                      ),
+                    ),
+                    borderOnForeground: true,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                borderOnForeground: true,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            onHover: (bool hover) {
-              if (hover) {
-                currentRendering = type;
-                setState(() {});
-              }
-            },
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => mapping[type]!['library']!,
-              ));
-            },
-          );
+                onHover: (bool hover) {
+                  if (hover) {
+                    currentRendering = type;
+                    setState(() {});
+                  }
+                },
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => mapping[type]!['library']!,
+                  ));
+                },
+              );
 
           return Container(
             decoration: BoxDecoration(
@@ -185,8 +187,7 @@ class MenuState extends State<Menu> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        for (MenuMediaType type in row)
-                          option(type),
+                        for (MenuMediaType type in row) option(type),
                       ],
                     ),
                   ),
