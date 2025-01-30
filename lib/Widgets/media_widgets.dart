@@ -338,7 +338,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
     .instance
     .items
     .where((mut) => mut.mediaId == mt.getMediaId())
-    .map((mut) => mut.tagId)
+    .map((mut) => mut.userTagId)
     .toSet();
   String mediaType            = getMediaTypeDbNameCapitalize(MT);
   String measureUnit          = getMeasureUnitForType(MT);
@@ -594,18 +594,18 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                             value: mutIds.contains(userTag.id),
                             onChanged: (value) async {
                               MediaUserTag mut = MediaUserTag(
-                                mediaId: mt.getMediaId(),
-                                userId : UserSystem.instance.getCurrentUserId(),
-                                tagId  : userTag.id,
+                                mediaId  : mt.getMediaId(),
+                                userId   : UserSystem.instance.getCurrentUserId(),
+                                userTagId: userTag.id,
                               );
 
                               if (value == true) {
                                 await MediaUserTagService.instance.create(mut);
-                                mutIds.add(mut.tagId);
+                                mutIds.add(mut.userTagId);
                               }
                               else {
-                                await MediaUserTagService.instance.delete([mut.mediaId, mut.tagId]);
-                                mutIds.remove(mut.tagId);
+                                await MediaUserTagService.instance.delete([mut.mediaId, mut.userTagId]);
+                                mutIds.remove(mut.userTagId);
                               }
                               setFullState();
                             },

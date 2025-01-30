@@ -4,12 +4,12 @@ class MediaUserTag implements Model {
   // Data
   int mediaId;
   String userId;
-  int tagId;
+  int userTagId;
 
   MediaUserTag({
     required this.mediaId,
     required this.userId,
-    required this.tagId
+    required this.userTagId,
   });
 
   static String get endpoint => 'mediausertags';
@@ -21,26 +21,26 @@ class MediaUserTag implements Model {
     }
     return userId == (other as MediaUserTag).userId &&
         mediaId == other.mediaId &&
-        tagId == other.tagId;
+        userTagId == other.userTagId;
   }
 
   @override
-  int get hashCode => Object.hash(mediaId, userId, tagId);
+  int get hashCode => Object.hash(mediaId, userId, userTagId);
 
   @override
-  dynamic get id => [mediaId, tagId];
+  dynamic get id => [mediaId, userTagId];
 
   @override
   Map<String, dynamic> toJson() => {
     'mediaid': mediaId,
     'userid' : userId,
-    'tagid'  : tagId,
+    'tagid'  : userTagId,
   };
 
   @override
   factory MediaUserTag.from(Map<String, dynamic> json) => MediaUserTag(
-    mediaId: json['mediaid'],
-    userId : json['userid'],
-    tagId  : json['tagid'],
+    mediaId  : json['mediaid'],
+    userId   : json['userid'],
+    userTagId: json['tagid'],
   );
 }

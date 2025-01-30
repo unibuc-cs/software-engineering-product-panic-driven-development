@@ -178,7 +178,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
           .items
           .where((mut) =>
             mut.mediaId == id &&
-            selectedTagsIds.contains(mut.tagId)
+            selectedTagsIds.contains(mut.userTagId)
           )
           .length +
           MediaGenreService
@@ -1026,7 +1026,7 @@ class LibraryState<MT extends MediaType> extends State<Library> {
         toDo.add(
           MediaUserTagService
             .instance
-            .delete([mediaId, mut.tagId])
+            .delete([mediaId, mut.userTagId])
         )
       );
     MediaGenreService

@@ -11,7 +11,7 @@ void main() async {
   MediaUserTag dummy = MediaUserTag(
     mediaId: 1,
     userId: '',
-    tagId: await getValidId(
+    userTagId: await getValidId(
       service: UserTagService.instance,
       backup : tag
     ),
