@@ -4,13 +4,12 @@ import '../helpers/responses.dart';
 import '../helpers/db.dart';
 import 'package:supabase/supabase.dart';
 import 'package:shelf_plus/shelf_plus.dart';
-import 'package:supabase/supabase.dart';
 
 RouterPlus authRouter() {
   final router = Router().plus;
   SupabaseClient supabase = SupabaseManager.client;
 
-  Future<User?> getUser(Request req) async => 
+  Future<User?> getUser(Request req) async =>
     (await supabase.auth.admin.getUserById(req.context['userId']! as String)).user;
 
   router.get('/details', (Request req) async {
@@ -36,41 +35,8 @@ RouterPlus authRouter() {
         password: body['password']
       )
     ).user;
-    return sendOk({ 'token': getToken(user?.id) });  
+    return sendOk({ 'token': getToken(user?.id) });
   });
-
-  router.post('/login-google', (Request req) async {
-    final authUrl = supabase.auth.getOAuthSignInUrl(
-      provider: OAuthProvider.google,
-    );
-    return sendOk({'authUrl': authUrl});
-  });
-
-  router.post('/callback-google', (Request req) async {
-    final body = await req.body.asJson;
-    validateFromBody(body, fields: ['token']);
-    final token = body['token'];
-
-    final response = await supabase.auth.signInWithIdToken(
-      idToken: token,
-      provider: OAuthProvider.google,
-    );
-
-    if (response.session == null) {
-      return sendBadRequest({'error': 'Authentication failed'});
-    }
-
-    final user = response.session?.user;
-
-    return sendOk({
-      'id': user?.id,
-      'email': user?.email,
-      'name': user?.userMetadata?['name'],
-      'token': response.session?.accessToken,
-    });
-  });
-
-
 
   router.post('/signup', (Request req) async {
     final body = await req.body.asJson;

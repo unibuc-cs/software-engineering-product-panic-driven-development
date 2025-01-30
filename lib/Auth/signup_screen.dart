@@ -172,21 +172,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           context,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: state is! SignUpLoading
-                          ? () {
-                              signUpBloc.add(SignUpWithGooglePressed());
-                            }
-                          : null,
-                      style: navigationButton(context).filledButtonTheme.style,
-                      child: const Text('Sign up with Google'),
-                    ),
-                    if (state is SignUpLoading)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: loadingWidget(context),
-                      ),
                   ],
                 ),
               );

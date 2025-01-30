@@ -10,8 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_sign_in: ^5.4.2
-  flutter_webview_plugin: ^0.4.0
 
   http             : ^1.2.1
   html             : ^0.15.4
@@ -63,6 +61,9 @@ scripts:
   app                 : flutter run -d windows
   app:dev             : flutter run -d windows --release
   app:local           : flutter run --dart-define=LOCAL=true -d windows
+  build               : flutter build windows --release
+  build:dev           : flutter build windows
+  build:local         : flutter build --dart-define=LOCAL=true windows
   lint                : flutter analyze
   server              : dart run --define=LOCAL=true backend/main.dart
   server:dev          : dart run --define=RELOAD=true --define=LOCAL=true --enable-vm-service backend/main.dart

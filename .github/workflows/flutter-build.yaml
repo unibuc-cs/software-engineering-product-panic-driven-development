@@ -1,0 +1,89 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Windows Release
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build-configuration: [Debug, Release]
+        build-platform: [x64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Latest Tag and Set Version
+        id: versioning
+        run: |
+          git fetch --tags
+          $latest_tag = git tag --sort=-v:refname | Select-Object -First 1
+          if ($latest_tag -eq $null) {
+            $new_version = "v0.0.1"
+          } else {
+            # Increment patch version
+            $version_parts = $latest_tag -replace 'v', '' -split '\.'
+
+            if ([int]$version_parts[2] -ge 9) {
+              $version_parts[2] = 0
+              if ([int]$version_parts[1] -ge 9) {
+                $version_parts[1] = 0
+                $version_parts[0] = [int]$version_parts[0] + 1
+              } else {
+                $version_parts[1] = [int]$version_parts[1] + 1
+              }
+            } else {
+              $version_parts[2] = [int]$version_parts[2] + 1
+            }
+
+            $new_version = "v$($version_parts -join '.')"
+          }
+          Write-Host "NEW_VERSION=$new_version"
+          echo "NEW_VERSION=$new_version" >> $env:GITHUB_ENV
+
+
+      - name: Create Tag for Release
+        run: |
+          git tag ${{ env.NEW_VERSION }}
+          git push origin ${{ env.NEW_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Flutter
+        uses: flutter-actions/setup-flutter@v2
+
+      - name: Enable Windows Support
+        run: flutter config --enable-windows-desktop
+
+      - name: Create .env file from secret
+        run: echo "${{ secrets.ENV_FILE_CONTENTS }}" > .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows EXE for ${{ matrix.build-configuration }}
+        run: |
+          if [ "${{ matrix.build-configuration }}" == "Debug" ]; then
+            flutter build windows --debug --dart-define=LOCAL=true
+          else
+            flutter build windows --release
+          fi
+
+      - name: Package EXE into ZIP for ${{ matrix.build-configuration }}
+        run: |
+          Compress-Archive -Path build/windows/${{ matrix.build-configuration }}/runner/Release/* -DestinationPath MediaMaster-${{ matrix.build-configuration }}.zip
+
+      - name: Upload EXE to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: MediaMaster-${{ matrix.build-configuration }}.zip
+          tag_name: ${{ env.NEW_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
