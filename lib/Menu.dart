@@ -46,7 +46,7 @@ class Menu extends StatefulWidget {
 enum MenuMediaType { Game, Book, Anime, Manga, Movie, TV_Series }
 
 class MenuState extends State<Menu> {
-  Map<MenuMediaType, Map<String, dynamic>> mapping = {
+  static Map<MenuMediaType, Map<String, dynamic>> mapping = {
     MenuMediaType.Anime: {
       'backgroundImageHref': 'https://wallpaperaccess.com/full/39033.png',
       'name': 'Anime',
@@ -91,19 +91,6 @@ class MenuState extends State<Menu> {
       MenuMediaType.TV_Series,
     ],
   ];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    for (MenuMediaType type in mapping.keys) {
-      if (mapping[type]!['backgroundImage'] == null) {
-        final imageProvider =
-            NetworkImage(mapping[type]!['backgroundImageHref'] as String);
-        mapping[type]!['backgroundImage'] = imageProvider;
-        precacheImage(imageProvider, context);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -24,8 +24,22 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  void preloadImages(BuildContext context) {
+    var mapping = MenuState.mapping;
+    for (MenuMediaType type in mapping.keys) {
+      if (mapping[type]!['backgroundImage'] == null) {
+        final imageProvider =
+            NetworkImage(mapping[type]!['backgroundImageHref'] as String);
+        mapping[type]!['backgroundImage'] = imageProvider;
+        precacheImage(imageProvider, context);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    preloadImages(context);
+
     return AdaptiveTheme(
       light: ThemeData.light().copyWith(
         colorScheme: ColorScheme.light(
