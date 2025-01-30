@@ -10,9 +10,6 @@ jobs:
     name: Get Latest Tag and Set Version
     runs-on: windows-latest
 
-    outputs:
-      version: ${{ steps.versioning.outputs.new_version }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,8 +40,7 @@ jobs:
             $new_version = "v$($version_parts -join '.')"
           }
           Write-Host "NEW_VERSION=$new_version"
-          echo "NEW_VERSION=$new_version" >> $env:GITHUB_ENV
-          echo "::set-output name=new_version::$new_version"
+          echo "version=$new_version" >> $GITHUB_ENV
 
   build:
     name: Windows Release
@@ -63,8 +59,8 @@ jobs:
 
       - name: Create Tag for Release
         run: |
-          git tag ${{ needs.versioning.outputs.version }}
-          git push origin ${{ needs.versioning.outputs.version }}
+          git tag ${{ env.version }}
+          git push origin ${{ env.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -96,6 +92,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: MediaMaster-${{ matrix.build-configuration }}.zip
-          tag_name: ${{ needs.versioning.outputs.version }}
+          tag_name: ${{ env.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
