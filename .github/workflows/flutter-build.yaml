@@ -6,15 +6,12 @@ on:
       - main
 
 jobs:
-  build:
-    name: Windows Release
+  versioning:
+    name: Get Latest Tag and Set Version
     runs-on: windows-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        build-configuration: [Debug, Release]
-        build-platform: [x64]
+    outputs:
+      version: ${{ steps.versioning.outputs.new_version }}
 
     steps:
       - name: Checkout repository
@@ -47,12 +44,27 @@ jobs:
           }
           Write-Host "NEW_VERSION=$new_version"
           echo "NEW_VERSION=$new_version" >> $env:GITHUB_ENV
+          echo "::set-output name=new_version::$new_version"
 
+  build:
+    name: Windows Release
+    runs-on: windows-latest
+    needs: versioning
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build-configuration: [Debug, Release]
+        build-platform: [x64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Create Tag for Release
         run: |
-          git tag ${{ env.NEW_VERSION }}
-          git push origin ${{ env.NEW_VERSION }}
+          git tag ${{ needs.versioning.outputs.version }}
+          git push origin ${{ needs.versioning.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -70,20 +82,20 @@ jobs:
 
       - name: Build Windows EXE for ${{ matrix.build-configuration }}
         run: |
-          if [ "${{ matrix.build-configuration }}" == "Debug" ]; then
+          if ("${{ matrix.build-configuration }}" -eq "Debug") {
             flutter build windows --debug --dart-define=LOCAL=true
-          else
+          } else {
             flutter build windows --release
-          fi
+          }
 
       - name: Package EXE into ZIP for ${{ matrix.build-configuration }}
         run: |
-          Compress-Archive -Path build/windows/${{ matrix.build-configuration }}/runner/Release/* -DestinationPath MediaMaster-${{ matrix.build-configuration }}.zip
+          Compress-Archive -Path build/windows/x64/runner/${{ matrix.build-configuration }}/* -DestinationPath MediaMaster-${{ matrix.build-configuration }}.zip
 
       - name: Upload EXE to Release
         uses: softprops/action-gh-release@v1
         with:
           files: MediaMaster-${{ matrix.build-configuration }}.zip
-          tag_name: ${{ env.NEW_VERSION }}
+          tag_name: ${{ needs.versioning.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
