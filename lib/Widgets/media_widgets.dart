@@ -22,6 +22,7 @@ import '../Models/general/media_type.dart';
 import '../Services/user_tag_service.dart';
 import '../Services/wishlist_service.dart';
 import '../Services/media_user_service.dart';
+import '../Services/source_service.dart';
 import '../Services/media_user_tag_service.dart';
 import '../UserSystem.dart';
 import 'game_widgets.dart';
@@ -142,6 +143,18 @@ Widget getRatingsWidget(Media media) {
   }
 
   return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
+}
+
+Widget getSourcesWidget(Media media){
+  var sources = SourceService
+      .instance
+      .items
+      .where((source) => source.mediaType == 'all' 
+                        )
+      .toList();
+
+  var sourceNames = sources.map((source) => source.name).toList();
+  return getListWidget('Sources', sourceNames.isEmpty ? ['N/A'] : sourceNames);
 }
 
 dynamic getCustomizations(int mediaId, bool isWishlist) {
@@ -318,6 +331,7 @@ Widget displayMedia(Media media, Widget additionalButtons, Widget notesWidget, b
                           getGenresWidget(media),
                           getPlatformsWidget(media),
                           getRatingsWidget(media),
+                          getSourcesWidget(media),
                         ],
                       ),
                     ),
