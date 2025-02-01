@@ -14,10 +14,18 @@ RouterPlus authRouter() {
 
   router.get('/details', (Request req) async {
     final user = await getUser(req);
-    return {
-      'id'  : user!.id,
-      'name': user.userMetadata?['name'],
-    };
+     if (user != null) {
+      //print("User Data: ${user.toJson()}");
+      print(user.createdAt);
+        return {
+        'id': user.id,
+        'name': user.userMetadata?['name'],
+        'email': user.email,
+        'lastSignIn': user.lastSignInAt, 
+        'createdAt': user.createdAt, 
+      };
+     }
+     return {'error': 'User not found'};
   });
 
   router.post('/login', (Request req) async {

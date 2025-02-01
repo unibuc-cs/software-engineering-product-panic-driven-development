@@ -10,6 +10,7 @@ import 'Models/movie.dart';
 import 'Models/tv_series.dart';
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'ProfilePage.dart'; 
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -95,6 +96,9 @@ class MenuState extends State<Menu> {
   @override
   Widget build(BuildContext context) {
     MenuMediaType currentRendering = MenuMediaType.Game;
+    Map<MenuMediaType, bool> hoverState = {
+      for (var type in MenuMediaType.values) type: false
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -108,6 +112,15 @@ class MenuState extends State<Menu> {
             },
             icon: const Icon(Icons.dark_mode),
             tooltip: 'Toggle dark mode',
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
+            icon: const Icon(Icons.account_circle),
+            tooltip: 'Go to Profile',
           ),
           IconButton(
             onPressed: () async {
@@ -124,45 +137,56 @@ class MenuState extends State<Menu> {
       ),
       body: StatefulBuilder(
         builder: (context, setState) {
-          Widget option(MenuMediaType type) => InkWell(
-                child: Container(
-                  constraints: const BoxConstraints(
-                    minHeight: 50,
-                    minWidth: 130,
-                  ),
-                  child: Card(
-                    child: Center(
-                      widthFactor: 1,
-                      heightFactor: 1,
-                      child: Text(
-                        mapping[type]!['name'],
-                        style: titleStyle,
-                      ),
+          Widget option(MenuMediaType type) => MouseRegion(
+                onEnter: (_) {
+                  setState(() {
+                    currentRendering = type;
+                    hoverState[type] = true;
+                  });
+                },
+                onExit: (_) {
+                  setState(() {
+                    hoverState[type] = false;
+                  });
+                },
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => mapping[type]!['library']!,
+                    ));
+                  },
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      minHeight: 50,
+                      minWidth: 130,
                     ),
-                    borderOnForeground: true,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(16),
+                    decoration: BoxDecoration(
+                      color: (hoverState[type] ?? false) ? Colors.greenAccent : Colors.blue,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Card(
+                      child: Center(
+                        widthFactor: 1,
+                        heightFactor: 1,
+                        child: Text(
+                          mapping[type]!['name'],
+                          style: titleStyle.copyWith(
+                          fontSize: (hoverState[type] ?? false) ? 19 : 18,
+                          // fontWeight: FontWeight.bold,
+                          // color: Colors.white,
+                        ),
+                        ),
+                      ),
+                      borderOnForeground: true,
+                    ),
                   ),
                 ),
-                onHover: (bool hover) {
-                  if (hover) {
-                    currentRendering = type;
-                    setState(() {});
-                  }
-                },
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => mapping[type]!['library']!,
-                  ));
-                },
               );
 
           return Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: mapping[currentRendering]!['backgroundImage'],
+                image: NetworkImage(mapping[currentRendering]!['backgroundImageHref']),
                 fit: BoxFit.cover,
               ),
             ),
@@ -185,4 +209,5 @@ class MenuState extends State<Menu> {
       ),
     );
   }
+
 }

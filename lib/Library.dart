@@ -34,6 +34,7 @@ import 'Widgets/media_widgets.dart';
 
 import 'Main.dart';
 import 'UserSystem.dart';
+import 'ProfilePage.dart'; 
 
 class Library<MT extends MediaType> extends StatefulWidget {
   late final bool isWishlist;
@@ -434,7 +435,11 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             tooltip: 'Toggle dark mode',
           ),
           TextButton(
-            onPressed: () {}, // TODO: profile page
+             onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
             style: navigationButton(context)
               .filledButtonTheme
               .style,
