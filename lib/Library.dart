@@ -35,6 +35,7 @@ import 'Widgets/media_widgets.dart';
 import 'Main.dart';
 import 'UserSystem.dart';
 import 'ProfilePage.dart'; 
+import 'Menu.dart';
 
 class Library<MT extends MediaType> extends StatefulWidget {
   late final bool isWishlist;
@@ -422,8 +423,18 @@ class LibraryState<MT extends MediaType> extends State<Library> {
           ),
         ),
 
-
         actions: [
+            TextButton(
+             onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => MenuPage()),
+              );
+            },
+            style: navigationButton(context)
+              .filledButtonTheme
+              .style,
+            child: Text('Menu'),
+          ),
           IconButton(
             onPressed: () {
               AdaptiveTheme.of(context).mode ==

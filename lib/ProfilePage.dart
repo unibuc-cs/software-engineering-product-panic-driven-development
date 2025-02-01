@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mediamaster/Widgets/themes.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'Services/wishlist_service.dart';
+import 'Services/media_user_service.dart';
 import 'UserSystem.dart';
 import 'Main.dart';
+import 'Menu.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -12,11 +16,19 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  var name = UserSystem.instance.currentUserData!['name'] ?? 'Unknown User';
+   late String name; 
+
+  @override
+  void initState() {
+    super.initState();
+
+    name = (UserSystem.instance.currentUserData!['name'] ?? 'Unknown User');
+    name = name[0].toUpperCase() + name.substring(1); 
+  }
+
   var email = UserSystem.instance.currentUserData!['email'] ?? 'Unknown Email';
   var lastSignInRaw = UserSystem.instance.currentUserData!['lastSignIn'] ?? '';
   var memberSinceRaw = UserSystem.instance.currentUserData!['createdAt'] ?? '';
-
   String _profileImageUrl = 'https://picsum.photos/200/200?random=1'; 
 
   String formatLastLogin(String dateString) {
@@ -39,6 +51,17 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
           actions: [
+          TextButton(
+             onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => MenuPage()),
+              );
+            },
+            style: navigationButton(context)
+              .filledButtonTheme
+              .style,
+            child: Text('Menu'),
+          ),
           IconButton(
             onPressed: () {
               AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
