@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'UserSystem.dart';
+import 'Main.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -36,6 +38,27 @@ class _ProfilePageState extends State<ProfilePage> {
         title: const Text('Profile Page'),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
+          actions: [
+          IconButton(
+            onPressed: () {
+              AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
+                  ? AdaptiveTheme.of(context).setDark()
+                  : AdaptiveTheme.of(context).setLight();
+            },
+            icon: const Icon(Icons.dark_mode),
+            tooltip: 'Toggle dark mode',
+          ),
+          IconButton(
+            onPressed: () {
+              UserSystem.instance.logout();
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const Home()));
+            },
+            icon: const Icon(Icons.logout),
+            tooltip: 'Log out',
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
