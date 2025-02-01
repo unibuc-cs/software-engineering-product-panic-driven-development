@@ -145,17 +145,23 @@ Widget getRatingsWidget(Media media) {
   return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
 }
 
-Widget getSourcesWidget(Media media){
+Widget getSourcesWidget(Media media) {
   var sources = SourceService
       .instance
       .items
-      .where((source) => source.mediaType == 'all' 
-                        )
+      .where((source) => source.mediaType == 'all' || source.mediaType == media.mediaType)
       .toList();
 
-  var sourceNames = sources.map((source) => source.name).toList();
-  return getListWidget('Sources', sourceNames.isEmpty ? ['N/A'] : sourceNames);
+  var sourceNames = sources.map((source) {
+    if (source.name == 'physical' || source.name == 'digital') {
+      return '${source.name} format';
+    }
+    return source.name;
+  }).toList();
+
+  return getListWidget('Available on', sourceNames.isEmpty ? ['N/A'] : sourceNames);
 }
+
 
 dynamic getCustomizations(int mediaId, bool isWishlist) {
   // TODO: maybe a try catch is required here. Not sure
