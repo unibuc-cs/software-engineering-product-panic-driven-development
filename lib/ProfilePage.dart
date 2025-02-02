@@ -197,7 +197,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
                 ),
             ),
             if (name != 'Guest' && currentUserId != visitedUserId)
@@ -205,7 +204,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 name,
                 style: const TextStyle(
                   fontSize: 16,
-                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -218,7 +216,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       name,
                       style: const TextStyle(
                         fontSize: 16,
-                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     )
@@ -229,7 +226,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         controller: _nameController,
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                         onChanged: (newText) {
@@ -261,7 +257,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 email,
                 style: const TextStyle(
                   fontSize: 16,
-                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -298,7 +293,7 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose Profile Picture', style: TextStyle(color: Colors.white)),
+          title: const Text('Choose Profile Picture'),
           backgroundColor: Colors.black,
           content: SingleChildScrollView(
             child: Wrap(
@@ -353,15 +348,15 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title1, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
+          Text(title1, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           const SizedBox(height: 4),
-          Text(value1, style: const TextStyle(fontSize: 14, color: Colors.white)),
+          Text(value1, style: const TextStyle(fontSize: 14)),
           if(title2 != '')
             ...[
               const SizedBox(height: 12),
-              Text(title2, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
+              Text(title2, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 4),
-              Text(value2, style: const TextStyle(fontSize: 14, color: Colors.white)),
+              Text(value2, style: const TextStyle(fontSize: 14)),
             ],
         ],
       ),
