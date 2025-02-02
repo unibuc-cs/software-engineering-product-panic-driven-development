@@ -55,7 +55,8 @@ class _ProfilePageState extends State<ProfilePage> {
         _nameController.text = name; 
         _isLoading = false;
       });
-    } catch (e) {
+    }
+    catch (e) {
       print('Error fetching user data: $e');
       setState(() {
         _isLoading = false; 
@@ -78,23 +79,31 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String formatLastLogin(String dateString) {
-    if (dateString.isEmpty) return 'Unknown';
+    if (dateString.isEmpty) {
+      return 'Unknown';
+    }
     DateTime date = DateTime.parse(dateString).toLocal(); 
     return DateFormat('dd MMM yyyy HH:mm').format(date);
   }
 
   String formatMemberSince(String dateString) {
-    if (dateString.isEmpty) return 'Unknown';
+    if (dateString.isEmpty) {
+      return 'Unknown';
+    }
     DateTime date = DateTime.parse(dateString);
     return DateFormat('dd MMM yyyy').format(date); 
   }
 
   Map<String, int> getUserMediaCounts(String currentUserId) {
     var userMedia = MediaUserService
-        .instance
-        .items
-        .where((mu) => mu.userId == currentUserId);
-    var mediaMap = {for (var media in MediaService.instance.items) media.id: media.mediaType};
+      .instance
+      .items
+      .where((mu) => mu.userId == currentUserId);
+    var mediaMap = Map.fromEntries(MediaService
+      .instance
+      .items
+      .map((media) => MapEntry(media.id, media.mediaType))
+    );
     var groupedMedia = groupBy(userMedia, (mu) => mediaMap[mu.mediaId] ?? 'Unknown');
 
     return groupedMedia.map((key, value) => MapEntry(key, value.length));
@@ -121,16 +130,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (visitedUserId == currentUserId) {
       mediaCountsText = userMediaCounts.isEmpty
-          ? "You don't have items in the library"
-          : userMediaCounts.entries
-              .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
-              .join('\n');
+        ? "You don't have items in the library"
+        : userMediaCounts.entries
+          .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
+          .join('\n');
     } else {
       mediaCountsText = userMediaCounts.isEmpty
-          ? "This user doesn't have items in the library"
-          : userMediaCounts.entries
-              .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
-              .join('\n');
+        ? "This user doesn't have items in the library"
+        : userMediaCounts.entries
+          .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
+          .join('\n');
     }
 
     return Scaffold(
@@ -158,17 +167,17 @@ class _ProfilePageState extends State<ProfilePage> {
             tooltip: 'Toggle dark mode',
           ),
           if (visitedUserId != currentUserId) 
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => ProfilePage(userId: currentUserId), 
-                ),
-              );
-            },
-            icon: const Icon(Icons.account_circle), 
-            tooltip: 'My Profile', 
-            ),
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(userId: currentUserId), 
+                  ),
+                );
+              },
+              icon: const Icon(Icons.account_circle), 
+              tooltip: 'My Profile', 
+              ),
           TextButton(
             onPressed: () {
               Navigator.of(context).push(
@@ -260,7 +269,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: Icon(_isEditing ? Icons.save : Icons.edit, color: Colors.white),
                     onPressed: () {
                       setState(() {
-                        _isEditing = !_isEditing; 
+                        _isEditing = !_isEditing;
                         if (!_isEditing) {
                           name = _nameController.text; 
                           AuthService.instance.updateUserProfile(name, photoUrl); 
@@ -359,10 +368,13 @@ class _ProfilePageState extends State<ProfilePage> {
           Text(title1, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
           const SizedBox(height: 4),
           Text(value1, style: const TextStyle(fontSize: 14, color: Colors.white)),
-          const SizedBox(height: 12),
-          Text(title2, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
-          const SizedBox(height: 4),
-          Text(value2, style: const TextStyle(fontSize: 14, color: Colors.white)),
+          if(title2 != '')
+            ...[
+              const SizedBox(height: 12),
+              Text(title2, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
+              const SizedBox(height: 4),
+              Text(value2, style: const TextStyle(fontSize: 14, color: Colors.white)),
+            ],
         ],
       ),
     );
