@@ -36,6 +36,7 @@ import 'Main.dart';
 import 'UserSystem.dart';
 import 'ProfilePage.dart'; 
 import 'Menu.dart';
+import 'UserListPage.dart';
 
 class Library<MT extends MediaType> extends StatefulWidget {
   late final bool isWishlist;
@@ -446,9 +447,18 @@ class LibraryState<MT extends MediaType> extends State<Library> {
             tooltip: 'Toggle dark mode',
           ),
           TextButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => UserListPage()),
+              );
+            },
+            style: navigationButton(context).filledButtonTheme.style,
+            child: Text('See Users'),
+          ),
+          TextButton(
              onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => ProfilePage()),
+                MaterialPageRoute(builder: (context) => ProfilePage(userId: UserSystem.instance.getCurrentUserId())),
               );
             },
             style: navigationButton(context)

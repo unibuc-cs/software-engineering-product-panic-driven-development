@@ -16,12 +16,15 @@ Future<void> createGuestUser() async {
   final email = '$name${_generateRandomString()}@gmail.com';
   final password = _generateRandomString();
 
+  const String defaultPhotoUrl = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
+  
   try {
     await AuthService.instance.signup(
       name    : name,
       email   : email,
       password: password,
       isGuest : true,
+      photoUrl : defaultPhotoUrl,
     );
     await AuthService.instance.login(
       email   : email,

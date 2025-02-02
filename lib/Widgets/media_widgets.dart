@@ -17,11 +17,13 @@ import '../Models/user_tag.dart';
 import '../Models/tv_series.dart';
 import '../Models/media_user.dart';
 import '../Models/media_user_tag.dart';
+import '../Models/media_user_source.dart';
 import '../Models/general/model.dart';
 import '../Models/general/media_type.dart';
 import '../Services/user_tag_service.dart';
 import '../Services/wishlist_service.dart';
 import '../Services/media_user_service.dart';
+import '../Services/media_user_source_service.dart';
 import '../Services/source_service.dart';
 import '../Services/media_user_tag_service.dart';
 import '../UserSystem.dart';
@@ -145,21 +147,50 @@ Widget getRatingsWidget(Media media) {
   return getListWidget('Ratings', List.of([criticScoreString, communityScoreString]));
 }
 
+
 Widget getSourcesWidget(Media media) {
+  var mus = MediaUserSourceService.instance.items;
+  var sources = mus.where((mus) => mus.mediaId == media.id && mus.userId == UserSystem.instance.getCurrentUserId()).toList();
+  var sourceIds = sources.map((source) => source.sourceId).toList();
+  var allSources = SourceService.instance.items;
+  List<String> sourceNames = [];
+  for (var id in sourceIds) {
+    var source = allSources.firstWhere((s) => s.id == id);
+    sourceNames.add(source?.name ?? 'N/A');
+  }
+
+  if (sourceNames.isEmpty) {
+    sourceNames.add('N/A');
+  }
+
+  return getListWidget('Source${sourceNames.length <= 1 ? '' : 's'}', sourceNames);
+}
+
+List<String> getAvailableSources(Media media) {
   var sources = SourceService
       .instance
       .items
       .where((source) => source.mediaType == 'all' || source.mediaType == media.mediaType)
       .toList();
+  var sourceNames = sources.map((source) => source.name).toList();
+  return sourceNames.isEmpty ? ['N/A'] : sourceNames;
+}
 
-  var sourceNames = sources.map((source) {
-    if (source.name == 'physical' || source.name == 'digital') {
-      return '${source.name} format';
+List<String> getSelectedSources(Media media) {
+  var mus = MediaUserSourceService.instance.items;
+  var sources = mus.where((mus) => mus.mediaId == media.id && mus.userId == UserSystem.instance.getCurrentUserId()).toList();
+  var sourceIds = sources.map((source) => source.sourceId).toList();
+  var allSources = SourceService.instance.items;
+  List<String> sourceNames = [];
+
+  for (var id in sourceIds) {
+    var source = allSources.firstWhere((s) => s.id == id);
+    if (source != null) {
+      sourceNames.add(source.name);
     }
-    return source.name;
-  }).toList();
+  }
 
-  return getListWidget('Available on', sourceNames.isEmpty ? ['N/A'] : sourceNames);
+  return sourceNames;
 }
 
 
@@ -454,12 +485,16 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
       throw UnimplementedError('Tracking not implemented for this media type');
     }
   }
-
+  
   return showDialog(
     context: context,
     builder: (context) {
+      List<String> sources = getAvailableSources(mt.media);
+      List<String> selectedSources = getSelectedSources(mt.media); 
+
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
+       
           void setFullState() {
             resetState();
             setState(() {});
@@ -670,10 +705,64 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                         ),
                       ),
                     ),
+
+                    Text('Edit Sources', style: titleStyle),
+                  ...sources.map((source) {
+                    return Row(
+                      children: [
+                        Checkbox(
+                          value: selectedSources.contains(source), 
+                          onChanged: (value) {
+                            setState(() {
+                              if (value == true) {
+                                if (!selectedSources.contains(source)) {
+                                  selectedSources.add(source); 
+                                  print(selectedSources);
+                                }
+                              } else {
+                                selectedSources.remove(source); 
+                              }
+                            });
+                          },
+                        ),
+                        Text(source, style: subtitleStyle),
+                      ],
+                    );
+                  }).toList(),
                   ],
                 ),
               ),
             ),
+            actions: [
+            TextButton(
+              onPressed: () async {
+                List<String> existingSources = getSelectedSources(mt.media);
+                var sourcesToAdd = selectedSources.where((s) => !existingSources.contains(s)).toList();
+                var sourcesToRemove = existingSources.where((s) => !selectedSources.contains(s)).toList();
+
+                for (var sourceName in sourcesToAdd) {
+                   var source = SourceService.instance.items.firstWhere((s) => s.name == sourceName);
+                   if (source != null) {
+                   var mus = MediaUserSource(
+                      mediaId: mt.getMediaId(),
+                      userId: UserSystem.instance.getCurrentUserId(),
+                      sourceId: source.id,
+                    );
+                    await MediaUserSourceService.instance.create(mus);
+                  }
+                }
+
+                for (var sourceName in sourcesToRemove) {
+                  var source = SourceService.instance.items.firstWhere((s) => s.name == sourceName);
+                  if (source != null) {
+                    await MediaUserSourceService.instance.delete([mt.getMediaId(), source.id]);
+                  }
+                }
+
+              },
+              child: Text("Save Sources"),
+            ),
+          ],
           );
         },
       );

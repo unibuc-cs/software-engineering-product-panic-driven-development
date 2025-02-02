@@ -16,17 +16,81 @@ RouterPlus authRouter() {
     final user = await getUser(req);
      if (user != null) {
       //print("User Data: ${user.toJson()}");
-      print(user.createdAt);
+      //print(user.createdAt);
         return {
         'id': user.id,
         'name': user.userMetadata?['name'],
         'email': user.email,
         'lastSignIn': user.lastSignInAt, 
         'createdAt': user.createdAt, 
+        'photoUrl': user.userMetadata?['photoUrl'],
       };
      }
      return {'error': 'User not found'};
   });
+
+  router.get('/users/<userId>', (Request req, String userId) async {
+    final user = await getUser(req);  
+    final response = await supabase.auth.admin.getUserById(userId);
+    final userData = response.user;
+
+    if (userData != null) {
+      //print(userData);
+      return {
+        'id': userData.id,
+        'name': userData.userMetadata?['name'],
+        'photoUrl': userData.userMetadata?['photoUrl'],
+        'email': userData.email,
+        'lastSignIn': userData.lastSignInAt,
+        'createdAt': userData.createdAt,
+      };
+    }
+    return {'error': 'User not found'};
+  });
+
+  router.get('/users', (Request req) async {
+    final response = await supabase.auth.admin.listUsers();
+
+    final users = response.map((user) => { 
+      'id': user.id,
+      'name': user.userMetadata?['name'] ?? 'Unknown',
+      'email': user.email,
+    }).toList();
+
+    return users;
+  });
+
+  router.post('/updateUser', (Request req) async {
+    final body = await req.body.asJson;
+    validateFromBody(body, fields: ['name', 'photoUrl']);
+
+    final user = await getUser(req);
+    if (user == null) {
+      return {'error': 'User not found'};
+    }
+
+    try {
+      final response = await supabase.auth.admin.updateUserById(
+        user.id,
+        attributes: AdminUserAttributes(
+          userMetadata: {
+            'name': body['name'],
+            'photoUrl': body['photoUrl'],
+          },
+        ),
+      );
+
+      final updatedUser = response.user;
+      return {
+        'id': updatedUser?.id,
+        'name': updatedUser?.userMetadata?['name'],
+        'photoUrl': updatedUser?.userMetadata?['photoUrl'],
+      };
+    } catch (e) {
+      return {'error': 'Failed to update metadata: $e'};
+    }
+  });
+
 
   router.post('/login', (Request req) async {
     final body = await req.body.asJson;
@@ -54,6 +118,7 @@ RouterPlus authRouter() {
         'password',
         'name',
         'isGuest',
+        'photoUrl',
       ]
     );
 
@@ -62,7 +127,7 @@ RouterPlus authRouter() {
     final response = await supabase.auth.admin.createUser(AdminUserAttributes(
       email: body['email'],
       password: body['password'],
-      userMetadata: {'name': body['name'], 'isGuest': body['isGuest']},
+      userMetadata: {'name': body['name'], 'isGuest': body['isGuest'], 'photoUrl': body['photoUrl']},
       emailConfirm: true,
     ));
     final User? user = response.user;

@@ -19,11 +19,13 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       throw Exception('The passwords don\'t match.');
     }
 
+    const String defaultPhotoUrl = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
     try {
       await AuthService.instance.signup(
         name    : body['name']!,
         email   : body['email']!,
         password: body['password']!,
+        photoUrl: defaultPhotoUrl,
       );
     }
     catch (e) {

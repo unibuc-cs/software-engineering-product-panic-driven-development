@@ -1,5 +1,7 @@
 import 'general/config.dart';
 import 'general/request.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AuthService {
   final String endpoint = '/auth';
@@ -15,6 +17,42 @@ class AuthService {
       endpoint: '$endpoint/details',
       fromJson: (_) => _,
     );
+  }
+
+  Future<List<Map<String, dynamic>>> getAllUsers() async {
+    final response = await getRequest<List<dynamic>>(
+      endpoint: '$endpoint/users',
+      fromJson: (json) => json as List<dynamic>,
+    );
+
+    return response.map((user) => Map<String, dynamic>.from(user)).toList();
+  }
+
+  Future<Map<String, dynamic>> getUserById(String userId) async {
+    final response = await getRequest<Map<String, dynamic>>(
+      endpoint: '$endpoint/users/$userId', 
+      fromJson: (json) => Map<String, dynamic>.from(json),
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> updateUserProfile(String name, String photoUrl) async {
+    final response = await postRequest<Map<String, dynamic>>(
+      endpoint: '$endpoint/updateUser',  
+      body: {
+        'name': name,
+        'photoUrl': photoUrl,
+      },
+      fromJson: (json) => Map<String, dynamic>.from(json),
+    );
+
+    if (response != null) {
+      print('User profile updated successfully');
+      return response;  
+    } else {
+      print('Failed to update user profile');
+      throw Exception('Failed to update profile');
+    }
   }
 
   Future<void> login({
@@ -36,6 +74,7 @@ class AuthService {
     required String email,
     required String password,
     bool isGuest = false,
+    String? photoUrl,
   }) {
     return postRequest<Map<String, dynamic>>(
       endpoint: '$endpoint/signup',
@@ -44,6 +83,7 @@ class AuthService {
         'password': password,
         'name': name,
         'isGuest': isGuest,
+        'photoUrl': photoUrl,
       },
       fromJson: (json) => json,
     );

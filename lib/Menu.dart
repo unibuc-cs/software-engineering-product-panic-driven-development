@@ -11,6 +11,7 @@ import 'Models/tv_series.dart';
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'ProfilePage.dart'; 
+import 'UserListPage.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -95,6 +96,7 @@ class MenuState extends State<Menu> {
 
   @override
   Widget build(BuildContext context) {
+    String userIdToNavigate = UserSystem.instance.getCurrentUserId();
     MenuMediaType currentRendering = MenuMediaType.Game;
     Map<MenuMediaType, bool> hoverState = {
       for (var type in MenuMediaType.values) type: false
@@ -113,14 +115,25 @@ class MenuState extends State<Menu> {
             icon: const Icon(Icons.dark_mode),
             tooltip: 'Toggle dark mode',
           ),
-          IconButton(
+          TextButton(
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => ProfilePage()),
+                MaterialPageRoute(builder: (context) => UserListPage()),
               );
             },
-            icon: const Icon(Icons.account_circle),
-            tooltip: 'Go to Profile',
+            style: navigationButton(context).filledButtonTheme.style,
+            child: Text('See Users'),
+          ),
+           TextButton(
+             onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => ProfilePage(userId: UserSystem.instance.getCurrentUserId())),
+              );
+            },
+            style: navigationButton(context)
+              .filledButtonTheme
+              .style,
+            child: Text(UserSystem.instance.currentUserData!['name']),
           ),
           IconButton(
             onPressed: () async {
