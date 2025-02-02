@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mediamaster/Widgets/themes.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:collection/collection.dart';
-import 'Services/media_user_service.dart';
-import 'Services/media_service.dart';
 import 'Services/user_service.dart';
 import 'UserSystem.dart';
 import 'Main.dart';
@@ -65,6 +62,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String _pluralize(String word, int count) {
+    if (word == 'anime') {
+      return 'anime';
+    }
     word = word.replaceAll('_', ' ');
     if (count == 1) return word;
     if (word.endsWith('s')) return word;
@@ -94,19 +94,11 @@ class _ProfilePageState extends State<ProfilePage> {
     return DateFormat('dd MMM yyyy').format(date);
   }
 
-  Map<String, int> getUserMediaCounts(String currentUserId) {
-    var userMedia = MediaUserService
+  Future<Map<String, dynamic>> getUserMediaCounts(String currentUserId) async {
+    return (await UserService
       .instance
-      .items
-      .where((mu) => mu.userId == currentUserId);
-    var mediaMap = Map.fromEntries(MediaService
-      .instance
-      .items
-      .map((media) => MapEntry(media.id, media.mediaType))
-    );
-    var groupedMedia = groupBy(userMedia, (mu) => mediaMap[mu.mediaId] ?? 'Unknown');
-
-    return groupedMedia.map((key, value) => MapEntry(key, value.length));
+      .read(currentUserId)
+    )['details'];
   }
 
   @override
@@ -122,24 +114,6 @@ class _ProfilePageState extends State<ProfilePage> {
           child: CircularProgressIndicator(),
         ),
       );
-    }
-
-    Map<String, int> userMediaCounts = getUserMediaCounts(currentUserId);
-
-    String mediaCountsText;
-
-    if (visitedUserId == currentUserId) {
-      mediaCountsText = userMediaCounts.isEmpty
-        ? "You don't have items in the library"
-        : userMediaCounts.entries
-          .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
-          .join('\n');
-    } else {
-      mediaCountsText = userMediaCounts.isEmpty
-        ? "This user doesn't have items in the library"
-        : userMediaCounts.entries
-          .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
-          .join('\n');
     }
 
     return Scaffold(
@@ -298,7 +272,15 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 _infoCard(context, 'Last Login', formatLastLogin(lastSignInRaw),
                           'Member Since', formatMemberSince(memberSinceRaw)),
-                _infoCard(context, 'Library', mediaCountsText, '', ''),
+                FutureBuilder(
+                  future: getUserMediaCounts(visitedUserId),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return _infoCard(context, 'Library', mediaCountsText(snapshot), '', '');
+                    }
+                    return _infoCard(context, 'Library', 'loading', '', '');
+                  },
+                ),
               ],
             ),
           ],
@@ -384,5 +366,23 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
+  }
+  
+  String mediaCountsText(AsyncSnapshot<Map<String, dynamic>> snapshot) {
+    if (snapshot.data != null) {
+      if (visitedUserId == currentUserId) {
+        return snapshot.requireData.isEmpty
+          ? "You don't have items in the library"
+          : snapshot.data!.entries
+            .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
+            .join('\n');
+      }
+      return  snapshot.requireData.isEmpty
+        ? "This user doesn't have items in the library"
+        : snapshot.data!.entries
+          .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
+          .join('\n');
+    }
+    return 'loading';
   }
 }

@@ -42,6 +42,9 @@ RouterPlus authRouter() {
         password: body['password']
       )
     ).user;
+    SupabaseManager.resetClient();
+    supabase = SupabaseManager.client;
+
     return sendOk({ 'token': getToken(user?.id) });
   });
 

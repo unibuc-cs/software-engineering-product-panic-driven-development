@@ -1,4 +1,3 @@
-import 'general/config.dart';
 import 'general/request.dart';
 
 class UserService {
