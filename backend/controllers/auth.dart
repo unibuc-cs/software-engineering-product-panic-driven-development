@@ -29,8 +29,7 @@ RouterPlus authRouter() {
      return {'error': 'User not found'};
   });
 
-  router.get('/users/<userId>', (Request req, String userId) async {
-    final user = await getUser(req);  
+  router.get('/users/<userId>', (Request req, String userId) async {  
     final response = await supabase.auth.admin.getUserById(userId);
     final userData = response.user;
 

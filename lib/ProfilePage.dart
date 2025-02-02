@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:mediamaster/Widgets/themes.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:collection/collection.dart';
-import 'Services/wishlist_service.dart';
 import 'Services/media_user_service.dart';
 import 'Services/media_service.dart';
 import 'Services/auth_service.dart';
@@ -27,10 +26,13 @@ class _ProfilePageState extends State<ProfilePage> {
   late String email;
   late String lastSignInRaw;
   late String memberSinceRaw;
-  late String photoUrl = "";
+  late String photoUrl = '';
   bool _isLoading = true;
   String _profileImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
   var currentUserId = UserSystem.instance.getCurrentUserId();
+
+  bool _isEditing = false; 
+  TextEditingController _nameController = TextEditingController();
 
   @override
   void initState() {
@@ -50,11 +52,12 @@ class _ProfilePageState extends State<ProfilePage> {
         lastSignInRaw = visitedUser['lastSignIn'] ?? '';
         memberSinceRaw = visitedUser['createdAt'] ?? '';
         photoUrl = visitedUser['photoUrl'] ?? _profileImageUrl;
+        _nameController.text = name; 
         _isLoading = false;
       });
     } catch (e) {
       print('Error fetching user data: $e');
-       setState(() {
+      setState(() {
         _isLoading = false; 
       });
     }
@@ -62,26 +65,22 @@ class _ProfilePageState extends State<ProfilePage> {
   
   String _pluralize(String word, int count) {
     word = word.replaceAll('_', ' '); 
-
-      if (count == 1) return word; 
-
-      if (word.endsWith('s')) return word; 
-
-      if (word.endsWith('y')) {
-        return word.substring(0, word.length - 1) + 'ies'; 
-      }
-      if (word.endsWith('s') || word.endsWith('x') || word.endsWith('z') || 
-          word.endsWith('sh') || word.endsWith('ch')) {
-        return word + 'es'; 
-      }
-
+    if (count == 1) return word; 
+    if (word.endsWith('s')) return word; 
+    if (word.endsWith('y')) {
+      return word.substring(0, word.length - 1) + 'ies'; 
+    }
+    if (word.endsWith('s') || word.endsWith('x') || word.endsWith('z') || 
+        word.endsWith('sh') || word.endsWith('ch')) {
+      return word + 'es'; 
+    }
     return word + 's'; 
   }
 
   String formatLastLogin(String dateString) {
     if (dateString.isEmpty) return 'Unknown';
-    DateTime date = DateTime.parse(dateString);
-    return DateFormat('dd MMM yyyy HH:mm').format(date); 
+    DateTime date = DateTime.parse(dateString).toLocal(); 
+    return DateFormat('dd MMM yyyy HH:mm').format(date);
   }
 
   String formatMemberSince(String dateString) {
@@ -95,9 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
         .instance
         .items
         .where((mu) => mu.userId == currentUserId);
-
     var mediaMap = {for (var media in MediaService.instance.items) media.id: media.mediaType};
-
     var groupedMedia = groupBy(userMedia, (mu) => mediaMap[mu.mediaId] ?? 'Unknown');
 
     return groupedMedia.map((key, value) => MapEntry(key, value.length));
@@ -126,14 +123,14 @@ class _ProfilePageState extends State<ProfilePage> {
       mediaCountsText = userMediaCounts.isEmpty
           ? "You don't have items in the library"
           : userMediaCounts.entries
-              .map((entry) => "• ${entry.value} ${_pluralize(entry.key, entry.value)}")
-              .join("\n");
+              .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
+              .join('\n');
     } else {
       mediaCountsText = userMediaCounts.isEmpty
           ? "This user doesn't have items in the library"
           : userMediaCounts.entries
-              .map((entry) => "• ${entry.value} ${_pluralize(entry.key, entry.value)}")
-              .join("\n");
+              .map((entry) => '• ${entry.value} ${_pluralize(entry.key, entry.value)}')
+              .join('\n');
     }
 
     return Scaffold(
@@ -172,7 +169,7 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: const Icon(Icons.account_circle), 
             tooltip: 'My Profile', 
             ),
-           TextButton(
+          TextButton(
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => UserListPage()),
@@ -211,30 +208,85 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              name == 'Guest' ? 'This account is a guest' : name,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,  
-              ),
+            if (name == 'Guest') 
+              Text(
+                'This account is a guest',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,  
+                ),
             ),
-            if (name != 'Guest') ...[
+            if (name != 'Guest' && currentUserId != visitedUserId)
+              Text(
+                name,  
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white, 
+                  fontWeight: FontWeight.bold, 
+                ),
+              ),
+            if (name != 'Guest' && currentUserId == visitedUserId) 
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (!_isEditing)
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  else
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.07, 
+                      child: TextField(
+                        controller: _nameController,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        onChanged: (newText) {
+                          setState(() {
+                            name = newText; 
+                          });
+                        },
+                      ),
+                    ),
+                  IconButton(
+                    icon: Icon(_isEditing ? Icons.save : Icons.edit, color: Colors.white),
+                    onPressed: () {
+                      setState(() {
+                        _isEditing = !_isEditing; 
+                        if (!_isEditing) {
+                          name = _nameController.text; 
+                          AuthService.instance.updateUserProfile(name, photoUrl); 
+                        }
+                      });
+                    },
+                  ),
+                ],
+              ),
+            if (name != 'Guest')
               Text(
                 email,  
                 style: const TextStyle(
                   fontSize: 16,
-                  color: Colors.white,  
+                  color: Colors.white, 
+                  fontWeight: FontWeight.bold, 
                 ),
               ),
-            ],
+            
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _infoCard(context, 'Last Login', formatLastLogin(lastSignInRaw), 
                           'Member Since', formatMemberSince(memberSinceRaw)),
-                _infoCard(context, 'Library', mediaCountsText, "", ""),
+                _infoCard(context, 'Library', mediaCountsText, '', ''),
               ],
             ),
           ],
@@ -243,53 +295,53 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-    void _showImageSelectionDialog() {
-      List<String> imageUrls = List.generate(
-        10, (index) => 'https://picsum.photos/200/200?random=${index + 1}'
-      );
+  void _showImageSelectionDialog() {
+    List<String> imageUrls = List.generate(
+      40, (index) => 'https://picsum.photos/200/200?random=${index + 1}'
+    );
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Choose Profile Picture', style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.black, 
-            content: SingleChildScrollView(
-              child: Wrap(
-                spacing: 8.0,
-                children: imageUrls.map((imageUrl) {
-                  return GestureDetector(
-                    onTap: () async { 
-                      setState(() {
-                        photoUrl = imageUrl; 
-                      });
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Choose Profile Picture', style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.black, 
+          content: SingleChildScrollView(
+            child: Wrap(
+              spacing: 8.0,
+              children: imageUrls.map((imageUrl) {
+                return GestureDetector(
+                  onTap: () async { 
+                    setState(() {
+                      photoUrl = imageUrl; 
+                    });
 
-                      try {
-                        await AuthService.instance.updateUserProfile(name, imageUrl); 
-                        Navigator.of(context).pop(); 
-                      } catch (error) {
-                        print("Error updating profile: $error");
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Failed to update profile image"))
-                        );
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundImage: NetworkImage(imageUrl),
-                        backgroundColor: Colors.grey,
-                      ),
+                    try {
+                      await AuthService.instance.updateUserProfile(name, imageUrl); 
+                      Navigator.of(context).pop(); 
+                    } catch (error) {
+                      print('Error updating profile: $error');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to update profile image'))
+                      );
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: NetworkImage(imageUrl),
+                      backgroundColor: Colors.grey,
                     ),
-                  );
-                }).toList(),
-              ),
+                  ),
+                );
+              }).toList(),
             ),
-          );
-        },
-      );
-    }
+          ),
+        );
+      },
+    );
+  }
 
   Widget _infoCard(BuildContext context, String title1, String value1, String title2, String value2) {
     return Container(
@@ -315,5 +367,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
 }

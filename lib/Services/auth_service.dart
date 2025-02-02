@@ -1,7 +1,5 @@
 import 'general/config.dart';
 import 'general/request.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class AuthService {
   final String endpoint = '/auth';
@@ -46,13 +44,8 @@ class AuthService {
       fromJson: (json) => Map<String, dynamic>.from(json),
     );
 
-    if (response != null) {
-      print('User profile updated successfully');
+    print('User profile updated successfully');
       return response;  
-    } else {
-      print('Failed to update user profile');
-      throw Exception('Failed to update profile');
-    }
   }
 
   Future<void> login({

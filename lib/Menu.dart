@@ -96,7 +96,6 @@ class MenuState extends State<Menu> {
 
   @override
   Widget build(BuildContext context) {
-    String userIdToNavigate = UserSystem.instance.getCurrentUserId();
     MenuMediaType currentRendering = MenuMediaType.Game;
     Map<MenuMediaType, bool> hoverState = {
       for (var type in MenuMediaType.values) type: false
@@ -124,17 +123,17 @@ class MenuState extends State<Menu> {
             style: navigationButton(context).filledButtonTheme.style,
             child: Text('See Users'),
           ),
-           TextButton(
-             onPressed: () {
+           IconButton(
+            onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => ProfilePage(userId: UserSystem.instance.getCurrentUserId())),
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(userId: UserSystem.instance.getCurrentUserId()), 
+                ),
               );
             },
-            style: navigationButton(context)
-              .filledButtonTheme
-              .style,
-            child: Text(UserSystem.instance.currentUserData!['name']),
-          ),
+            icon: const Icon(Icons.account_circle), 
+            tooltip: 'My Profile', 
+            ),
           IconButton(
             onPressed: () async {
               UserSystem.instance.logout();

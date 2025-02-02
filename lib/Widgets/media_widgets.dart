@@ -156,7 +156,7 @@ Widget getSourcesWidget(Media media) {
   List<String> sourceNames = [];
   for (var id in sourceIds) {
     var source = allSources.firstWhere((s) => s.id == id);
-    sourceNames.add(source?.name ?? 'N/A');
+    sourceNames.add(source.name);
   }
 
   if (sourceNames.isEmpty) {
@@ -185,9 +185,7 @@ List<String> getSelectedSources(Media media) {
 
   for (var id in sourceIds) {
     var source = allSources.firstWhere((s) => s.id == id);
-    if (source != null) {
-      sourceNames.add(source.name);
-    }
+    sourceNames.add(source.name);
   }
 
   return sourceNames;
@@ -705,7 +703,7 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                         ),
                       ),
                     ),
-
+                    SizedBox(height: 16), 
                     Text('Edit Sources', style: titleStyle),
                   ...sources.map((source) {
                     return Row(
@@ -717,7 +715,6 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                               if (value == true) {
                                 if (!selectedSources.contains(source)) {
                                   selectedSources.add(source); 
-                                  print(selectedSources);
                                 }
                               } else {
                                 selectedSources.remove(source); 
@@ -729,40 +726,46 @@ Future<void> showSettingsDialog<MT extends MediaType>(MT mt, BuildContext contex
                       ],
                     );
                   }).toList(),
+                  SizedBox(height: 16), 
+
+                  Center( 
+                    child: TextButton(
+                      onPressed: () async {
+                        List<String> existingSources = getSelectedSources(mt.media);
+                        var sourcesToAdd = selectedSources.where((s) => !existingSources.contains(s)).toList();
+                        var sourcesToRemove = existingSources.where((s) => !selectedSources.contains(s)).toList();
+
+                        for (var sourceName in sourcesToAdd) {
+                          var source = SourceService.instance.items.firstWhere((s) => s.name == sourceName);
+                          var mus = MediaUserSource(
+                            mediaId: mt.getMediaId(),
+                            userId: UserSystem.instance.getCurrentUserId(),
+                            sourceId: source.id,
+                          );
+                          await MediaUserSourceService.instance.create(mus);
+                        }
+
+                        for (var sourceName in sourcesToRemove) {
+                          var source = SourceService.instance.items.firstWhere((s) => s.name == sourceName);
+                          await MediaUserSourceService.instance.delete([mt.getMediaId(), source.id]);
+                          
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.white, 
+                        foregroundColor: Colors.black, 
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), 
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10), 
+                        ),
+                      ),
+                      child: Text('Save Sources', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
                   ],
                 ),
               ),
             ),
-            actions: [
-            TextButton(
-              onPressed: () async {
-                List<String> existingSources = getSelectedSources(mt.media);
-                var sourcesToAdd = selectedSources.where((s) => !existingSources.contains(s)).toList();
-                var sourcesToRemove = existingSources.where((s) => !selectedSources.contains(s)).toList();
-
-                for (var sourceName in sourcesToAdd) {
-                   var source = SourceService.instance.items.firstWhere((s) => s.name == sourceName);
-                   if (source != null) {
-                   var mus = MediaUserSource(
-                      mediaId: mt.getMediaId(),
-                      userId: UserSystem.instance.getCurrentUserId(),
-                      sourceId: source.id,
-                    );
-                    await MediaUserSourceService.instance.create(mus);
-                  }
-                }
-
-                for (var sourceName in sourcesToRemove) {
-                  var source = SourceService.instance.items.firstWhere((s) => s.name == sourceName);
-                  if (source != null) {
-                    await MediaUserSourceService.instance.delete([mt.getMediaId(), source.id]);
-                  }
-                }
-
-              },
-              child: Text("Save Sources"),
-            ),
-          ],
           );
         },
       );

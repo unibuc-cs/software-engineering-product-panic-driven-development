@@ -43,6 +43,17 @@ class _UserListPageState extends State<UserListPage> {
           ),
           IconButton(
             onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(userId: UserSystem.instance.getCurrentUserId()), 
+                ),
+              );
+            },
+            icon: const Icon(Icons.account_circle), 
+            tooltip: 'My Profile', 
+          ),
+          IconButton(
+            onPressed: () {
               AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
                   ? AdaptiveTheme.of(context).setDark()
                   : AdaptiveTheme.of(context).setLight();
@@ -104,7 +115,7 @@ class _UserListPageState extends State<UserListPage> {
                             const Padding(
                                 padding: EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                "You",
+                                'You',
                                 style: TextStyle(color: Colors.green),
                                 ),
                             ),
