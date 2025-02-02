@@ -27,13 +27,18 @@ RouterPlus usersRouter() {
       .map((mediaUser) => mediaUser['mediaid'])
       .toList();
 
+    List<dynamic> mediaCount = await Future.wait(
+      ['anime', 'book', 'game', 'manga', 'movie', 'tv_series']
+      .map((mediaType) => getMediaTypeCount(mediaIds, mediaType))
+    );
+
     return {
-      'anime'    : await getMediaTypeCount(mediaIds, 'anime'),
-      'books'    : await getMediaTypeCount(mediaIds, 'book'),
-      'games'    : await getMediaTypeCount(mediaIds, 'game'),
-      'manga'    : await getMediaTypeCount(mediaIds, 'manga'),
-      'movies'   : await getMediaTypeCount(mediaIds, 'movie'),
-      'tv_series': await getMediaTypeCount(mediaIds, 'tv_series'),
+      'anime'    : mediaCount[0],
+      'books'    : mediaCount[1],
+      'games'    : mediaCount[2],
+      'manga'    : mediaCount[3],
+      'movies'   : mediaCount[4],
+      'tv_series': mediaCount[5],
     };
   }
 
