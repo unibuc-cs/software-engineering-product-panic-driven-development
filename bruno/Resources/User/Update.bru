@@ -1,0 +1,22 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{URL}}/usertags/2
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{tokenValid}}
+}
+
+body:json {
+  {
+    "id": 10,
+    "name": "test name"
+  }
+}

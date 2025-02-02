@@ -5,6 +5,7 @@ import 'anime.dart';
 import 'books.dart';
 import 'games.dart';
 import 'links.dart';
+import 'users.dart';
 import 'manga.dart';
 import 'genres.dart';
 import 'medias.dart';
@@ -62,6 +63,7 @@ RouterPlus apiRouter() {
   router.mount('/mediagenres', mediaGenresRouter().call);
   router.mount('/mediaseries', mediaSeriesRouter().call);
   router.mount('/notes', requireAuth(notesRouter().call));
+  router.mount('/users', requireAuth(usersRouter().call));
   router.mount('/mediacreators', mediaCreatorsRouter().call);
   router.mount('/mediaplatforms', mediaPlatformsRouter().call);
   router.mount('/mediaretailers', mediaRetailersRouter().call);

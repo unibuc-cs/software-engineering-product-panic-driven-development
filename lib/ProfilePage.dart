@@ -5,7 +5,7 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:collection/collection.dart';
 import 'Services/media_user_service.dart';
 import 'Services/media_service.dart';
-import 'Services/auth_service.dart';
+import 'Services/user_service.dart';
 import 'UserSystem.dart';
 import 'Main.dart';
 import 'Menu.dart';
@@ -13,14 +13,14 @@ import 'UserListPage.dart';
 
 class ProfilePage extends StatefulWidget {
   final String userId;
-  const ProfilePage({Key? key, required this.userId}) : super(key: key); 
+  const ProfilePage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late String name; 
+  late String name;
   late String visitedUserId;
   late Map<String, dynamic> visitedUser;
   late String email;
@@ -31,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _profileImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
   var currentUserId = UserSystem.instance.getCurrentUserId();
 
-  bool _isEditing = false; 
+  bool _isEditing = false;
   TextEditingController _nameController = TextEditingController();
 
   @override
@@ -43,8 +43,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> fetchUserData() async {
     try {
-      visitedUser = await AuthService.instance.getUserById(visitedUserId);
-      
+      visitedUser = await UserService.instance.read(visitedUserId);
+
       setState(() {
         name = visitedUser['name'] ?? 'Unknown User';
         name = name[0].toUpperCase() + name.substring(1);
@@ -52,37 +52,37 @@ class _ProfilePageState extends State<ProfilePage> {
         lastSignInRaw = visitedUser['lastSignIn'] ?? '';
         memberSinceRaw = visitedUser['createdAt'] ?? '';
         photoUrl = visitedUser['photoUrl'] ?? _profileImageUrl;
-        _nameController.text = name; 
+        _nameController.text = name;
         _isLoading = false;
       });
     }
     catch (e) {
       print('Error fetching user data: $e');
       setState(() {
-        _isLoading = false; 
+        _isLoading = false;
       });
     }
   }
-  
+
   String _pluralize(String word, int count) {
-    word = word.replaceAll('_', ' '); 
-    if (count == 1) return word; 
-    if (word.endsWith('s')) return word; 
+    word = word.replaceAll('_', ' ');
+    if (count == 1) return word;
+    if (word.endsWith('s')) return word;
     if (word.endsWith('y')) {
-      return word.substring(0, word.length - 1) + 'ies'; 
+      return word.substring(0, word.length - 1) + 'ies';
     }
-    if (word.endsWith('s') || word.endsWith('x') || word.endsWith('z') || 
+    if (word.endsWith('s') || word.endsWith('x') || word.endsWith('z') ||
         word.endsWith('sh') || word.endsWith('ch')) {
-      return word + 'es'; 
+      return word + 'es';
     }
-    return word + 's'; 
+    return word + 's';
   }
 
   String formatLastLogin(String dateString) {
     if (dateString.isEmpty) {
       return 'Unknown';
     }
-    DateTime date = DateTime.parse(dateString).toLocal(); 
+    DateTime date = DateTime.parse(dateString).toLocal();
     return DateFormat('dd MMM yyyy HH:mm').format(date);
   }
 
@@ -91,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
       return 'Unknown';
     }
     DateTime date = DateTime.parse(dateString);
-    return DateFormat('dd MMM yyyy').format(date); 
+    return DateFormat('dd MMM yyyy').format(date);
   }
 
   Map<String, int> getUserMediaCounts(String currentUserId) {
@@ -119,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
           foregroundColor: Colors.white,
         ),
         body: const Center(
-          child: CircularProgressIndicator(), 
+          child: CircularProgressIndicator(),
         ),
       );
     }
@@ -166,17 +166,17 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: const Icon(Icons.dark_mode),
             tooltip: 'Toggle dark mode',
           ),
-          if (visitedUserId != currentUserId) 
+          if (visitedUserId != currentUserId)
             IconButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => ProfilePage(userId: currentUserId), 
+                    builder: (context) => ProfilePage(userId: currentUserId),
                   ),
                 );
               },
-              icon: const Icon(Icons.account_circle), 
-              tooltip: 'My Profile', 
+              icon: const Icon(Icons.account_circle),
+              tooltip: 'My Profile',
               ),
           TextButton(
             onPressed: () {
@@ -207,9 +207,9 @@ class _ProfilePageState extends State<ProfilePage> {
             GestureDetector(
               onTap: () {
                 if (visitedUserId == currentUserId) {
-                  _showImageSelectionDialog();  
+                  _showImageSelectionDialog();
                 }
-              }, 
+              },
               child: CircleAvatar(
                 radius: 50,
                 backgroundImage: NetworkImage(photoUrl),
@@ -217,25 +217,25 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 16),
-            if (name == 'Guest') 
+            if (name == 'Guest')
               Text(
                 'This account is a guest',
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,  
+                  color: Colors.white,
                 ),
             ),
             if (name != 'Guest' && currentUserId != visitedUserId)
               Text(
-                name,  
+                name,
                 style: const TextStyle(
                   fontSize: 16,
-                  color: Colors.white, 
-                  fontWeight: FontWeight.bold, 
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            if (name != 'Guest' && currentUserId == visitedUserId) 
+            if (name != 'Guest' && currentUserId == visitedUserId)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -250,7 +250,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   else
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.07, 
+                      width: MediaQuery.of(context).size.width * 0.07,
                       child: TextField(
                         controller: _nameController,
                         style: const TextStyle(
@@ -260,7 +260,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         onChanged: (newText) {
                           setState(() {
-                            name = newText; 
+                            name = newText;
                           });
                         },
                       ),
@@ -271,8 +271,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       setState(() {
                         _isEditing = !_isEditing;
                         if (!_isEditing) {
-                          name = _nameController.text; 
-                          AuthService.instance.updateUserProfile(name, photoUrl); 
+                          name = _nameController.text;
+                          UserService.instance.update({
+                            'name'    : name,
+                            'photoUrl': photoUrl
+                          });
                         }
                       });
                     },
@@ -281,19 +284,19 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             if (name != 'Guest')
               Text(
-                email,  
+                email,
                 style: const TextStyle(
                   fontSize: 16,
-                  color: Colors.white, 
-                  fontWeight: FontWeight.bold, 
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            
+
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _infoCard(context, 'Last Login', formatLastLogin(lastSignInRaw), 
+                _infoCard(context, 'Last Login', formatLastLogin(lastSignInRaw),
                           'Member Since', formatMemberSince(memberSinceRaw)),
                 _infoCard(context, 'Library', mediaCountsText, '', ''),
               ],
@@ -314,20 +317,23 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Choose Profile Picture', style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.black, 
+          backgroundColor: Colors.black,
           content: SingleChildScrollView(
             child: Wrap(
               spacing: 8.0,
               children: imageUrls.map((imageUrl) {
                 return GestureDetector(
-                  onTap: () async { 
+                  onTap: () async {
                     setState(() {
-                      photoUrl = imageUrl; 
+                      photoUrl = imageUrl;
                     });
 
                     try {
-                      await AuthService.instance.updateUserProfile(name, imageUrl); 
-                      Navigator.of(context).pop(); 
+                      await UserService.instance.update({
+                        'name'    : name,
+                        'photoUrl': imageUrl,
+                      });
+                      Navigator.of(context).pop();
                     } catch (error) {
                       print('Error updating profile: $error');
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -356,7 +362,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       width: MediaQuery.of(context).size.width / 2.5,
-      height: 190, 
+      height: 190,
       decoration: BoxDecoration(
         color: Colors.grey[800],
         borderRadius: BorderRadius.circular(8),

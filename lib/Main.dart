@@ -122,7 +122,7 @@ class HomeState extends State<Home> {
                     if (currentGuestStage != guestCreationStage.notStarted) {
                       return;
                     }
-                    
+
                     Navigator
                       .of(context)
                       .push(

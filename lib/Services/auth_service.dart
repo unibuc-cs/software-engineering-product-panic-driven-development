@@ -17,37 +17,6 @@ class AuthService {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getAllUsers() async {
-    final response = await getRequest<List<dynamic>>(
-      endpoint: '$endpoint/users',
-      fromJson: (json) => json as List<dynamic>,
-    );
-
-    return response.map((user) => Map<String, dynamic>.from(user)).toList();
-  }
-
-  Future<Map<String, dynamic>> getUserById(String userId) async {
-    final response = await getRequest<Map<String, dynamic>>(
-      endpoint: '$endpoint/users/$userId', 
-      fromJson: (json) => Map<String, dynamic>.from(json),
-    );
-    return response;
-  }
-
-  Future<Map<String, dynamic>> updateUserProfile(String name, String photoUrl) async {
-    final response = await postRequest<Map<String, dynamic>>(
-      endpoint: '$endpoint/updateUser',  
-      body: {
-        'name': name,
-        'photoUrl': photoUrl,
-      },
-      fromJson: (json) => Map<String, dynamic>.from(json),
-    );
-
-    print('User profile updated successfully');
-      return response;  
-  }
-
   Future<void> login({
     required String email,
     required String password,

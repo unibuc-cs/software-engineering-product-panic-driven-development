@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mediamaster/Widgets/themes.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'Services/auth_service.dart';
+import 'Services/user_service.dart';
 import 'Menu.dart';
 import 'Main.dart';
 import 'UserSystem.dart';
@@ -21,7 +21,7 @@ class _UserListPageState extends State<UserListPage> {
   @override
   void initState() {
     super.initState();
-    _usersFuture = AuthService.instance.getAllUsers();
+    _usersFuture = UserService.instance.readAll();
   }
 
   @override
@@ -45,12 +45,12 @@ class _UserListPageState extends State<UserListPage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => ProfilePage(userId: UserSystem.instance.getCurrentUserId()), 
+                  builder: (context) => ProfilePage(userId: UserSystem.instance.getCurrentUserId()),
                 ),
               );
             },
-            icon: const Icon(Icons.account_circle), 
-            tooltip: 'My Profile', 
+            icon: const Icon(Icons.account_circle),
+            tooltip: 'My Profile',
           ),
           IconButton(
             onPressed: () {
@@ -96,7 +96,7 @@ class _UserListPageState extends State<UserListPage> {
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                     final user = users[index];
-       
+
                     String displayName = user['name'] ?? 'Unknown';
                     bool isCurrentUser = user['id'] == currentUserId;
 
@@ -105,7 +105,7 @@ class _UserListPageState extends State<UserListPage> {
                     color: Colors.grey[800],
                     child: ListTile(
                         title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                             Text(
                             displayName,
@@ -127,17 +127,17 @@ class _UserListPageState extends State<UserListPage> {
                         ),
                         leading: const Icon(Icons.person, color: Colors.white),
                          onTap: () {
-                   
+
                             Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ProfilePage(userId: user['id']), 
+                                builder: (context) => ProfilePage(userId: user['id']),
                             ),
-                            );  
+                            );
                          }
                     ),
                 );
-      
+
                 },
             );
         },

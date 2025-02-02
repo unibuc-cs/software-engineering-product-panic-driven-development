@@ -22,6 +22,7 @@ import 'Models/general/media_type.dart';
 import 'Services/game_service.dart';
 import 'Services/note_service.dart';
 import 'Services/genre_service.dart';
+import 'Services/user_service.dart';
 import 'Services/media_service.dart';
 import 'Services/provider_service.dart';
 import 'Services/user_tag_service.dart';
@@ -34,7 +35,7 @@ import 'Widgets/media_widgets.dart';
 
 import 'Main.dart';
 import 'UserSystem.dart';
-import 'ProfilePage.dart'; 
+import 'ProfilePage.dart';
 import 'Menu.dart';
 import 'UserListPage.dart';
 
@@ -1178,6 +1179,8 @@ class LibraryState<MT extends MediaType> extends State<Library> {
   // Despite its name, this function only connects the User and the MT. Speciffic data is being sent throught the data parameter
   Future<void> addToLibraryOrWishlist(Map<String, dynamic> data, MT mt) async {
     await HydrateWithoutUser();
+
+    print(await UserService.instance.read('ebc4c9ea-e91c-44b9-908e-722d18b600bf'));
 
     final String placeholderImage = 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg';
     String coverImage = placeholderImage, icon = placeholderImage, backgroundImage = placeholderImage;
